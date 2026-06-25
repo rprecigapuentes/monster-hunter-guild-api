@@ -12,6 +12,42 @@ The system will evolve over multiple iterations, requiring the team to design a 
 
 ---
 
+## Getting Started
+
+### Prerequisites
+- Node.js v20 or higher
+
+### Installation and Usage
+
+1. Clone the repository
+```bash
+   git clone https://gitlab.com/josecarlosgvr/monster-hunter-guild.git
+   cd monster-hunter-guild
+```
+
+2. Install dependencies
+```bash
+   npm install
+```
+
+3. Run in development mode
+```bash
+   npm run dev
+```
+
+4. Run compiled app (requires build first)
+```bash
+   npm run build
+   npm start
+```
+
+5. Run tests
+```bash
+    npm test
+```
+
+---
+
 # Sprint 1 Scope
 
 Implement CRUD operations for the following entities:
