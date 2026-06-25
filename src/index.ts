@@ -4,7 +4,7 @@ interface Guild {
     headquarters: string;
 }
 
-function greetGuild(guild: Guild): string {
+export function greetGuild(guild: Guild): string {
     return `Welcome to the ${guild.name}, based in ${guild.headquarters} (${guild.region})!`;
 }
 
