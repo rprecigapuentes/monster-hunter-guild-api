@@ -47,14 +47,14 @@ The pattern with the highest rating will be the most switable for the project:
 
 |Parameter|n_layer|Hexagonal|Microservices|
 |-|:-:|:-:|:-:|
-|**Initial Development Speed**|0|0|0|
-|**Learning Curve**|0|0|0|
-|**Infraestructure Complexity**|0|0|0|
-|**Code Overload**|0|0|0|
-|**Technical Change Tolerance**|0|0|0|
-|**$\sum$ TOTAL:**|**0**|**0**|**0**|
+|**Initial Development Speed**|5|3|2|
+|**Learning Curve**|5|4|2|
+|**Infraestructure Complexity**|4|5|1|
+|**Code Overload**|5|2|3|
+|**Technical Change Tolerance**|1|5|4|
+|**$\sum$ TOTAL:**|_**20**_|**19**|**12**|
 
-The previous table shows that the most suitable architectural pattern for the project is {PATTERN_NAME}.
+The previous table shows that the most suitable architectural pattern for the project is **N layer**.
 ___
 
 
@@ -95,12 +95,12 @@ The ORM with the highest rating will be the most switable for the project:
 
 |Parameter|TypeORM|Prisma|
 |-|:-:|:-:|
-|**Learning Curve**|0|0|
-|**Migration Management**|0|0|
-|**Initial Configuration**|0|0|
-|**Relationship Management**|0|0|
-|**Framework Integration**|0|0|
-|**$\sum$ TOTAL:**|**0**|**0**|
+|**Learning Curve**|3|4|
+|**Migration Management**|3|4|
+|**Initial Configuration**|2|4|
+|**Relationship Management**|3|4|
+|**Framework Integration**|5|3|
+|**$\sum$ TOTAL:**|**16**|_**19**_|
 
-The previous table shows that the most suitable ORM package for the project is {ORM_NAME}.
+The previous table shows that the most suitable ORM package for the project is **Prisma**.
 
