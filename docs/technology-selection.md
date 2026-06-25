@@ -1,13 +1,13 @@
 # Monster Hunter Guild technology selection
 
-This file provides breif information about architectural software patterns and the two most common ORM packages (TypeORM & Prisma). Alongside the given information, there are also two tables comparing these technologies using a set of parameters that allow for a rating to be assigned. The technology with the highest rating will be the most suitable for the project. 
+This file provides brief information about architectural software patterns and the two most common ORM packages (TypeORM & Prisma). Alongside the given information, there are also two tables comparing these technologies using a set of parameters that allow for a rating to be assigned. The technology with the highest rating will be the most suitable for the project. 
 ___
 
 # Architectural Pattern
 This section will compare three architectural patterns: _n_layer, hexagonal and microservices_. To compare these patterns we must investigate them first and then make de comparison.
 
 ## Investigation
-Here is a brief definition of each patter, mentioning its advantages and disadvantages.
+Here is a brief definition of each pattern, mentioning its advantages and disadvantages.
 
 #### 1. *n_layer*
 Organizes the code in sequential layers (Controller -> Service -> Database)
