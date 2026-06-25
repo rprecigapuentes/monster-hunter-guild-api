@@ -2,7 +2,7 @@
   "name": "monster-hunter-guild",
   "version": "1.0.0",
   "description": "The world is plagued by dangerous monsters that threaten villages, cities, and trade routes.",
-  "main": "index.js",
+  "main": "dist/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
