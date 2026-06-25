@@ -10,13 +10,29 @@ This section will compare three architectural patterns: _n_layer, hexagonal and 
 Here is a brief definition of each patter, mentioning its advantages and disadvantages.
 
 #### 1. *n_layer*
-{N_LAYER_DESC}
+Organizes the code in sequential layers (Controller -> Service -> Database)
+
+- Initial Development Speed: Excelent, straight line programming, ideal for a fast MVP.
+- Learning Curve: Minimum, every developer knows it by default.
+- Infraestructure Complexity: Minimum, unique process and server, simple deploy.
+- Code Overload: Low, few files and modifications.
+- Technical Change Tolerance: Low, highly coupled to database and ORM. Changing technology needs severe code rewriting.
 
 #### 2. *microservices*
-{MICROSERVICES_DESC}
+The app is divided into autonomous services, each with its own database, communicating over the network.
+
+- Initial Development Speed: Very slow, forces to solve distributed system problems from day one.
+- Learning Curve: Very high, requires complex data consitency, network and design patterns concepts knowledge.
+- Infraestructure Complexity: Very high, forces to use docker, kubernetes, virtual networks and complex design patterns.
+- Code Overload: High, redundant configuration, DTO contracts and single deploy for each service.
+- Technical Change Tolerance: High, due its isolation, it is easy to change the technology of a service without afecting the others.
 
 #### 3. *hexagonal*
-{HEXAGONAL_DESC}
+- Initial Development Speed: Moderate to slow, demands creating a lot of structure before start with real logic.
+- Learning Curve: Moderate to high, requires high dependency inversion knowledge.
+- Infraestructure Complexity: Minimum, it remains a monolitic deploy process.
+- Code Overload: High, forces structur duplication (entities, ports, adapters and mappers).
+- Technical Change Tolerance: Maximum, tools and database are "details", changing them does not affect the bussines logic.
 
 ## Comparison
 Given a short definition for each pattern, the comparison was made using the following parameters:
@@ -49,10 +65,22 @@ Having selected the most suitable architectural pattern, the next step is the OR
 Here we briefly describe both ORM packages:
 
 #### TypeOrm
-{TYPEORM_DESC}
+CLassic ORM, influenced by *Hibernate*, based in OOP concepts, typescript classes and decorators.
+
+- Learning Curve: Moderate, it requires undertanding design patterns such as Data Mapper  or Active Record and the intensive usage of decorator (`@Entity`, `@Column`). Very familiar with Java or .NET.
+- Migration management: Complex, migrations are generated comparing the code entities with the real database. CLI can be a little bit complex to configure.
+- Initial Configuration: Easy, direct integration through a `DataSource` object. You only define your entity classes and the conection is stablished inmediately.
+- Relationship Management: Moderate, decorators are configured within classes (`@ManyToOne`). It is powerfull, but the typing in complex queries is complex.
+- Framework Integration: Excelent, fits natively into enterprise architecture frameworks (like NestJS or Typescript).
 
 #### Prisma
-{PRISMA_DESC}
+Modern and declarative ORM, based in a unique schema file.
+
+- Learning Curve: Minimun, intuitive syntax (it looks like native JavaScript). The client is generated atomatically, with type safety.
+- Migration Management: Excelent, `prisma migrate dev` reads the schema file, detects changes and generates and applies a SQL file automatically.
+- Initial configuration: Moderate, it requires the CLI instalation, initialize the `schema.prisma`, configure database environment variables and run the generation command.
+- Relationship Mangement: Excelent, defines the relations easy and visually. When making queries, it brings related data through `include` or `select`.
+- Framework Integration: Good, it works well in every Node.js/Typescript environment. However, with highly OOP frameworks it needs to configure a intermediary service to inject it to the client.
 
 ## Comparison
 Here are the parameters used for the ORM package comparison:
