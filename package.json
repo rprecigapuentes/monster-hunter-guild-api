@@ -1,0 +1,25 @@
+{
+  "name": "monster-hunter-guild",
+  "version": "1.0.0",
+  "description": "The world is plagued by dangerous monsters that threaten villages, cities, and trade routes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/josecarlosgvr/monster-hunter-guild.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/josecarlosgvr/monster-hunter-guild/issues"
+  },
+  "homepage": "https://gitlab.com/josecarlosgvr/monster-hunter-guild#readme",
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
