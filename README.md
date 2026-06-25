@@ -30,6 +30,16 @@ The system will evolve over multiple iterations, requiring the team to design a 
    npm install
 ```
 
+3. Generate prisma client
+```bash
+   npx prisma generate
+```
+
+4. Sinchronize local db with schema (using migrations)
+```bash
+   npx prisma migrate dev
+```
+
 3. Run in development mode
 ```bash
    npm run dev
