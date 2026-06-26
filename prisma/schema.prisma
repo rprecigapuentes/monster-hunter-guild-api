@@ -18,3 +18,11 @@ model Guild {
   region String?
   headquarters String?
 }
+
+model Monster {
+  id String @id @default(uuid())
+  name String
+  species String?
+  dangerLevel Int?
+  rewardValue Int?
+}
