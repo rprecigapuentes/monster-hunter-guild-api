@@ -11,3 +11,10 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+model Guild {
+  id String @id @default(uuid())
+  name String
+  region String?
+  headquarters String?
+}
