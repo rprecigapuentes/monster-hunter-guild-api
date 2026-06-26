@@ -1,0 +1,60 @@
+image: node:18
+
+stages:
+  - install
+  - build
+  - lint
+  - format
+  - test
+
+variables:
+  NODE_ENV: test
+
+cache:
+  paths:
+    - node_modules/
+
+install_dependencies:
+  stage: install
+  script:
+    - npm install --no-audit --no-fund
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1h
+
+prisma_generate:
+  stage: generate
+  needs: [install_dependencies]
+  script:
+    - npm run prisma:generate
+
+prisma_migrate:
+  stage: migrate
+  needs: [prisma_generate]
+  script:
+    - npm run prisma:migrate
+
+build:
+  stage: build
+  needs: [install_dependencies]
+  script:
+    - npm run build
+
+lint:
+  stage: lint
+  needs: [install_dependencies]
+  script:
+    - npm run lint
+
+format_check:
+  stage: format
+  needs: [install_dependencies]
+  script:
+    - npm run format:check
+
+test:
+  stage: test
+  needs: [install_dependencies]
+  script:
+    - npm run test:ci --silent
