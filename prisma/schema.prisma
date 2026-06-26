@@ -17,6 +17,8 @@ model Guild {
   name String
   region String?
   headquarters String?
+
+  hunters Hunter[]
 }
 
 model Monster {
@@ -25,4 +27,14 @@ model Monster {
   species String?
   dangerLevel Int?
   rewardValue Int?
+}
+
+model Hunter {
+  id String @id @default(uuid())
+  name String
+  rank Int?
+  experiencePoints Int?
+
+  guildId String
+  guild Guild @relation(fields: [guildId], references: [id])
 }
