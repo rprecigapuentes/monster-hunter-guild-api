@@ -11,3 +11,43 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+model Guild {
+  id String @id @default(uuid())
+  name String
+  region String?
+  headquarters String?
+
+  hunters Hunter[]
+}
+
+model Monster {
+  id String @id @default(uuid())
+  name String
+  species String?
+  dangerLevel Int?
+  rewardValue Int?
+
+  quests      Quest[]
+}
+
+model Hunter {
+  id String @id @default(uuid())
+  name String
+  rank Int?
+  experiencePoints Int?
+
+  guildId String
+  guild Guild @relation(fields: [guildId], references: [id])
+}
+
+model Quest {
+  id String @id @default(uuid())
+  title String
+  location String?
+  reward Int?
+  status String?
+
+  monsterId String
+  monster Monster @relation(fields: [monsterId], references: [id])
+}
