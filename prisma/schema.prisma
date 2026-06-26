@@ -27,6 +27,8 @@ model Monster {
   species String?
   dangerLevel Int?
   rewardValue Int?
+
+  quests      Quest[]
 }
 
 model Hunter {
@@ -37,4 +39,15 @@ model Hunter {
 
   guildId String
   guild Guild @relation(fields: [guildId], references: [id])
+}
+
+model Quest {
+  id String @id @default(uuid())
+  title String
+  location String?
+  reward Int?
+  status String?
+
+  monsterId String
+  monster Monster @relation(fields: [monsterId], references: [id])
 }
