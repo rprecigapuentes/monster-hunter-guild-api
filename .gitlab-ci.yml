@@ -2,6 +2,8 @@ image: node:18
 
 stages:
   - install
+  - generate
+  - migrate
   - build
   - lint
   - format
@@ -37,24 +39,24 @@ prisma_migrate:
 
 build:
   stage: build
-  needs: [install_dependencies]
+  needs: [prisma_migrate]
   script:
     - npm run build
 
 lint:
   stage: lint
-  needs: [install_dependencies]
+  needs: [build]
   script:
     - npm run lint
 
 format_check:
   stage: format
-  needs: [install_dependencies]
+  needs: [build]
   script:
     - npm run format:check
 
 test:
   stage: test
-  needs: [install_dependencies]
+  needs: [build]
   script:
     - npm run test:ci --silent
