@@ -29,9 +29,11 @@ export abstract class PrismaRepository<
     }
   }
   async findById(id: string): Promise<TModel | null> {
-    throw new Error('Method not implemented.');
+    return await this.model.findUnique({
+      where: { id },
+    });
   }
   async findAll(): Promise<TModel[]> {
-    throw new Error('Method not implemented.');
+    return await this.model.findMany();
   }
 }
