@@ -1,0 +1,13 @@
+import { Prisma, Quest } from '../generated/prisma/client';
+import { prisma } from '../lib/prisma';
+import { PrismaRepository } from './interfaces/prisma-repository.abstract';
+
+export class QuestRepository extends PrismaRepository<
+  Quest,
+  Prisma.QuestCreateInput,
+  Prisma.QuestUpdateInput
+> {
+  constructor() {
+    super(prisma.quest);
+  }
+}
