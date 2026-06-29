@@ -1,3 +1,4 @@
+import { Prisma } from '../../generated/prisma/client';
 import { IBasicRepository } from './basic-repository.interface';
 
 export abstract class PrismaRepository<
@@ -11,10 +12,21 @@ export abstract class PrismaRepository<
     return await this.model.create({ data });
   }
   async update(id: string, data: TUpdateInput): Promise<TModel> {
-    throw new Error('Method not implemented.');
+    return await this.model.update({
+      where: { id },
+      data,
+    });
   }
   async delete(id: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    try {
+      const result = await this.model.delete({ where: { id } });
+      return !!result;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') return false;
+      }
+      throw error;
+    }
   }
   async findById(id: string): Promise<TModel | null> {
     throw new Error('Method not implemented.');

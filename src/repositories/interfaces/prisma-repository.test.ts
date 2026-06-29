@@ -1,5 +1,6 @@
 import { PrismaRepository } from './prisma-repository.abstract';
 import { prisma } from '../../lib/prisma';
+import { Prisma } from '../../generated/prisma/client';
 
 jest.mock('../../lib/prisma', () => ({
   prisma: {
@@ -58,8 +59,6 @@ describe('PrismaRepository', () => {
 
       const result = await repository.create(mockInput);
 
-      console.log(result);
-
       expect(mockGuildModel.create).toHaveBeenCalledWith({ data: mockInput });
       expect(result).toEqual(mockResult);
     });
@@ -97,12 +96,20 @@ describe('PrismaRepository', () => {
     });
 
     it('should return false if item not found', async () => {
-      const id = '7';
-      const mockResult = { id: '3', name: 'Drakes', headquarters: 'Abiss Crags', region: 'south' };
+      const id = 'non-existent-id';
+      const prismaError = new Prisma.PrismaClientKnownRequestError(
+        'Record to delete does not exist.',
+        {
+          code: 'P2025',
+          clientVersion: '5.0.0', // <-- dummy
+        }
+      );
 
-      mockGuildModel.delete.mockRejectedValue(new Error('Record to delete does not exist.'));
+      mockGuildModel.delete.mockRejectedValue(prismaError);
 
       const result = await repository.delete(id);
+
+      expect(mockGuildModel.delete).toHaveBeenCalledWith({ where: { id } });
       expect(result).toBe(false);
     });
   });
