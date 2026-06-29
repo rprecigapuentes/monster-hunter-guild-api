@@ -21,15 +21,15 @@ export class Monster {
 
   validate(): void {
     if (!this.name.trim()) {
-      throw new Error("Monster name is required.");
+      throw new Error('Monster name is required.');
     }
 
     if (this.dangerLevel !== null && (this.dangerLevel < 1 || this.dangerLevel > 10)) {
-      throw new Error("Danger level must be between 1 and 10.");
+      throw new Error('Danger level must be between 1 and 10.');
     }
 
     if (this.rewardValue !== null && this.rewardValue < 0) {
-      throw new Error("Reward value must be >= 0.");
+      throw new Error('Reward value must be >= 0.');
     }
   }
 }

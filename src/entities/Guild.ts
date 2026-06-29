@@ -18,7 +18,7 @@ export class Guild {
 
   validate(): void {
     if (!this.name?.trim()) {
-      throw new Error("Guild name is required.");
+      throw new Error('Guild name is required.');
     }
   }
 }
