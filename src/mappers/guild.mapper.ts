@@ -1,5 +1,5 @@
-import type { Guild as PrismaGuild } from "../generated/prisma/client";
-import { Guild } from "../entities/Guild";
+import type { Guild as PrismaGuild } from '../generated/prisma/client';
+import { Guild } from '../entities/Guild';
 
 export function toGuildEntity(data: PrismaGuild): Guild {
   return new Guild({

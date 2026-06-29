@@ -1,5 +1,5 @@
-import type { Quest as PrismaQuest } from "../generated/prisma/client";
-import { Quest } from "../entities/Quest";
+import type { Quest as PrismaQuest } from '../generated/prisma/client';
+import { Quest } from '../entities/Quest';
 
 export function toQuestEntity(data: PrismaQuest): Quest {
   return new Quest({
