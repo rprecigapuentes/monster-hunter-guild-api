@@ -24,11 +24,11 @@ export class Quest {
 
   validate(): void {
     if (!this.title.trim()) {
-      throw new Error("Quest title is required.");
+      throw new Error('Quest title is required.');
     }
 
     if (this.reward !== null && this.reward < 0) {
-      throw new Error("Reward must be >= 0.");
+      throw new Error('Reward must be >= 0.');
     }
   }
 }
