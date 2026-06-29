@@ -4,7 +4,7 @@
   "description": "The world is plagued by dangerous monsters that threaten villages, cities, and trade routes.",
   "main": "dist/index.ts",
   "scripts": {
-    "build": "tsc --build --clean",
+    "build": "tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
     "test": "jest",
