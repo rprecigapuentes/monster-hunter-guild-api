@@ -58,6 +58,8 @@ describe('PrismaRepository', () => {
 
       const result = await repository.create(mockInput);
 
+      console.log(result);
+
       expect(mockGuildModel.create).toHaveBeenCalledWith({ data: mockInput });
       expect(result).toEqual(mockResult);
     });

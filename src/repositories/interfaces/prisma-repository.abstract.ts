@@ -8,7 +8,7 @@ export abstract class PrismaRepository<
   constructor(protected model: any) {}
 
   async create(data: TCreateInput): Promise<TModel> {
-    throw new Error('Method not implemented.');
+    return await this.model.create({ data });
   }
   async update(id: string, data: TUpdateInput): Promise<TModel> {
     throw new Error('Method not implemented.');
