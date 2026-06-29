@@ -64,4 +64,46 @@ describe('PrismaRepository', () => {
       expect(result).toEqual(mockResult);
     });
   });
+
+  describe('update', () => {
+    it('should call prisma.guild.update with given id 1 and correct data', async () => {
+      const id = '1';
+      const mockUpdateData = { name: 'Devs' };
+      const mockResult = { id: '1', name: 'Devs', headquarters: 'Kingshot', region: 'west' };
+
+      mockGuildModel.update.mockResolvedValue(mockResult);
+
+      const result = await repository.update(id, mockUpdateData);
+
+      expect(mockGuildModel.update).toHaveBeenCalledWith({
+        where: { id },
+        data: mockUpdateData,
+      });
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('delete', () => {
+    it('should return true if deleted item', async () => {
+      const id = '3';
+      const mockResult = { id: '3', name: 'Drakes', headquarters: 'Abiss Crags', region: 'south' };
+
+      mockGuildModel.delete.mockResolvedValue(mockResult);
+
+      const result = await repository.delete(id);
+
+      expect(mockGuildModel.delete).toHaveBeenCalledWith({ where: { id } });
+      expect(result).toBe(true);
+    });
+
+    it('should return false if item not found', async () => {
+      const id = '7';
+      const mockResult = { id: '3', name: 'Drakes', headquarters: 'Abiss Crags', region: 'south' };
+
+      mockGuildModel.delete.mockRejectedValue(new Error('Record to delete does not exist.'));
+
+      const result = await repository.delete(id);
+      expect(result).toBe(false);
+    });
+  });
 });
