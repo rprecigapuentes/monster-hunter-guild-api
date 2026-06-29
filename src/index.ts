@@ -20,7 +20,7 @@ console.log(greetGuild(exampleGuild));
 // Check ORM - Database conection
 import { prisma } from './lib/prisma';
 
-async function testDbConection() {
+export async function testDbConection() {
   console.log('Testing db conection...');
 
   await prisma.$queryRaw`SELECT 1`;
@@ -29,12 +29,3 @@ async function testDbConection() {
     `Succesfully connecte to database "${process.env.DATABASE_NAME}" at ${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}`
   );
 }
-
-testDbConection()
-  .catch((error) => {
-    console.log(`Error connecting database ${error}`);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
