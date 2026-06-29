@@ -8,10 +8,10 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'Hello World!'
-  })
-})
+    message: 'Hello World!',
+  });
+});
 
 app.listen(port, () => {
-  console.log(`Express app running on port ${port}`)
+  console.log(`Express app running on port ${port}`);
 });
