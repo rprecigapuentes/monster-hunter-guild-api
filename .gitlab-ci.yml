@@ -1,16 +1,19 @@
 image: node:24
 
-stages:
-  - install
-  - generate
-  - migrate
-  - build
-  - lint
-  - format
-  - test
-
 variables:
   NODE_ENV: test
+  # Configure mysql service (https://hub.docker.com/_/mysql/)
+  MYSQL_DATABASE: monster_hunter_guild
+  MYSQL_ROOT_PASSWORD: root
+  DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/monster_hunter_guild
+
+services:
+  - mysql:latest
+
+stages:
+  - install
+  - build
+  - check
 
 cache:
   paths:
@@ -25,38 +28,36 @@ install_dependencies:
       - node_modules/
     expire_in: 1h
 
-prisma_generate:
-  stage: generate
+prisma:
+  stage: build
   needs: [install_dependencies]
   script:
-    - npm run prisma:generate
-
-prisma_migrate:
-  stage: migrate
-  needs: [prisma_generate]
-  script:
     - npm run prisma:migrate
+    - npm run prisma:generate
+  artifacts:
+    paths:
+    - src/generated
 
 build:
   stage: build
-  needs: [prisma_migrate]
+  needs: [prisma]
   script:
     - npm run build
 
 lint:
-  stage: lint
+  stage: check
   needs: [build]
   script:
     - npm run lint
 
 format_check:
-  stage: format
+  stage: check
   needs: [build]
   script:
     - npm run format:check
 
 test:
-  stage: test
-  needs: [build]
+  stage: check
+  needs: [build,prisma]
   script:
     - npm run test:ci --silent
