@@ -113,4 +113,35 @@ describe('PrismaRepository', () => {
       expect(result).toBe(false);
     });
   });
+
+  describe('findById', () => {
+    it('should return by ID', async () => {
+      const id = '1';
+      const mockResult = { id: '1', name: 'Ravagers', region: 'east', headquarters: 'london' };
+
+      mockGuildModel.findUnique.mockResolvedValue(mockResult);
+
+      const result = await repository.findById(id);
+
+      expect(mockGuildModel.findUnique).toHaveBeenCalledWith({ where: { id } });
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return ALL records of the table', async () => {
+      const mockList = [
+        { id: '1', name: 'Ravagers', region: 'east', headquarters: 'london' },
+        { id: '2', name: 'Devs', region: 'east', headquarters: 'japan' },
+        { id: '3', name: 'Blindeads', region: 'west', headquarters: "old man's risk" },
+      ];
+
+      mockGuildModel.findMany.mockResolvedValue(mockList);
+
+      const result = await repository.findAll();
+
+      expect(mockGuildModel.findMany).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockList);
+    });
+  });
 });
