@@ -1,24 +1,7 @@
-interface Guild {
-  name: string;
-  region: string;
-  headquarters: string;
-}
-
-export function greetGuild(guild: Guild): string {
-  return `Welcome to the ${guild.name}, based in ${guild.headquarters} (${guild.region})!`;
-}
-
-const exampleGuild: Guild = {
-  name: 'Monster Hunter Guild',
-  region: 'Central Continent',
-  headquarters: 'Astera',
-};
-
-console.log('Hello World!');
-console.log(greetGuild(exampleGuild));
-
-// Check ORM - Database conection
+import app from './app/app';
 import { prisma } from './lib/prisma';
+
+const port = process.env.APP_PORT || 3000;
 
 export async function testDbConection() {
   console.log('Testing db conection...');
@@ -30,15 +13,6 @@ export async function testDbConection() {
   );
 }
 
-import express from 'express';
-import guildRoutes from './routes/guild.routes';
-
-const app = express();
-
-app.use(express.json());
-
-app.use('/guilds', guildRoutes);
-
-app.listen(3000, () => {
-  console.log('Server running');
+app.listen(port, () => {
+  console.log(`Express app running on port ${port}`);
 });
