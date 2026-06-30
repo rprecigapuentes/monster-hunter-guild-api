@@ -5,7 +5,7 @@ import { PrismaRepository } from './interfaces/prisma-repository.abstract';
 export class HunterRepository extends PrismaRepository<
   Hunter,
   Prisma.HunterCreateInput,
-  Prisma.HunterUpdateArgs
+  Prisma.HunterUpdateInput
 > {
   constructor() {
     super(prisma.hunter);

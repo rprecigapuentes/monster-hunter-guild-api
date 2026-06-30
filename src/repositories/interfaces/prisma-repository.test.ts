@@ -17,8 +17,8 @@ jest.mock('../../lib/prisma', () => ({
 interface MockModel {
   id: string;
   name: string;
-  region: string;
-  headquarters: string;
+  region: string | null;
+  headquarters: string | null;
 }
 
 interface MockCreateInput {
