@@ -4,7 +4,7 @@ import type { GuildService } from '../services/guild.service';
 import { GuildNotFoundError, GuildValidationError } from '../services/guild.service';
 
 export class GuildController {
-  constructor(private readonly guildService: GuildService) {} // instacia al abstract de service
+  constructor(private readonly guildService: GuildService) {}
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {
