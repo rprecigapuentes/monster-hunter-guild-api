@@ -1,4 +1,4 @@
-import { Monster, Prisma } from '../generated/prisma/client';
+import type { Monster, Prisma } from '../generated/prisma/client';
 import { prisma } from '../lib/prisma';
 import { PrismaRepository } from './interfaces/prisma-repository.abstract';
 
