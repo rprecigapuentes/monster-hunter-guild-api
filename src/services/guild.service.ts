@@ -1,7 +1,3 @@
-//clase abstracta que apunta a basic-repository.interface.ts y que implementa sus metodos, para que las clases que hereden de esta clase abstracta
-//puedan usar los metodos de basic-repository.interface.ts
-
-//investigar buenas prácticas para manejo de errores (middleware)
 import type { Guild, Prisma } from '../generated/prisma/client';
 import type { GuildRepository } from '../repositories/guild.repository';
 
