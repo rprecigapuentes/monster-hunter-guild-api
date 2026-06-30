@@ -1,4 +1,4 @@
-import { Guild, Prisma } from '../generated/prisma/client';
+import type { Guild, Prisma } from '../generated/prisma/client';
 import { prisma } from '../lib/prisma';
 import { PrismaRepository } from './interfaces/prisma-repository.abstract';
 

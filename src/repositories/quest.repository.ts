@@ -1,4 +1,4 @@
-import { Prisma, Quest } from '../generated/prisma/client';
+import type { Prisma, Quest } from '../generated/prisma/client';
 import { prisma } from '../lib/prisma';
 import { PrismaRepository } from './interfaces/prisma-repository.abstract';
 

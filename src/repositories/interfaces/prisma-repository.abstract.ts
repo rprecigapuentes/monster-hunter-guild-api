@@ -1,5 +1,5 @@
 import { Prisma } from '../../generated/prisma/client';
-import { IBasicRepository } from './basic-repository.interface';
+import type { IBasicRepository } from './basic-repository.interface';
 
 export abstract class PrismaRepository<
   TModel,
@@ -20,10 +20,12 @@ export abstract class PrismaRepository<
   async delete(id: string): Promise<boolean> {
     try {
       const result = await this.model.delete({ where: { id } });
-      return !!result;
+      return Boolean(result);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') return false;
+        if (error.code === 'P2025') {
+          return false;
+        }
       }
       throw error;
     }
