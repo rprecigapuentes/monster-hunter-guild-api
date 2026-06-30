@@ -29,3 +29,16 @@ export async function testDbConection() {
     `Succesfully connecte to database "${process.env.DATABASE_NAME}" at ${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}`
   );
 }
+
+import express from 'express';
+import guildRoutes from './routes/guild.routes';
+
+const app = express();
+
+app.use(express.json());
+
+app.use('/guilds', guildRoutes);
+
+app.listen(3000, () => {
+  console.log('Server running');
+});
