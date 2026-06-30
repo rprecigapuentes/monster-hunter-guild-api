@@ -2,13 +2,18 @@ image: node:24
 
 variables:
   NODE_ENV: test
-  # Configure mysql service (https://hub.docker.com/_/mysql/)
   MYSQL_DATABASE: monster_hunter_guild
   MYSQL_ROOT_PASSWORD: root
-  DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/monster_hunter_guild
+  MYSQL_ROOT_HOST: "%"
+  DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+  DATABASE_USER: root
+  DATABASE_PASSWORD: root
+  DATABASE_NAME: monster_hunter_guild
+  DATABASE_HOST: mysql
+  DATABASE_PORT: "3306"
 
 services:
-  - mysql:latest
+  - mysql:8.4
 
 stages:
   - install
@@ -60,4 +65,6 @@ test:
   stage: check
   needs: [build,prisma]
   script:
+    - apt-get update && apt-get install -y default-mysql-client
+    - until mysqladmin ping -h mysql -u root -proot --silent; do echo "Waiting for MySQL..."; sleep 2; done
     - npm run test:ci --silent
