@@ -1,9 +1,20 @@
 import type { Request, Response } from 'express';
+import type { Prisma } from '../generated/prisma/client';
 import type { QuestService } from '../services/quest.service';
-import { QuestNotFoundError } from '../services/quest.service';
+import { QuestNotFoundError, QuestValidationError } from '../services/quest.service';
 
 export class QuestController {
   constructor(private readonly questService: QuestService) {}
+
+  create = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const data: Prisma.QuestUncheckedCreateInput = req.body;
+      const quest = await this.questService.create(data);
+      res.status(201).json(quest);
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
 
   findById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
@@ -26,6 +37,10 @@ export class QuestController {
   private handleError(error: unknown, res: Response): void {
     if (error instanceof QuestNotFoundError) {
       res.status(404).json({ message: error.message });
+      return;
+    }
+    if (error instanceof QuestValidationError) {
+      res.status(400).json({ message: error.message });
       return;
     }
     console.error(error);

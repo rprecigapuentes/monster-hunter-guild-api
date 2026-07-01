@@ -4,7 +4,7 @@ import { PrismaRepository } from './interfaces/prisma-repository.abstract';
 
 export class QuestRepository extends PrismaRepository<
   Quest,
-  Prisma.QuestCreateInput,
+  Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUpdateInput
 > {
   constructor() {
