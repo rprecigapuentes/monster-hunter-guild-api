@@ -3,7 +3,7 @@ import type { Prisma } from '../generated/prisma/client';
 import { MonsterService } from '../services/monster.service';
 import { MonsterNotFoundError, MonsterValidationError } from '../services/monster.service';
 
-export class GuildController {
+export class MonsterController {
   private readonly monsterService: MonsterService;
 
   constructor() {
