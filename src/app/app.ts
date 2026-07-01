@@ -8,7 +8,6 @@ app.use(express.json());
 app.use('/guilds', guildRoutes);
 app.use('/hunters', hunterRoutes);
 
-
 app.get('/', (req, res) => {
   res.json({
     message: 'Hello World!',
