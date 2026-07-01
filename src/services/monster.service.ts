@@ -25,11 +25,14 @@ export class MonsterService {
   async create(data: Prisma.MonsterCreateInput): Promise<Monster> {
     this.validateName(data.name);
     this.validateDangerLevel(data);
+    this.validateRewardValue(data);
     return await this.monsterRepository.create(data);
   }
 
   async update(id: string, data: Prisma.MonsterUpdateInput): Promise<Monster> {
     await this.ensureExists(id);
+    this.validateDangerLevel(data);
+    this.validateRewardValue(data);
     return await this.monsterRepository.update(id, data);
   }
 
@@ -80,7 +83,7 @@ export class MonsterService {
     }
 
     if (typeof rewardValue === 'number') {
-      if (rewardValue >= 0) {
+      if (rewardValue < 0) {
         throw new MonsterValidationError('Monster reward value must be greater or equal to 0');
       }
     } else {
