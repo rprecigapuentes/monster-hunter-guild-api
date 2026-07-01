@@ -15,5 +15,6 @@ router.post('/', questController.create);
 router.get('/', questController.findAll);
 router.get('/:id', questController.findById);
 router.put('/:id', questController.update);
+router.delete('/:id', questController.delete);
 
 export default router;

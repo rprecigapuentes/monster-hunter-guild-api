@@ -40,6 +40,11 @@ export class QuestService {
     return await this.questRepository.update(id, data);
   }
 
+  async delete(id: string): Promise<boolean> {
+    await this.ensureExists(id);
+    return await this.questRepository.delete(id);
+  }
+
   async findById(id: string): Promise<Quest> {
     return await this.ensureExists(id);
   }

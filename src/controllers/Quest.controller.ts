@@ -26,6 +26,15 @@ export class QuestController {
     }
   };
 
+  delete = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    try {
+      await this.questService.delete(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
+
   findById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
       const quest = await this.questService.findById(req.params.id);
