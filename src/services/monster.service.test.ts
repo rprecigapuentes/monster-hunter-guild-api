@@ -1,4 +1,3 @@
-import { MonsterRepository } from '../repositories/monster.repository';
 import { MonsterNotFoundError, MonsterService, MonsterValidationError } from './monster.service';
 
 const mockCreate = jest.fn();
@@ -22,7 +21,6 @@ jest.mock('../repositories/monster.repository', () => {
 
 describe('MonsterService', () => {
   let service: MonsterService;
-  let mockRepository: jest.Mocked<MonsterRepository>;
 
   const mockMonster = {
     id: 'm1',
@@ -71,6 +69,7 @@ describe('MonsterService', () => {
     });
 
     it('should trhow MonsterValidationError if dangerLevel is not a number', async () => {
+      // eslint-disable-next-line
       const inputInvalid = { name: 'Anjanath', dangerLevel: 'high' as any };
 
       await expect(service.create(inputInvalid)).rejects.toThrow(
