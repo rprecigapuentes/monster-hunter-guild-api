@@ -14,5 +14,6 @@ const questController = new QuestController(questService);
 router.post('/', questController.create);
 router.get('/', questController.findAll);
 router.get('/:id', questController.findById);
+router.put('/:id', questController.update);
 
 export default router;

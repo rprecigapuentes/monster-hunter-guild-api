@@ -29,6 +29,17 @@ export class QuestService {
     return await this.questRepository.create(data);
   }
 
+  async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
+    await this.ensureExists(id);
+    if (typeof data.reward === 'number') {
+      this.validateReward(data.reward);
+    }
+    if (typeof data.monsterId === 'string') {
+      await this.ensureMonsterExists(data.monsterId);
+    }
+    return await this.questRepository.update(id, data);
+  }
+
   async findById(id: string): Promise<Quest> {
     return await this.ensureExists(id);
   }

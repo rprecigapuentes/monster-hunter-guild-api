@@ -16,6 +16,16 @@ export class QuestController {
     }
   };
 
+  update = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    try {
+      const data: Prisma.QuestUncheckedUpdateInput = req.body;
+      const quest = await this.questService.update(req.params.id, data);
+      res.status(200).json(quest);
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
+
   findById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
       const quest = await this.questService.findById(req.params.id);
