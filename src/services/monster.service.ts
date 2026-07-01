@@ -1,5 +1,5 @@
 import type { Monster, Prisma } from '../generated/prisma/client';
-import type { MonsterRepository } from '../repositories/monster.repository';
+import { MonsterRepository } from '../repositories/monster.repository';
 
 export class MonsterNotFoundError extends Error {
   constructor(id: string) {
@@ -16,7 +16,11 @@ export class MonsterValidationError extends Error {
 }
 
 export class MonsterService {
-  constructor(private readonly monsterRepository: MonsterRepository) {}
+  private readonly monsterRepository: MonsterRepository;
+
+  constructor() {
+    this.monsterRepository = new MonsterRepository();
+  }
 
   async create(data: Prisma.MonsterCreateInput): Promise<Monster> {
     this.validateName(data.name);
