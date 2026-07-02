@@ -3,11 +3,12 @@ import { QuestController } from '../controllers/Quest.controller';
 import { QuestService } from '../services/quest.service';
 import { QuestRepository } from '../repositories/quest.repository';
 import { MonsterRepository } from '../repositories/monster.repository';
+import { prisma } from '../lib/prisma';
 
 const router = Router();
 
-const questRepository = new QuestRepository();
-const monsterRepository = new MonsterRepository();
+const questRepository = new QuestRepository(prisma.quest);
+const monsterRepository = new MonsterRepository(prisma.monster);
 const questService = new QuestService(questRepository, monsterRepository);
 const questController = new QuestController(questService);
 

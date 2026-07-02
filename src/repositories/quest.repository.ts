@@ -1,13 +1,21 @@
 import type { Prisma, Quest } from '../generated/prisma/client';
-import { prisma } from '../lib/prisma';
-import { PrismaRepository } from './interfaces/prisma-repository.abstract';
+import {
+  type PrismaModelDelegate,
+  PrismaRepository,
+} from './interfaces/prisma-repository.abstract';
 
 export class QuestRepository extends PrismaRepository<
   Quest,
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
-  constructor() {
-    super(prisma.quest);
+  constructor(
+    prismaModel: PrismaModelDelegate<
+      Quest,
+      Prisma.QuestUncheckedCreateInput,
+      Prisma.QuestUncheckedUpdateInput
+    >
+  ) {
+    super(prismaModel);
   }
 }
