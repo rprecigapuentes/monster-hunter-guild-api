@@ -1,7 +1,7 @@
 import { Prisma } from '../../generated/prisma/client';
 import type { IBasicRepository } from './basic-repository.interface';
 
-interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
+export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
   create(args: { data: TCreateInput }): Promise<TModel>;
   update(args: { where: { id: string }; data: TUpdateInput }): Promise<TModel>;
   delete(args: { where: { id: string } }): Promise<unknown>;

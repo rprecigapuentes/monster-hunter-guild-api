@@ -1,14 +1,10 @@
 import type { Request, Response } from 'express';
 import type { Prisma } from '../generated/prisma/client';
-import { MonsterService } from '../services/monster.service';
+import { type MonsterService } from '../services/monster.service';
 import { MonsterNotFoundError, MonsterValidationError } from '../services/monster.service';
 
 export class MonsterController {
-  private readonly monsterService: MonsterService;
-
-  constructor() {
-    this.monsterService = new MonsterService();
-  }
+  constructor(private readonly monsterService: MonsterService) {}
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {

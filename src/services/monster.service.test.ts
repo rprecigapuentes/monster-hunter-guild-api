@@ -1,26 +1,9 @@
+import { type MonsterRepository } from '../repositories/monster.repository';
 import { MonsterNotFoundError, MonsterService, MonsterValidationError } from './monster.service';
-
-const mockCreate = jest.fn();
-const mockUpdate = jest.fn();
-const mockDelete = jest.fn();
-const mockFindById = jest.fn();
-const mockFindAll = jest.fn();
-
-// 2. Pasamos estos mocks definidos a la implementación de la clase mockeada
-jest.mock('../repositories/monster.repository', () => {
-  return {
-    MonsterRepository: jest.fn().mockImplementation(() => ({
-      create: mockCreate,
-      update: mockUpdate,
-      delete: mockDelete,
-      findById: mockFindById,
-      findAll: mockFindAll,
-    })),
-  };
-});
 
 describe('MonsterService', () => {
   let service: MonsterService;
+  let mockRepository: jest.Mocked<MonsterRepository>;
 
   const mockMonster = {
     id: 'm1',
@@ -31,19 +14,25 @@ describe('MonsterService', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockRepository = {
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findById: jest.fn(),
+      findAll: jest.fn(),
+    } as unknown as jest.Mocked<MonsterRepository>;
 
-    service = new MonsterService();
+    service = new MonsterService(mockRepository);
   });
 
   describe('create', () => {
     it('should create a monster when provided data is valid', async () => {
       const input = { name: 'Thanatos', dangerLevel: 5, rewardValue: 1500 };
-      mockCreate.mockResolvedValue(mockMonster);
+      mockRepository.create.mockResolvedValue(mockMonster);
 
       const result = await service.create(input);
 
-      expect(mockCreate).toHaveBeenCalledWith(input);
+      expect(mockRepository.create).toHaveBeenCalledWith(input);
       expect(result).toEqual(mockMonster);
     });
 
@@ -52,7 +41,7 @@ describe('MonsterService', () => {
 
       await expect(service.create(input)).rejects.toThrow(MonsterValidationError);
       await expect(service.create(input)).rejects.toThrow('Monster name is required');
-      expect(mockCreate).not.toHaveBeenCalled();
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
     it('should throw MonsterValidationError if dangerLevel is out of range', async () => {
@@ -65,7 +54,7 @@ describe('MonsterService', () => {
       await expect(service.create(inputHigh)).rejects.toThrow(
         'Monster danger level must be between 1 and 10'
       );
-      expect(mockCreate).not.toHaveBeenCalled();
+      expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
     it('should trhow MonsterValidationError if dangerLevel is not a number', async () => {
@@ -87,11 +76,11 @@ describe('MonsterService', () => {
         species: 'goblin',
       };
 
-      mockCreate.mockResolvedValue(mockResult);
+      mockRepository.create.mockResolvedValue(mockResult);
 
       const result = await service.create(input);
 
-      expect(mockCreate).toHaveBeenCalledWith(input);
+      expect(mockRepository.create).toHaveBeenCalledWith(input);
       expect(result).toEqual(mockResult);
     });
 
@@ -108,46 +97,46 @@ describe('MonsterService', () => {
     const updateData = { name: 'Azure Rathalos' };
 
     it('should update a monster if it exists', async () => {
-      mockFindById.mockResolvedValue(mockMonster);
-      mockUpdate.mockResolvedValue({ ...mockMonster, ...updateData });
+      mockRepository.findById.mockResolvedValue(mockMonster);
+      mockRepository.update.mockResolvedValue({ ...mockMonster, ...updateData });
 
       const result = await service.update('m-1', updateData);
 
-      expect(mockFindById).toHaveBeenCalledWith('m-1');
-      expect(mockUpdate).toHaveBeenCalledWith('m-1', updateData);
+      expect(mockRepository.findById).toHaveBeenCalledWith('m-1');
+      expect(mockRepository.update).toHaveBeenCalledWith('m-1', updateData);
       expect(result.name).toBe('Azure Rathalos');
     });
 
     it('should throw MonsterNotFoundError if monster does not exist', async () => {
-      mockFindById.mockResolvedValue(null);
+      mockRepository.findById.mockResolvedValue(null);
 
       await expect(service.update('invalid-id', updateData)).rejects.toThrow(MonsterNotFoundError);
-      expect(mockUpdate).not.toHaveBeenCalled();
+      expect(mockRepository.update).not.toHaveBeenCalled();
     });
   });
 
   describe('delete', () => {
     it('should delete a monster successfully if it exists', async () => {
-      mockFindById.mockResolvedValue(mockMonster);
-      mockDelete.mockResolvedValue(true);
+      mockRepository.findById.mockResolvedValue(mockMonster);
+      mockRepository.delete.mockResolvedValue(true);
 
       const result = await service.delete('m-1');
 
-      expect(mockDelete).toHaveBeenCalledWith('m-1');
+      expect(mockRepository.delete).toHaveBeenCalledWith('m-1');
       expect(result).toBe(true);
     });
 
     it('should throw MonsterNotFoundError if monster does not exist on delete', async () => {
-      mockFindById.mockResolvedValue(null);
+      mockRepository.findById.mockResolvedValue(null);
 
       await expect(service.delete('invalid-id')).rejects.toThrow(MonsterNotFoundError);
-      expect(mockDelete).not.toHaveBeenCalled();
+      expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
 
   describe('findById', () => {
     it('should return the monster if found', async () => {
-      mockFindById.mockResolvedValue(mockMonster);
+      mockRepository.findById.mockResolvedValue(mockMonster);
 
       const result = await service.findById('m-1');
 
@@ -155,7 +144,7 @@ describe('MonsterService', () => {
     });
 
     it('should throw MonsterNotFoundError if not found', async () => {
-      mockFindById.mockResolvedValue(null);
+      mockRepository.findById.mockResolvedValue(null);
 
       await expect(service.findById('invalid-id')).rejects.toThrow(MonsterNotFoundError);
     });
@@ -164,11 +153,11 @@ describe('MonsterService', () => {
   describe('findAll', () => {
     it('should return an array of monsters', async () => {
       const mockList = [mockMonster];
-      mockFindAll.mockResolvedValue(mockList);
+      mockRepository.findAll.mockResolvedValue(mockList);
 
       const result = await service.findAll();
 
-      expect(mockFindAll).toHaveBeenCalledTimes(1);
+      expect(mockRepository.findAll).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockList);
     });
   });
