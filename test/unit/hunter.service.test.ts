@@ -96,6 +96,7 @@ describe('HunterService', () => {
 
     describe('delete', () => {
         it('should delete an existing hunter', async () => {
+        mockRepository.findById.mockResolvedValue(mockHunter);
         mockRepository.delete.mockResolvedValue(true);
 
         await service.delete('1');
