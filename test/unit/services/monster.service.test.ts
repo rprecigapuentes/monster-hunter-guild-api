@@ -1,5 +1,5 @@
-import { type MonsterRepository } from '../repositories/monster.repository';
-import { MonsterNotFoundError, MonsterService, MonsterValidationError } from './monster.service';
+import { type MonsterRepository } from '../../../src/repositories/monster.repository';
+import { MonsterNotFoundError, MonsterService, MonsterValidationError } from '../../../src/services/monster.service';
 
 describe('MonsterService', () => {
   let service: MonsterService;

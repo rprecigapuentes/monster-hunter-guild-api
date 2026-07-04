@@ -1,12 +1,12 @@
 import request from 'supertest';
 import express, { type Express } from 'express';
-import { QuestController } from '../../src/controllers/quest.controller';
+import { QuestController } from '../../../src/controllers/quest.controller';
 import {
   QuestNotFoundError,
   QuestValidationError,
   type QuestService,
-} from '../../src/services/quest.service';
-import type { Quest } from '../../src/generated/prisma/client';
+} from '../../../src/services/quest.service';
+import type { Quest } from '../../../src/generated/prisma/client';
 
 describe('QuestController', () => {
   let app: Express;

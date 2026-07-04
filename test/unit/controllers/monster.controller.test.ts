@@ -1,13 +1,13 @@
 import request from 'supertest';
 import express, { type Express } from 'express';
-import { MonsterController } from './monster.controller';
+import { MonsterController } from '../../../src/controllers/monster.controller';
 import {
   MonsterNotFoundError,
   type MonsterService,
   MonsterValidationError,
-} from '../services/monster.service';
+} from '../../../src/services/monster.service';
 
-jest.mock('../services/monster.service', () => {
+jest.mock('../../../src/services/monster.service', () => {
   return {
     MonsterNotFoundError: class MonsterNotFoundError extends Error {
       constructor(id: string) {
