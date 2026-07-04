@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { HunterRepository } from '../repositories/hunter.repository';
 import { HunterService } from '../services/hunter.service';
-import { HunterController } from '../controllers/Hunter.controller';
+import { HunterController } from '../controllers/hunter.controller';
 import { prisma } from '../lib/prisma';
 
 const router = Router();

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { GuildController } from '../controllers/Guild.controller';
+import { GuildController } from '../controllers/guild.controller';
 import { GuildService } from '../services/guild.service';
 import { GuildRepository } from '../repositories/guild.repository';
 import { prisma } from '../lib/prisma';

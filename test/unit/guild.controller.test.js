@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const express_1 = __importDefault(require("express"));
-const Guild_controller_1 = require("../../src/controllers/Guild.controller");
+const Guild_controller_1 = require("../../src/controllers/guild.controller");
 const guild_service_1 = require("../../src/services/guild.service");
 describe('GuildController', () => {
     let app;

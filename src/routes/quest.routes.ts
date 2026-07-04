@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { QuestController } from '../controllers/Quest.controller';
+import { QuestController } from '../controllers/quest.controller';
 import { QuestService } from '../services/quest.service';
 import { QuestRepository } from '../repositories/quest.repository';
 import { MonsterRepository } from '../repositories/monster.repository';

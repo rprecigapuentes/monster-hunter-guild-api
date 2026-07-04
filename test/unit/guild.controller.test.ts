@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express, { type Express } from 'express';
-import { GuildController } from '../../src/controllers/Guild.controller';
+import { GuildController } from '../../src/controllers/guild.controller';
 import { GuildNotFoundError, GuildValidationError, type GuildService } from '../../src/services/guild.service';
 import type { Guild } from '../../src/generated/prisma/client';
 

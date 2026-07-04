@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express, { type Express } from 'express';
-import { QuestController } from '../../src/controllers/Quest.controller';
+import { QuestController } from '../../src/controllers/quest.controller';
 import {
   QuestNotFoundError,
   QuestValidationError,
