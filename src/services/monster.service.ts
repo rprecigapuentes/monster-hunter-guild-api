@@ -1,5 +1,6 @@
 import type { Monster, Prisma } from '../generated/prisma/client';
-import { type MonsterRepository } from '../repositories/monster.repository';
+import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
+import { AbstractService } from './service.abstract';
 
 export class MonsterNotFoundError extends Error {
   constructor(id: string) {
@@ -15,34 +16,30 @@ export class MonsterValidationError extends Error {
   }
 }
 
-export class MonsterService {
-  constructor(private readonly monsterRepository: MonsterRepository) {}
+export class MonsterService extends AbstractService<
+  Monster,
+  Prisma.MonsterCreateInput,
+  Prisma.MonsterUpdateInput
+> {
+  constructor(
+    repository: PrismaRepository<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>
+  ) {
+    super(repository);
+  }
 
-  async create(data: Prisma.MonsterCreateInput): Promise<Monster> {
+  protected notFoundError(id: string): Error {
+    return new MonsterNotFoundError(id);
+  }
+
+  protected override async validateCreate(data: Prisma.MonsterCreateInput): Promise<void> {
     this.validateName(data.name);
     this.validateDangerLevel(data);
     this.validateRewardValue(data);
-    return await this.monsterRepository.create(data);
   }
 
-  async update(id: string, data: Prisma.MonsterUpdateInput): Promise<Monster> {
-    await this.ensureExists(id);
+  protected override async validateUpdate(data: Prisma.MonsterCreateInput): Promise<void> {
     this.validateDangerLevel(data);
     this.validateRewardValue(data);
-    return await this.monsterRepository.update(id, data);
-  }
-
-  async delete(id: string): Promise<boolean> {
-    await this.ensureExists(id);
-    return await this.monsterRepository.delete(id);
-  }
-
-  async findById(id: string): Promise<Monster> {
-    return await this.ensureExists(id);
-  }
-
-  async findAll(): Promise<Monster[]> {
-    return await this.monsterRepository.findAll();
   }
 
   private validateName(name: string): void {
@@ -85,13 +82,5 @@ export class MonsterService {
     } else {
       throw new MonsterValidationError('Monster reward value must be a precise number value');
     }
-  }
-
-  private async ensureExists(id: string): Promise<Monster> {
-    const monster = await this.monsterRepository.findById(id);
-    if (!monster) {
-      throw new MonsterNotFoundError(id);
-    }
-    return monster;
   }
 }
