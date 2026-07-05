@@ -22,8 +22,7 @@ export abstract class AbstractService<TModel, TCreateInput, TUpdateInput> {
   }
 
   async findById(id: string): Promise<TModel | null> {
-    await this.ensureExists(id);
-    return await this.repository.findById(id);
+    return await this.ensureExists(id);
   }
 
   async findAll(): Promise<TModel[]> {
