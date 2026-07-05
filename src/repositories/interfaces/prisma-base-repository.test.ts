@@ -33,7 +33,11 @@ interface MockUpdateInput {
   headquarters?: string;
 }
 
-class TestGuildRepository extends PrismaBaseRepository<MockModel, MockCreateInput, MockUpdateInput> {
+class TestGuildRepository extends PrismaBaseRepository<
+  MockModel,
+  MockCreateInput,
+  MockUpdateInput
+> {
   constructor() {
     super(prisma.guild);
   }
