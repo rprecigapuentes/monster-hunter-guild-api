@@ -19,7 +19,7 @@ describe('QuestController', () => {
     title: 'Hunt the Rathalos',
     location: 'Ancient Forest',
     reward: 5000,
-    status: 'OPEN',
+    status: 'PENDING',
     monsterId: 'm1',
   };
 
@@ -58,7 +58,9 @@ describe('QuestController', () => {
     });
 
     it('Should respond with 400 when the service throws QuestValidationError', async () => {
-      mockQuestService.create.mockRejectedValue(new QuestValidationError('Quest title is required'));
+      mockQuestService.create.mockRejectedValue(
+        new QuestValidationError('Quest title is required')
+      );
 
       const response = await request(app).post('/quests').send({ title: '' });
 
@@ -142,7 +144,9 @@ describe('QuestController', () => {
     });
 
     it('Should respond with 400 when the service throws QuestValidationError', async () => {
-      mockQuestService.update.mockRejectedValue(new QuestValidationError('Quest reward must be >= 0'));
+      mockQuestService.update.mockRejectedValue(
+        new QuestValidationError('Quest reward must be >= 0')
+      );
 
       const response = await request(app).put('/quests/1').send({ reward: -1 });
 
