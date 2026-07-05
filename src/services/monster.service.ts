@@ -37,7 +37,7 @@ export class MonsterService extends AbstractService<
     this.validateRewardValue(data);
   }
 
-  protected override async validateUpdate(data: Prisma.MonsterCreateInput): Promise<void> {
+  protected override async validateUpdate(data: Prisma.MonsterUpdateInput): Promise<void> {
     this.validateDangerLevel(data);
     this.validateRewardValue(data);
   }
