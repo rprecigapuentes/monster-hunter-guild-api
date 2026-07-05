@@ -51,8 +51,15 @@ model Quest {
   title String
   location String?
   reward Int?
-  status String?
+  status QuestStatus @default(PENDING)
 
   monsterId String
   monster Monster @relation(fields: [monsterId], references: [id])
+}
+
+enum QuestStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
 }
