@@ -1,7 +1,8 @@
 import type { Response } from 'express';
 import type { Prisma, Quest } from '../generated/prisma/client';
 import { AbstractController } from './base-controller.abstract';
-import { QuestNotFoundError, QuestValidationError, QuestService } from '../services/quest.service';
+import type { QuestService } from '../services/quest.service';
+import { QuestNotFoundError, QuestValidationError } from '../services/quest.service';
 
 export class QuestController extends AbstractController<
   Quest,

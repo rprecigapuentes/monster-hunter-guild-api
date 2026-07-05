@@ -1,11 +1,8 @@
 import type { Response } from 'express';
 import type { Monster, Prisma } from '../generated/prisma/client';
 import { AbstractController } from './base-controller.abstract';
-import {
-  MonsterNotFoundError,
-  MonsterValidationError,
-  MonsterService,
-} from '../services/monster.service';
+import type { MonsterService } from '../services/monster.service';
+import { MonsterNotFoundError, MonsterValidationError } from '../services/monster.service';
 
 export class MonsterController extends AbstractController<
   Monster,
