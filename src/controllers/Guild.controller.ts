@@ -1,10 +1,10 @@
 import type { Response } from 'express';
 import type { Guild, Prisma } from '../generated/prisma/client';
-import { AbstractController } from './base-controller.abstract';
+import { BaseController } from './base-controller.abstract';
 import type { GuildService } from '../services/guild.service';
 import { GuildNotFoundError, GuildValidationError } from '../services/guild.service';
 
-export class GuildController extends AbstractController<
+export class GuildController extends BaseController<
   Guild,
   Prisma.GuildCreateInput,
   Prisma.GuildUpdateInput

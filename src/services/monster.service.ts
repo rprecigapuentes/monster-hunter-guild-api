@@ -1,6 +1,6 @@
 import type { Monster, Prisma } from '../generated/prisma/client';
-import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
-import { AbstractService } from './service.abstract';
+import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import { BaseService } from './base-service.abstract';
 
 export class MonsterNotFoundError extends Error {
   constructor(id: string) {
@@ -16,13 +16,13 @@ export class MonsterValidationError extends Error {
   }
 }
 
-export class MonsterService extends AbstractService<
+export class MonsterService extends BaseService<
   Monster,
   Prisma.MonsterCreateInput,
   Prisma.MonsterUpdateInput
 > {
   constructor(
-    repository: PrismaRepository<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>
+    repository: PrismaBaseRepository<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>
   ) {
     super(repository);
   }

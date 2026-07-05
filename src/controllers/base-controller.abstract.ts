@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import type { AbstractService } from '../services/service.abstract'; //in development process
+import type { BaseService } from '../services/base-service.abstract'; //in development process
 
-export abstract class AbstractController<TModel, TCreateInput, TUpdateInput> {
-  constructor(protected readonly service: AbstractService<TModel, TCreateInput, TUpdateInput>) {}
+export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
+  constructor(protected readonly service: BaseService<TModel, TCreateInput, TUpdateInput>) {}
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {

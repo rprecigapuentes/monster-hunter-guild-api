@@ -1,10 +1,10 @@
 import type { Response } from 'express';
 import type { Hunter, Prisma } from '../generated/prisma/client';
-import { AbstractController } from './base-controller.abstract';
+import { BaseController } from './base-controller.abstract';
 import type { HunterService } from '../services/hunter.service';
 import { HunterNotFoundError, HunterValidationError } from '../services/hunter.service';
 
-export class HunterController extends AbstractController<
+export class HunterController extends BaseController<
   Hunter,
   Prisma.HunterCreateInput,
   Prisma.HunterUpdateInput

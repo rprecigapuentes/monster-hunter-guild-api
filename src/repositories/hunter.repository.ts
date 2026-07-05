@@ -1,10 +1,10 @@
 import type { Hunter, Prisma } from '../generated/prisma/client';
 import {
   type PrismaModelDelegate,
-  PrismaRepository,
-} from './interfaces/prisma-repository.abstract';
+  PrismaBaseRepository,
+} from './interfaces/prisma-base-repository.abstract';
 
-export class HunterRepository extends PrismaRepository<
+export class HunterRepository extends PrismaBaseRepository<
   Hunter,
   Prisma.HunterCreateInput,
   Prisma.HunterUpdateInput

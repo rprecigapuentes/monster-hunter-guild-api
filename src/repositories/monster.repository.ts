@@ -1,10 +1,10 @@
 import type { Monster, Prisma } from '../generated/prisma/client';
 import {
   type PrismaModelDelegate,
-  PrismaRepository,
-} from './interfaces/prisma-repository.abstract';
+  PrismaBaseRepository,
+} from './interfaces/prisma-base-repository.abstract';
 
-export class MonsterRepository extends PrismaRepository<
+export class MonsterRepository extends PrismaBaseRepository<
   Monster,
   Prisma.MonsterCreateInput,
   Prisma.MonsterUpdateInput
