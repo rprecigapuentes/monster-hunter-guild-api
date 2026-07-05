@@ -1,5 +1,6 @@
 import type { Guild, Prisma } from '../generated/prisma/client';
-import type { GuildRepository } from '../repositories/guild.repository';
+import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
+import { AbstractService } from './service.abstract';
 
 export class GuildNotFoundError extends Error {
   constructor(id: string) {
@@ -15,43 +16,28 @@ export class GuildValidationError extends Error {
   }
 }
 
-export class GuildService {
-  constructor(private readonly guildRepository: GuildRepository) {}
+export class GuildService extends AbstractService<
+  Guild,
+  Prisma.GuildCreateInput,
+  Prisma.GuildUpdateInput
+> {
+  constructor(
+    repository: PrismaRepository<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>
+  ) {
+    super(repository);
+  }
 
-  async create(data: Prisma.GuildCreateInput): Promise<Guild> {
+  protected notFoundError(id: string): Error {
+    return new GuildNotFoundError(id);
+  }
+
+  protected override async validateCreate(data: Prisma.GuildCreateInput): Promise<void> {
     this.validateName(data.name);
-    return await this.guildRepository.create(data);
-  }
-
-  async update(id: string, data: Prisma.GuildUpdateInput): Promise<Guild> {
-    await this.ensureExists(id);
-    return await this.guildRepository.update(id, data);
-  }
-
-  async delete(id: string): Promise<boolean> {
-    await this.ensureExists(id);
-    return await this.guildRepository.delete(id);
-  }
-
-  async findById(id: string): Promise<Guild> {
-    return await this.ensureExists(id);
-  }
-
-  async findAll(): Promise<Guild[]> {
-    return await this.guildRepository.findAll();
   }
 
   private validateName(name: string): void {
     if (!name || name.trim().length === 0) {
       throw new GuildValidationError('Guild name is required');
     }
-  }
-
-  private async ensureExists(id: string): Promise<Guild> {
-    const guild = await this.guildRepository.findById(id);
-    if (!guild) {
-      throw new GuildNotFoundError(id);
-    }
-    return guild;
   }
 }

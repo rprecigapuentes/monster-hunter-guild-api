@@ -1,6 +1,7 @@
 import type { Prisma, Quest } from '../generated/prisma/client';
-import type { QuestRepository } from '../repositories/quest.repository';
-import type { MonsterRepository } from '../repositories/monster.repository';
+import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
+import type { MonsterService } from './monster.service';
+import { AbstractService } from './service.abstract';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -16,41 +17,39 @@ export class QuestValidationError extends Error {
   }
 }
 
-export class QuestService {
+export class QuestService extends AbstractService<
+  Quest,
+  Prisma.QuestUncheckedCreateInput,
+  Prisma.QuestUncheckedUpdateInput
+> {
   constructor(
-    private readonly questRepository: QuestRepository,
-    private readonly monsterRepository: MonsterRepository
-  ) {}
+    repository: PrismaRepository<
+      Quest,
+      Prisma.QuestUncheckedCreateInput,
+      Prisma.QuestUncheckedUpdateInput
+    >,
+    private readonly monsterService: MonsterService
+  ) {
+    super(repository);
+  }
 
-  async create(data: Prisma.QuestUncheckedCreateInput): Promise<Quest> {
+  protected notFoundError(id: string): Error {
+    return new QuestNotFoundError(id);
+  }
+
+  protected override async validateCreate(data: Prisma.QuestUncheckedCreateInput): Promise<void> {
     this.validateTitle(data.title);
     this.validateReward(data.reward);
     await this.ensureMonsterExists(data.monsterId);
-    return await this.questRepository.create(data);
   }
 
-  async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
-    await this.ensureExists(id);
+  protected override async validateUpdate(data: Prisma.QuestUncheckedUpdateInput): Promise<void> {
     if (typeof data.reward === 'number') {
       this.validateReward(data.reward);
     }
     if (typeof data.monsterId === 'string') {
       await this.ensureMonsterExists(data.monsterId);
     }
-    return await this.questRepository.update(id, data);
-  }
-
-  async delete(id: string): Promise<boolean> {
-    await this.ensureExists(id);
-    return await this.questRepository.delete(id);
-  }
-
-  async findById(id: string): Promise<Quest> {
-    return await this.ensureExists(id);
-  }
-
-  async findAll(): Promise<Quest[]> {
-    return await this.questRepository.findAll();
   }
 
   private validateTitle(title: string): void {
@@ -66,17 +65,10 @@ export class QuestService {
   }
 
   private async ensureMonsterExists(monsterId: string): Promise<void> {
-    const monster = await this.monsterRepository.findById(monsterId);
-    if (!monster) {
+    try {
+      await this.monsterService.ensureExists(monsterId);
+    } catch {
       throw new QuestValidationError(`Monster with id ${monsterId} does not exist`);
     }
-  }
-
-  private async ensureExists(id: string): Promise<Quest> {
-    const quest = await this.questRepository.findById(id);
-    if (!quest) {
-      throw new QuestNotFoundError(id);
-    }
-    return quest;
   }
 }

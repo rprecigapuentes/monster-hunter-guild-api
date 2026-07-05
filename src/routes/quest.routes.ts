@@ -1,15 +1,14 @@
 import { Router } from 'express';
+import { monsterService } from './monster.routes';
 import { QuestController } from '../controllers/quest.controller';
 import { QuestService } from '../services/quest.service';
 import { QuestRepository } from '../repositories/quest.repository';
-import { MonsterRepository } from '../repositories/monster.repository';
 import { prisma } from '../lib/prisma';
 
 const router = Router();
 
 const questRepository = new QuestRepository(prisma.quest);
-const monsterRepository = new MonsterRepository(prisma.monster);
-const questService = new QuestService(questRepository, monsterRepository);
+const questService = new QuestService(questRepository, monsterService);
 const questController = new QuestController(questService);
 
 router.post('/', questController.create);

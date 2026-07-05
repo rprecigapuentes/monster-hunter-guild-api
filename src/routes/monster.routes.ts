@@ -7,7 +7,7 @@ import { prisma } from '../lib/prisma';
 const router = Router();
 
 const monsterRepository = new MonsterRepository(prisma.monster);
-const monsterService = new MonsterService(monsterRepository);
+export const monsterService = new MonsterService(monsterRepository);
 const monsterController = new MonsterController(monsterService);
 
 router.post('/', monsterController.create);

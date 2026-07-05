@@ -138,7 +138,7 @@ describe('HunterController', () => {
 
     describe('DELETE /hunters/:id', () => {
         it('should delete the hunter and respond with 204', async () => {
-        mockHunterService.delete.mockResolvedValue(undefined);
+        mockHunterService.delete.mockResolvedValue(true);
 
         const response = await request(app).delete('/hunters/1');
 
