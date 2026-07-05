@@ -1,49 +1,33 @@
 import type { Hunter, Prisma } from '../generated/prisma/client';
-import type { HunterRepository } from '../repositories/hunter.repository';
+import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
+import { AbstractService } from './service.abstract';
 
 export class HunterNotFoundError extends Error {
   constructor(id: string) {
     super(`Hunter with id ${id} not found`);
+    this.name = `HunterNotFoundError`;
   }
 }
 
 export class HunterValidationError extends Error {
   constructor(message: string) {
     super(message);
+    this.name = `HunterValidationError`;
   }
 }
 
-export class HunterService {
-  constructor(private readonly hunterRepository: HunterRepository) {}
-
-  async create(data: Prisma.HunterCreateInput): Promise<Hunter> {
-    return this.hunterRepository.create(data);
+export class HunterService extends AbstractService<
+  Hunter,
+  Prisma.HunterCreateInput,
+  Prisma.HunterUpdateInput
+> {
+  constructor(
+    repository: PrismaRepository<Hunter, Prisma.HunterCreateInput, Prisma.HunterUpdateInput>
+  ) {
+    super(repository);
   }
 
-  async findById(id: string): Promise<Hunter> {
-    const hunter = await this.hunterRepository.findById(id);
-    if (!hunter) {
-      throw new HunterNotFoundError(id);
-    }
-    return hunter;
-  }
-
-  async findAll(): Promise<Hunter[]> {
-    return this.hunterRepository.findAll();
-  }
-
-  async update(id: string, data: Prisma.HunterUpdateInput): Promise<Hunter> {
-    const hunter = await this.hunterRepository.findById(id);
-    if (!hunter) {
-      throw new HunterNotFoundError(id);
-    }
-    return this.hunterRepository.update(id, data);
-  }
-
-  async delete(id: string): Promise<void> {
-    const deleted = await this.hunterRepository.delete(id);
-    if (!deleted) {
-      throw new HunterNotFoundError(id);
-    }
+  protected notFoundError(id: string): Error {
+    return new HunterNotFoundError(id);
   }
 }
