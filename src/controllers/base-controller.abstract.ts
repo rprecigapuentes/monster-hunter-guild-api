@@ -16,6 +16,7 @@ export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
   update = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
       const entity = await this.service.update(req.params.id, req.body as TUpdateInput);
+
       res.status(200).json(entity);
     } catch (error) {
       this.handleError(error, res);
@@ -25,6 +26,7 @@ export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
   delete = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
       await this.service.delete(req.params.id);
+
       res.status(204).send();
     } catch (error) {
       this.handleError(error, res);
