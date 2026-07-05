@@ -1,4 +1,4 @@
-import type { Prisma, Quest } from '../generated/prisma/client';
+import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
 import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
 import type { MonsterService } from './monster.service';
 import { BaseService } from './base-service.abstract';
@@ -22,6 +22,12 @@ export class QuestService extends BaseService<
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
+  private _validTransitions: Record<QuestStatus, QuestStatus[]> = {
+    PENDING: ['IN_PROGRESS'],
+    IN_PROGRESS: ['COMPLETED', 'FAILED'],
+    COMPLETED: [],
+    FAILED: ['PENDING'],
+  };
   constructor(
     repository: PrismaBaseRepository<
       Quest,
@@ -70,5 +76,31 @@ export class QuestService extends BaseService<
     } catch {
       throw new QuestValidationError(`Monster with id ${monsterId} does not exist`);
     }
+  }
+
+  private validateStatusTransition(currentStatus: QuestStatus, nextStatus: QuestStatus): void {
+    const allowedNextStatuses = this._validTransitions[currentStatus];
+
+    if (!allowedNextStatuses.includes(nextStatus)) {
+      throw new QuestValidationError(
+        `Provided status: ${currentStatus} can not be changed to ${nextStatus}`
+      );
+    }
+  }
+
+  private async changeStatus(id: string, newStatus: QuestStatus): Promise<Quest> {
+    const quest = await this.repository.findById(id);
+
+    if (!quest) {
+      throw new QuestNotFoundError(id);
+    }
+
+    const { status: currentStatus } = quest;
+    this.validateStatusTransition(currentStatus, newStatus);
+
+    return this.repository.update(id, {
+      ...quest,
+      status: newStatus,
+    });
   }
 }
