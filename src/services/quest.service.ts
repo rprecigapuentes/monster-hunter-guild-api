@@ -88,7 +88,7 @@ export class QuestService extends BaseService<
     }
   }
 
-  private async changeStatus(id: string, newStatus: QuestStatus): Promise<Quest> {
+  public async changeStatus(id: string, newStatus: QuestStatus): Promise<Quest> {
     const quest = await this.repository.findById(id);
 
     if (!quest) {

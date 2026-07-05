@@ -177,4 +177,51 @@ describe('QuestService', () => {
       expect(result).toEqual(quests);
     });
   });
+
+  describe('changeStatus', () => {
+    it('should change from PENDING to IN_PROGRESS', async () => {
+      mockQuestRepository.findById.mockResolvedValue({ ...mockQuest });
+      mockQuestRepository.update.mockResolvedValue({ ...mockQuest, status: 'IN_PROGRESS' });
+
+      const result = await service.changeStatus('1', 'IN_PROGRESS');
+
+      expect(result.status).toBe('IN_PROGRESS');
+      expect(mockQuestRepository.update).toHaveBeenCalledWith(
+        '1',
+        expect.objectContaining({
+          status: 'IN_PROGRESS',
+        })
+      );
+    });
+
+    it('should throw QuestValidationError trying an invalid transition (example: PENDING -> COMPLETED)', async () => {
+      mockQuestRepository.findById.mockResolvedValue({ ...mockQuest });
+
+      await expect(service.changeStatus('1', 'COMPLETED')).rejects.toThrow(QuestValidationError);
+
+      await expect(service.changeStatus('1', 'COMPLETED')).rejects.toThrow(
+        'Provided status: PENDING can not be changed to COMPLETED'
+      );
+
+      expect(mockQuestRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw QuestValidationError if trying to change status from COMPLETED', async () => {
+      mockQuestRepository.findById.mockResolvedValue({ ...mockQuest, status: 'COMPLETED' });
+
+      await expect(service.changeStatus('1', 'IN_PROGRESS')).rejects.toThrow(QuestValidationError);
+
+      expect(mockQuestRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should change status from FAILED to PENDING to retry', async () => {
+      mockQuestRepository.findById.mockResolvedValue({ ...mockQuest, status: 'FAILED' });
+      mockQuestRepository.update.mockResolvedValue({ ...mockQuest, status: 'PENDING' });
+
+      const result = await service.changeStatus('1', 'PENDING');
+
+      expect(result.status).toBe('PENDING');
+      expect(mockQuestRepository.update).toHaveBeenCalled();
+    });
+  });
 });
