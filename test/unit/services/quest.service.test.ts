@@ -6,6 +6,7 @@ import {
 import type { QuestRepository } from '../../../src/repositories/quest.repository';
 import type { Monster, Quest } from '../../../src/generated/prisma/client';
 import { MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
+import { QuestUncheckedCreateInput } from '../../src/generated/prisma/models';
 
 describe('QuestService', () => {
   let service: QuestService;
@@ -17,7 +18,7 @@ describe('QuestService', () => {
     title: 'Hunt the Rathalos',
     location: 'Ancient Forest',
     reward: 5000,
-    status: 'OPEN',
+    status: 'PENDING',
     monsterId: 'm1',
   };
 
@@ -46,12 +47,12 @@ describe('QuestService', () => {
   });
 
   describe('Create Quest', () => {
-    const input = {
+    const input: QuestUncheckedCreateInput = {
       title: 'Hunt the Rathalos',
       monsterId: 'm1',
       location: 'Ancient Forest',
       reward: 5000,
-      status: 'OPEN',
+      status: 'PENDING',
     };
 
     it('Should create a new quest when data is valid', async () => {
@@ -66,7 +67,9 @@ describe('QuestService', () => {
     });
 
     it('Should throw validation error when title is empty', async () => {
-      await expect(service.create({ ...input, title: '   ' })).rejects.toThrow(QuestValidationError);
+      await expect(service.create({ ...input, title: '   ' })).rejects.toThrow(
+        QuestValidationError
+      );
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
 
@@ -118,7 +121,9 @@ describe('QuestService', () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockMonsterService.ensureExists.mockRejectedValue(new MonsterNotFoundError('m1'));
 
-      await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(QuestValidationError);
+      await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(
+        QuestValidationError
+      );
       expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
     });
