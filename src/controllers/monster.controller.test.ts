@@ -6,6 +6,8 @@ import {
   type MonsterService,
   MonsterValidationError,
 } from '../services/monster.service';
+import { errorHandler } from '../../src/middlewares/error-handler.middleware';
+import { notFound } from '../../src/middlewares/not-found.middleware';
 
 jest.mock('../services/monster.service', () => {
   return {
@@ -65,6 +67,8 @@ describe('MonsterController', () => {
     app.get('/monsters/:id', monsterController.findById);
     app.put('/monsters/:id', monsterController.update);
     app.delete('/monsters/:id', monsterController.delete);
+    app.use(notFound);
+    app.use(errorHandler);
   });
 
   describe('POST /monsters', () => {

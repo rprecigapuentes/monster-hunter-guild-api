@@ -3,6 +3,9 @@ import express, { type Express } from 'express';
 import { GuildController } from '../../src/controllers/Guild.controller';
 import { GuildNotFoundError, GuildValidationError, type GuildService } from '../../src/services/guild.service';
 import type { Guild } from '../../src/generated/prisma/client';
+import { errorHandler } from '../../src/middlewares/error-handler.middleware';
+import { notFound } from '../../src/middlewares/not-found.middleware';
+
 
 describe('GuildController', () => {
   let app: Express;
@@ -33,6 +36,8 @@ describe('GuildController', () => {
     app.get('/guilds/:id', guildController.findById);
     app.put('/guilds/:id', guildController.update);
     app.delete('/guilds/:id', guildController.delete);
+    app.use(notFound);
+    app.use(errorHandler);
   });
 
   describe('POST /guilds', () => {

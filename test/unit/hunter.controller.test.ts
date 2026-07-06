@@ -3,6 +3,8 @@ import express, { type Express } from 'express';
 import { HunterController } from '../../src/controllers/Hunter.controller';
 import { HunterNotFoundError, HunterValidationError, type HunterService } from '../../src/services/hunter.service';
 import type { Hunter } from '../../src/generated/prisma/client';
+import { errorHandler } from '../../src/middlewares/error-handler.middleware';
+import { notFound } from '../../src/middlewares/not-found.middleware';
 
 describe('HunterController', () => {
     let app: Express;
@@ -34,6 +36,8 @@ describe('HunterController', () => {
         app.get('/hunters/:id', hunterController.findById);
         app.put('/hunters/:id', hunterController.update);
         app.delete('/hunters/:id', hunterController.delete);
+        app.use(notFound);
+        app.use(errorHandler);
     });
 
     describe('POST /hunters', () => {
