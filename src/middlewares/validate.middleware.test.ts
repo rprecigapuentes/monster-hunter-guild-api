@@ -34,8 +34,6 @@ describe('validate', () => {
 
     expect(next).not.toHaveBeenCalled();
     expect(statusMock).toHaveBeenCalledWith(400);
-    expect(jsonMock).toHaveBeenCalledWith(
-      expect.objectContaining({ message: 'Validation error' })
-    );
+    expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ message: 'Validation error' }));
   });
 });
