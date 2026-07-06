@@ -9,6 +9,13 @@ import { notFound } from '../middlewares/not-found.middleware';
 
 const app = express();
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Hello World!',
+  });
+});
+
 app.use('/guilds', guildRoutes);
 app.use('/monsters', monsterRoutes);
 app.use('/hunters', hunterRoutes);
@@ -16,11 +23,5 @@ app.use('/quests', questRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
-
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Hello World!',
-  });
-});
 
 export default app;
