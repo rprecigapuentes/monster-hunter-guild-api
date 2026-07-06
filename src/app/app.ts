@@ -5,6 +5,7 @@ import monsterRoutes from '../routes/monster.routes';
 import hunterRoutes from '../routes/hunter.routes';
 import questRoutes from '../routes/quest.routes';
 import { errorHandler } from '../middlewares/error-handler.middleware';
+import { notFound } from '../middlewares/not-found.middleware';
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use('/monsters', monsterRoutes);
 app.use('/hunters', hunterRoutes);
 app.use('/quests', questRoutes);
 
+app.use(notFound);
 app.use(errorHandler);
 
 app.get('/', (req, res) => {
