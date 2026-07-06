@@ -1,68 +1,54 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import type { Prisma } from '../generated/prisma/client';
 import type { GuildService } from '../services/guild.service';
-import { GuildNotFoundError, GuildValidationError } from '../services/guild.service';
 
 export class GuildController {
   constructor(private readonly guildService: GuildService) {}
 
-  create = async (req: Request, res: Response): Promise<void> => {
+  create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data: Prisma.GuildCreateInput = req.body;
       const guild = await this.guildService.create(data);
       res.status(201).json(guild);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  update = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+  update = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data: Prisma.GuildUpdateInput = req.body;
       const guild = await this.guildService.update(req.params.id, data);
       res.status(200).json(guild);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  delete = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+  delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
       await this.guildService.delete(req.params.id);
       res.status(204).send();
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  findById = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+  findById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const guild = await this.guildService.findById(req.params.id);
       res.status(200).json(guild);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  findAll = async (_req: Request, res: Response): Promise<void> => {
+  findAll = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const guilds = await this.guildService.findAll();
       res.status(200).json(guilds);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
-
-  private handleError(error: unknown, res: Response): void {
-    if (error instanceof GuildNotFoundError) {
-      res.status(404).json({ message: error.message });
-      return;
-    }
-    if (error instanceof GuildValidationError) {
-      res.status(400).json({ message: error.message });
-      return;
-    }
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
 }
