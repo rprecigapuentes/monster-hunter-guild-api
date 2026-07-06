@@ -15,7 +15,11 @@ export class QuestController {
     }
   };
 
-  update = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  update = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const data: Prisma.QuestUncheckedUpdateInput = req.body;
       const quest = await this.questService.update(req.params.id, data);
@@ -25,7 +29,11 @@ export class QuestController {
     }
   };
 
-  delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  delete = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await this.questService.delete(req.params.id);
       res.status(204).send();
@@ -34,7 +42,11 @@ export class QuestController {
     }
   };
 
-  findById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  findById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const quest = await this.questService.findById(req.params.id);
       res.status(200).json(quest);

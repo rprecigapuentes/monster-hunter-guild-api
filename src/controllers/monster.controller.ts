@@ -15,7 +15,11 @@ export class MonsterController {
     }
   };
 
-  update = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  update = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const data: Prisma.MonsterUpdateInput = req.body;
       const monster = await this.monsterService.update(req.params.id, data);
@@ -25,7 +29,11 @@ export class MonsterController {
     }
   };
 
-  delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  delete = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await this.monsterService.delete(req.params.id);
       res.status(204).send();
@@ -34,7 +42,11 @@ export class MonsterController {
     }
   };
 
-  findById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  findById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const monster = await this.monsterService.findById(req.params.id);
       res.status(200).json(monster);

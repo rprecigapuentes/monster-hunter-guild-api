@@ -15,7 +15,11 @@ export class GuildController {
     }
   };
 
-  update = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  update = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const data: Prisma.GuildUpdateInput = req.body;
       const guild = await this.guildService.update(req.params.id, data);
@@ -25,7 +29,11 @@ export class GuildController {
     }
   };
 
-  delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  delete = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await this.guildService.delete(req.params.id);
       res.status(204).send();
@@ -34,7 +42,11 @@ export class GuildController {
     }
   };
 
-  findById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  findById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const guild = await this.guildService.findById(req.params.id);
       res.status(200).json(guild);

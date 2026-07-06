@@ -15,7 +15,11 @@ export class HunterController {
     }
   };
 
-  update = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  update = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const data: Prisma.HunterUpdateInput = req.body;
       const hunter = await this.hunterService.update(req.params.id, data);
@@ -25,7 +29,11 @@ export class HunterController {
     }
   };
 
-  delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  delete = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await this.hunterService.delete(req.params.id);
       res.status(204).send();
@@ -34,7 +42,11 @@ export class HunterController {
     }
   };
 
-  findById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  findById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const hunter = await this.hunterService.findById(req.params.id);
       res.status(200).json(hunter);
