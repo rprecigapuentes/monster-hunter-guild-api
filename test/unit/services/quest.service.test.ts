@@ -5,8 +5,8 @@ import {
 } from '../../../src/services/quest.service';
 import type { QuestRepository } from '../../../src/repositories/quest.repository';
 import type { Monster, Quest, QuestStatus } from '../../../src/generated/prisma/client';
-import { MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
-import { QuestUncheckedCreateInput } from '../../src/generated/prisma/models';
+import { type MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
+import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
 
 describe('QuestService', () => {
   let service: QuestService;
