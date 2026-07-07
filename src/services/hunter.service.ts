@@ -1,7 +1,7 @@
 import type { Hunter, Prisma } from '../generated/prisma/client';
 import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
 import { BaseService } from './base-service.abstract';
-import { IRankCalculator } from './rank-calculator.interface';
+import type { IRankCalculator } from './rank-calculator.interface';
 
 export class HunterNotFoundError extends Error {
   constructor(id: string) {
