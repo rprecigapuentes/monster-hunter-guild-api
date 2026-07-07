@@ -1,7 +1,7 @@
-import { IRankCalculator } from "./rank-calculator.interface";
+import { IRankCalculator, RankThreshold } from "./rank-calculator.interface";
 
 export class RankCalculator implements IRankCalculator{
-    private static readonly RANK_PROGRESS: ReadonlyArray<{rank: number; requiredExperience: number }> = [
+    private static readonly RANK_PROGRESS: ReadonlyArray< RankThreshold> = [
         { rank: 1, requiredExperience: 0},
         { rank: 2, requiredExperience: 500},
         { rank: 3, requiredExperience: 1000},
