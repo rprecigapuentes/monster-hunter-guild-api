@@ -1,10 +1,10 @@
 import request from 'supertest';
 import express, { type Express } from 'express';
-import { HunterController } from '../../src/controllers/Hunter.controller';
-import { HunterNotFoundError, HunterValidationError, type HunterService } from '../../src/services/hunter.service';
-import type { Hunter } from '../../src/generated/prisma/client';
-import { errorHandler } from '../../src/middlewares/error-handler.middleware';
-import { notFound } from '../../src/middlewares/not-found.middleware';
+import { HunterController } from '../../../src/controllers/hunter.controller';
+import { HunterNotFoundError, HunterValidationError, type HunterService } from '../../../src/services/hunter.service';
+import type { Hunter } from '../../../src/generated/prisma/client';
+import { errorHandler } from '../../../src/middlewares/error-handler.middleware';
+import { notFound } from '../../../src/middlewares/not-found.middleware';
 
 describe('HunterController', () => {
     let app: Express;

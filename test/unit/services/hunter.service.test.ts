@@ -1,5 +1,5 @@
-import { HunterService, HunterNotFoundError } from '../../src/services/hunter.service';
-import type { HunterRepository } from '../../src/repositories/hunter.repository';
+import { HunterService, HunterNotFoundError } from '../../../src/services/hunter.service';
+import type { HunterRepository } from '../../../src/repositories/hunter.repository';
 
 describe('HunterService', () => {
     let service: HunterService;

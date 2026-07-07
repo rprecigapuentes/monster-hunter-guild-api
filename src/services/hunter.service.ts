@@ -1,6 +1,6 @@
 import type { Hunter, Prisma } from '../generated/prisma/client';
-import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
-import { AbstractService } from './service.abstract';
+import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import { BaseService } from './base-service.abstract';
 
 export class HunterNotFoundError extends Error {
   constructor(id: string) {
@@ -16,13 +16,13 @@ export class HunterValidationError extends Error {
   }
 }
 
-export class HunterService extends AbstractService<
+export class HunterService extends BaseService<
   Hunter,
   Prisma.HunterCreateInput,
   Prisma.HunterUpdateInput
 > {
   constructor(
-    repository: PrismaRepository<Hunter, Prisma.HunterCreateInput, Prisma.HunterUpdateInput>
+    repository: PrismaBaseRepository<Hunter, Prisma.HunterCreateInput, Prisma.HunterUpdateInput>
   ) {
     super(repository);
   }

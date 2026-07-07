@@ -1,6 +1,6 @@
 import type { Guild, Prisma } from '../generated/prisma/client';
-import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
-import { AbstractService } from './service.abstract';
+import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import { BaseService } from './base-service.abstract';
 
 export class GuildNotFoundError extends Error {
   constructor(id: string) {
@@ -16,13 +16,13 @@ export class GuildValidationError extends Error {
   }
 }
 
-export class GuildService extends AbstractService<
+export class GuildService extends BaseService<
   Guild,
   Prisma.GuildCreateInput,
   Prisma.GuildUpdateInput
 > {
   constructor(
-    repository: PrismaRepository<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>
+    repository: PrismaBaseRepository<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>
   ) {
     super(repository);
   }

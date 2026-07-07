@@ -2,10 +2,10 @@ import {
   QuestService,
   QuestNotFoundError,
   QuestValidationError,
-} from '../../src/services/quest.service';
-import type { QuestRepository } from '../../src/repositories/quest.repository';
-import type { Monster, Quest } from '../../src/generated/prisma/client';
-import { MonsterService, MonsterNotFoundError } from '../../src/services/monster.service';
+} from '../../../src/services/quest.service';
+import type { QuestRepository } from '../../../src/repositories/quest.repository';
+import type { Monster, Quest } from '../../../src/generated/prisma/client';
+import { MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
 
 describe('QuestService', () => {
   let service: QuestService;
