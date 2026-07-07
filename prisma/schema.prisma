@@ -39,8 +39,8 @@ model Monster {
 model Hunter {
   id String @id @default(uuid())
   name String
-  rank Int?
-  experiencePoints Int?
+  rank Int @default(1)
+  experiencePoints Int @default(0)
 
   guildId String
   guild Guild @relation(fields: [guildId], references: [id])

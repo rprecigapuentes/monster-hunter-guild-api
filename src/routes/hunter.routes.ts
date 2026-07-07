@@ -5,11 +5,12 @@ import { HunterController } from '../controllers/hunter.controller';
 import { prisma } from '../lib/prisma';
 import { validate } from '../middlewares/validate.middleware';
 import { HunterCreateInputSchema, HunterUpdateInputSchema } from '../generated/zod';
+import { RankCalculator } from '../services/rank-calculator';
 
 const router = Router();
-
 const hunterRepository = new HunterRepository(prisma.hunter);
-const hunterService = new HunterService(hunterRepository);
+const rankCalculator = new RankCalculator()
+const hunterService = new HunterService(hunterRepository, rankCalculator);
 const hunterController = new HunterController(hunterService);
 
 router.post('/', validate(HunterCreateInputSchema), hunterController.create);

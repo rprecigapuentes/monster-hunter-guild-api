@@ -9,11 +9,11 @@ export class RankCalculator implements IRankCalculator{
         { rank: 5, requiredExperience: 4000}
     ]
 
-    calculate(experience: number): number {
+    calculate(experiencePoints: number): number {
         let currentRank = RankCalculator.RANK_PROGRESS[0].rank;
 
         for(const rank_progress of RankCalculator.RANK_PROGRESS){
-            if(experience >= rank_progress.requiredExperience){
+            if(experiencePoints >= rank_progress.requiredExperience){
                 currentRank = rank_progress.rank;
             }
         }
