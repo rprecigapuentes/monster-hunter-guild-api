@@ -87,6 +87,29 @@ describe('QuestService', () => {
       expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
+
+    it('Should throw QuestValidationError when trying to create a quest with COMPLETED status', async () => {
+      await expect(service.create({ ...input, status: 'COMPLETED' })).rejects.toThrow(
+        QuestValidationError
+      );
+      expect(mockQuestRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('Should throw QuestValidationError when trying to create a quest with FAILED status', async () => {
+      await expect(service.create({ ...input, status: 'FAILED' })).rejects.toThrow(
+        QuestValidationError
+      );
+
+      expect(mockQuestRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('Should throw QuestValidationError when trying to create a quest with IN_PROGRESS status', async () => {
+      await expect(service.create({ ...input, status: 'IN_PROGRESS' })).rejects.toThrow(
+        QuestValidationError
+      );
+
+      expect(mockQuestRepository.create).not.toHaveBeenCalled();
+    });
   });
 
   describe('Update Quest', () => {

@@ -44,9 +44,13 @@ export class QuestService extends BaseService<
   }
 
   protected override async validateCreate(data: Prisma.QuestUncheckedCreateInput): Promise<void> {
-    this.validateTitle(data.title);
-    this.validateReward(data.reward);
-    await this.ensureMonsterExists(data.monsterId);
+    const { title, reward, status, monsterId } = data;
+    this.validateTitle(title);
+    this.validateReward(reward);
+    if (status && status !== 'PENDING') {
+      throw new QuestValidationError('A quest must be created with "PENDING" status.');
+    }
+    await this.ensureMonsterExists(monsterId);
   }
 
   protected override async validateUpdate(
