@@ -50,10 +50,10 @@ export class QuestService extends BaseService<
   }
 
   protected override async validateUpdate(
-    exsiting: Quest,
+    existing: Quest,
     data: Prisma.QuestUncheckedUpdateInput
   ): Promise<void> {
-    const { status: currentStatus } = exsiting;
+    const { status: currentStatus } = existing;
     const { monsterId, reward, status: nextStatus } = data;
 
     if (typeof monsterId === 'string') {
