@@ -9,7 +9,7 @@ import { RankCalculator } from '../services/rank-calculator';
 
 const router = Router();
 const hunterRepository = new HunterRepository(prisma.hunter);
-const rankCalculator = new RankCalculator()
+const rankCalculator = new RankCalculator();
 const hunterService = new HunterService(hunterRepository, rankCalculator);
 const hunterController = new HunterController(hunterService);
 
