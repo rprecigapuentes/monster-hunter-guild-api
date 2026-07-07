@@ -1,5 +1,5 @@
-import { GuildService, GuildNotFoundError, GuildValidationError } from '../../src/services/guild.service';
-import type { GuildRepository } from '../../src/repositories/guild.repository';
+import { GuildService, GuildNotFoundError, GuildValidationError } from '../../../src/services/guild.service';
+import type { GuildRepository } from '../../../src/repositories/guild.repository';
 
 describe('GuildService', () => {
   let service: GuildService;

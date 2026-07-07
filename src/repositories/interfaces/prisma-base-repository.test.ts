@@ -1,4 +1,4 @@
-import { PrismaRepository } from './prisma-repository.abstract';
+import { PrismaBaseRepository } from './prisma-base-repository.abstract';
 import { prisma } from '../../lib/prisma';
 import { Prisma } from '../../generated/prisma/client';
 
@@ -33,7 +33,11 @@ interface MockUpdateInput {
   headquarters?: string;
 }
 
-class TestGuildRepository extends PrismaRepository<MockModel, MockCreateInput, MockUpdateInput> {
+class TestGuildRepository extends PrismaBaseRepository<
+  MockModel,
+  MockCreateInput,
+  MockUpdateInput
+> {
   constructor() {
     super(prisma.guild);
   }

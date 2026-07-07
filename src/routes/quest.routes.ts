@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { monsterService } from './monster.routes';
-import { QuestController } from '../controllers/Quest.controller';
+import { QuestController } from '../controllers/quest.controller';
 import { QuestService } from '../services/quest.service';
 import { QuestRepository } from '../repositories/quest.repository';
 import { prisma } from '../lib/prisma';

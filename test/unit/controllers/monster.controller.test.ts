@@ -1,15 +1,15 @@
 import request from 'supertest';
 import express, { type Express } from 'express';
-import { MonsterController } from './monster.controller';
+import { MonsterController } from '../../../src/controllers/monster.controller';
 import {
   MonsterNotFoundError,
   type MonsterService,
   MonsterValidationError,
-} from '../services/monster.service';
-import { errorHandler } from '../../src/middlewares/error-handler.middleware';
-import { notFound } from '../../src/middlewares/not-found.middleware';
+} from '../../../src/services/monster.service';
+import { errorHandler } from '../../../src/middlewares/error-handler.middleware';
+import { notFound } from '../../../src/middlewares/not-found.middleware';
 
-jest.mock('../services/monster.service', () => {
+jest.mock('../../../src/services/monster.service', () => {
   return {
     MonsterNotFoundError: class MonsterNotFoundError extends Error {
       constructor(id: string) {

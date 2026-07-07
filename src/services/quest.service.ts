@@ -1,7 +1,7 @@
 import type { Prisma, Quest } from '../generated/prisma/client';
-import type { PrismaRepository } from '../repositories/interfaces/prisma-repository.abstract';
+import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
 import type { MonsterService } from './monster.service';
-import { AbstractService } from './service.abstract';
+import { BaseService } from './base-service.abstract';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -17,13 +17,13 @@ export class QuestValidationError extends Error {
   }
 }
 
-export class QuestService extends AbstractService<
+export class QuestService extends BaseService<
   Quest,
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
   constructor(
-    repository: PrismaRepository<
+    repository: PrismaBaseRepository<
       Quest,
       Prisma.QuestUncheckedCreateInput,
       Prisma.QuestUncheckedUpdateInput

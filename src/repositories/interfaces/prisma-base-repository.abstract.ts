@@ -9,7 +9,7 @@ export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
   findMany(): Promise<TModel[]>;
 }
 
-export abstract class PrismaRepository<
+export abstract class PrismaBaseRepository<
   TModel,
   TCreateInput,
   TUpdateInput,
