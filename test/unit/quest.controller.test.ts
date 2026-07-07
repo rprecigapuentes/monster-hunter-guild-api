@@ -7,6 +7,8 @@ import {
   type QuestService,
 } from '../../src/services/quest.service';
 import type { Quest } from '../../src/generated/prisma/client';
+import { errorHandler } from '../../src/middlewares/error-handler.middleware';
+import { notFound } from '../../src/middlewares/not-found.middleware';
 
 describe('QuestController', () => {
   let app: Express;
@@ -39,6 +41,8 @@ describe('QuestController', () => {
     app.get('/quests/:id', questController.findById);
     app.put('/quests/:id', questController.update);
     app.delete('/quests/:id', questController.delete);
+    app.use(notFound);
+    app.use(errorHandler);
   });
 
   describe('POST /quests', () => {
