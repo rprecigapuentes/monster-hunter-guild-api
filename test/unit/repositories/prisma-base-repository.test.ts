@@ -2,7 +2,7 @@ import { PrismaBaseRepository } from '../../../src/repositories/interfaces/prism
 import { prisma } from '../../../src/lib/prisma';
 import { Prisma } from '../../../src/generated/prisma/client';
 
-jest.mock('../../lib/prisma', () => ({
+jest.mock('../../../src/lib/prisma', () => ({
   prisma: {
     guild: {
       create: jest.fn(),

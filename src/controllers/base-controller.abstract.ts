@@ -13,7 +13,11 @@ export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
     }
   };
 
-  update = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  update = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const entity = await this.service.update(req.params.id, req.body as TUpdateInput);
 
@@ -23,7 +27,11 @@ export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
     }
   };
 
-  delete = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  delete = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await this.service.delete(req.params.id);
 
@@ -33,7 +41,11 @@ export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
     }
   };
 
-  findById = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+  findById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const entity = await this.service.findById(req.params.id);
       res.status(200).json(entity);
