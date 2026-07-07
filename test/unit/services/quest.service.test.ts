@@ -4,8 +4,9 @@ import {
   QuestValidationError,
 } from '../../../src/services/quest.service';
 import type { QuestRepository } from '../../../src/repositories/quest.repository';
-import type { Monster, Quest } from '../../../src/generated/prisma/client';
-import { MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
+import type { Monster, Quest, QuestStatus } from '../../../src/generated/prisma/client';
+import { type MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
+import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
 
 describe('QuestService', () => {
   let service: QuestService;
@@ -17,7 +18,7 @@ describe('QuestService', () => {
     title: 'Hunt the Rathalos',
     location: 'Ancient Forest',
     reward: 5000,
-    status: 'OPEN',
+    status: 'PENDING',
     monsterId: 'm1',
   };
 
@@ -46,12 +47,12 @@ describe('QuestService', () => {
   });
 
   describe('Create Quest', () => {
-    const input = {
+    const input: QuestUncheckedCreateInput = {
       title: 'Hunt the Rathalos',
       monsterId: 'm1',
       location: 'Ancient Forest',
       reward: 5000,
-      status: 'OPEN',
+      status: 'PENDING',
     };
 
     it('Should create a new quest when data is valid', async () => {
@@ -66,7 +67,9 @@ describe('QuestService', () => {
     });
 
     it('Should throw validation error when title is empty', async () => {
-      await expect(service.create({ ...input, title: '   ' })).rejects.toThrow(QuestValidationError);
+      await expect(service.create({ ...input, title: '   ' })).rejects.toThrow(
+        QuestValidationError
+      );
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
 
@@ -82,6 +85,29 @@ describe('QuestService', () => {
         QuestValidationError
       );
       expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
+      expect(mockQuestRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('Should throw QuestValidationError when trying to create a quest with COMPLETED status', async () => {
+      await expect(service.create({ ...input, status: 'COMPLETED' })).rejects.toThrow(
+        QuestValidationError
+      );
+      expect(mockQuestRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('Should throw QuestValidationError when trying to create a quest with FAILED status', async () => {
+      await expect(service.create({ ...input, status: 'FAILED' })).rejects.toThrow(
+        QuestValidationError
+      );
+
+      expect(mockQuestRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('Should throw QuestValidationError when trying to create a quest with IN_PROGRESS status', async () => {
+      await expect(service.create({ ...input, status: 'IN_PROGRESS' })).rejects.toThrow(
+        QuestValidationError
+      );
+
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
   });
@@ -118,8 +144,60 @@ describe('QuestService', () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockMonsterService.ensureExists.mockRejectedValue(new MonsterNotFoundError('m1'));
 
-      await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(QuestValidationError);
+      await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(
+        QuestValidationError
+      );
       expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
+      expect(mockQuestRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('Should change status from PENDING to IN_PROGRESS', async () => {
+      const updateData = { status: 'IN_PROGRESS' } as { status: QuestStatus };
+      const updatedQuest = { ...mockQuest, ...updateData };
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
+      mockQuestRepository.update.mockResolvedValue(updatedQuest);
+
+      const result = await service.update('1', updateData);
+
+      expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockQuestRepository.update).toHaveBeenCalledWith('1', updateData);
+      expect(result).toEqual(updatedQuest);
+    });
+
+    it('Should change status from IN_PROGRESS to COMPLETED', async () => {
+      const currentData = { ...mockQuest, status: 'IN_PROGRESS' };
+      const updateData = { status: 'COMPLETED' } as { status: QuestStatus };
+      const updatedQuest = { ...currentData, ...updateData };
+      mockQuestRepository.findById.mockResolvedValue(currentData as Quest);
+      mockQuestRepository.update.mockResolvedValue(updatedQuest);
+
+      const result = await service.update('1', updateData);
+
+      expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockQuestRepository.update).toHaveBeenCalledWith('1', updateData);
+      expect(result).toEqual(updatedQuest);
+    });
+
+    it('Should change status from IN_PROGRESS to FAILED', async () => {
+      const currentData = { ...mockQuest, status: 'IN_PROGRESS' };
+      const updateData = { status: 'FAILED' } as { status: QuestStatus };
+      const updatedQuest = { ...currentData, ...updateData };
+      mockQuestRepository.findById.mockResolvedValue(currentData as Quest);
+      mockQuestRepository.update.mockResolvedValue(updatedQuest);
+
+      const result = await service.update('1', updateData);
+
+      expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockQuestRepository.update).toHaveBeenCalledWith('1', updateData);
+      expect(result).toEqual(updatedQuest);
+    });
+
+    it('Should throw a QuestValidationError when changing status from PENDING to COMPLETED', async () => {
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
+
+      await expect(service.update('1', { status: 'COMPLETED' })).rejects.toThrow(
+        QuestValidationError
+      );
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
     });
   });

@@ -1,4 +1,4 @@
-import type { Prisma, Quest } from '../generated/prisma/client';
+import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
 import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
 import type { MonsterService } from './monster.service';
 import { BaseService } from './base-service.abstract';
@@ -22,6 +22,12 @@ export class QuestService extends BaseService<
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
+  private _validTransitions: Record<QuestStatus, QuestStatus[]> = {
+    PENDING: ['IN_PROGRESS'],
+    IN_PROGRESS: ['COMPLETED', 'FAILED'],
+    COMPLETED: [],
+    FAILED: ['PENDING'],
+  };
   constructor(
     repository: PrismaBaseRepository<
       Quest,
@@ -38,17 +44,31 @@ export class QuestService extends BaseService<
   }
 
   protected override async validateCreate(data: Prisma.QuestUncheckedCreateInput): Promise<void> {
-    this.validateTitle(data.title);
-    this.validateReward(data.reward);
-    await this.ensureMonsterExists(data.monsterId);
+    const { title, reward, status, monsterId } = data;
+    this.validateTitle(title);
+    this.validateReward(reward);
+    if (status && status !== 'PENDING') {
+      throw new QuestValidationError('A quest must be created with "PENDING" status.');
+    }
+    await this.ensureMonsterExists(monsterId);
   }
 
-  protected override async validateUpdate(data: Prisma.QuestUncheckedUpdateInput): Promise<void> {
-    if (typeof data.reward === 'number') {
-      this.validateReward(data.reward);
+  protected override async validateUpdate(
+    existing: Quest,
+    data: Prisma.QuestUncheckedUpdateInput
+  ): Promise<void> {
+    const { status: currentStatus } = existing;
+    const { monsterId, reward, status: nextStatus } = data;
+
+    if (typeof monsterId === 'string') {
+      await this.ensureMonsterExists(monsterId);
     }
-    if (typeof data.monsterId === 'string') {
-      await this.ensureMonsterExists(data.monsterId);
+    if (typeof reward === 'number') {
+      this.validateReward(reward);
+    }
+
+    if (nextStatus && currentStatus !== nextStatus) {
+      this.validateStatusTransition(currentStatus, nextStatus as QuestStatus);
     }
   }
 
@@ -69,6 +89,16 @@ export class QuestService extends BaseService<
       await this.monsterService.ensureExists(monsterId);
     } catch {
       throw new QuestValidationError(`Monster with id ${monsterId} does not exist`);
+    }
+  }
+
+  private validateStatusTransition(currentStatus: QuestStatus, nextStatus: QuestStatus): void {
+    const allowedNextStatuses = this._validTransitions[currentStatus];
+
+    if (!allowedNextStatuses.includes(nextStatus)) {
+      throw new QuestValidationError(
+        `Provided status: ${currentStatus} can not be changed to ${nextStatus}`
+      );
     }
   }
 }
