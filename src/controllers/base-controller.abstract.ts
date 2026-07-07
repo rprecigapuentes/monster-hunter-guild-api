@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { BaseService } from '../services/base-service.abstract'; //in development process
+import type { BaseService } from '../services/base-service.abstract';
 
 export abstract class BaseController<TModel, TCreateInput, TUpdateInput> {
   constructor(protected readonly service: BaseService<TModel, TCreateInput, TUpdateInput>) {}
