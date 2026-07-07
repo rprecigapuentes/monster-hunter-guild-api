@@ -50,11 +50,19 @@ export class QuestService extends BaseService<
   }
 
   protected override async validateUpdate(data: Prisma.QuestUncheckedUpdateInput): Promise<void> {
-    if (typeof data.reward === 'number') {
-      this.validateReward(data.reward);
+    const quest = await this.ensureExists(data.id as string);
+    const { status: currentStatus } = quest;
+    const { monsterId, reward, status: nextStatus } = data;
+
+    if (typeof monsterId === 'string') {
+      await this.ensureMonsterExists(monsterId);
     }
-    if (typeof data.monsterId === 'string') {
-      await this.ensureMonsterExists(data.monsterId);
+    if (typeof reward === 'number') {
+      this.validateReward(reward);
+    }
+
+    if (nextStatus && currentStatus !== nextStatus) {
+      this.validateStatusTransition(currentStatus, nextStatus as QuestStatus);
     }
   }
 
@@ -86,21 +94,5 @@ export class QuestService extends BaseService<
         `Provided status: ${currentStatus} can not be changed to ${nextStatus}`
       );
     }
-  }
-
-  public async changeStatus(id: string, newStatus: QuestStatus): Promise<Quest> {
-    const quest = await this.repository.findById(id);
-
-    if (!quest) {
-      throw new QuestNotFoundError(id);
-    }
-
-    const { status: currentStatus } = quest;
-    this.validateStatusTransition(currentStatus, newStatus);
-
-    return this.repository.update(id, {
-      ...quest,
-      status: newStatus,
-    });
   }
 }
