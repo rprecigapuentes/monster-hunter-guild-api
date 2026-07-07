@@ -11,8 +11,8 @@ export abstract class BaseService<TModel, TCreateInput, TUpdateInput> {
   }
 
   async update(id: string, data: TUpdateInput): Promise<TModel> {
-    await this.ensureExists(id);
-    await this.validateUpdate(data);
+    const quest = await this.ensureExists(id);
+    await this.validateUpdate(quest, data);
     return await this.repository.update(id, data);
   }
 
@@ -40,5 +40,5 @@ export abstract class BaseService<TModel, TCreateInput, TUpdateInput> {
   protected abstract notFoundError(id: string): Error;
 
   protected async validateCreate(_data: TCreateInput): Promise<void> {}
-  protected async validateUpdate(_data: TUpdateInput): Promise<void> {}
+  protected async validateUpdate(_existing: TModel, _data: TUpdateInput): Promise<void> {}
 }

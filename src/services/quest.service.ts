@@ -49,9 +49,11 @@ export class QuestService extends BaseService<
     await this.ensureMonsterExists(data.monsterId);
   }
 
-  protected override async validateUpdate(data: Prisma.QuestUncheckedUpdateInput): Promise<void> {
-    const quest = await this.ensureExists(data.id as string);
-    const { status: currentStatus } = quest;
+  protected override async validateUpdate(
+    exsiting: Quest,
+    data: Prisma.QuestUncheckedUpdateInput
+  ): Promise<void> {
+    const { status: currentStatus } = exsiting;
     const { monsterId, reward, status: nextStatus } = data;
 
     if (typeof monsterId === 'string') {
