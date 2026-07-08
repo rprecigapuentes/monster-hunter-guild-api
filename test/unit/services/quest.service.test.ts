@@ -12,6 +12,7 @@ describe('QuestService', () => {
   let service: QuestService;
   let mockQuestRepository: jest.Mocked<QuestRepository>;
   let mockMonsterService: jest.Mocked<MonsterService>;
+  let mockQuestAssignmentService: { findByQuest: jest.Mock };
 
   const mockQuest: Quest = {
     id: '1',
@@ -44,6 +45,8 @@ describe('QuestService', () => {
     } as unknown as jest.Mocked<MonsterService>;
 
     service = new QuestService(mockQuestRepository, mockMonsterService);
+    mockQuestAssignmentService = { findByQuest: jest.fn().mockResolvedValue([]) };
+    service.setQuestAssignmentService(mockQuestAssignmentService as any);
   });
 
   describe('Create Quest', () => {
@@ -157,6 +160,10 @@ describe('QuestService', () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockQuestRepository.update.mockResolvedValue(updatedQuest);
 
+      mockQuestAssignmentService.findByQuest.mockResolvedValue([
+        { id: 'a1', hunterId: 'h1', questId: '1', role: 'Support' },
+      ]);
+
       const result = await service.update('1', updateData);
 
       expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
@@ -196,6 +203,16 @@ describe('QuestService', () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
 
       await expect(service.update('1', { status: 'COMPLETED' })).rejects.toThrow(
+        QuestValidationError
+      );
+      expect(mockQuestRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('Should throw when starting a quest with no hunters assigned', async () => {
+      mockQuestRepository.findById.mockResolvedValue(mockQuest); 
+      mockQuestAssignmentService.findByQuest.mockResolvedValue([]);
+
+      await expect(service.update('1', { status: 'IN_PROGRESS' })).rejects.toThrow(
         QuestValidationError
       );
       expect(mockQuestRepository.update).not.toHaveBeenCalled();

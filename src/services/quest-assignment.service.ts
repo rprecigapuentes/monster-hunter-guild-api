@@ -104,6 +104,10 @@ export class QuestAssignmentService extends BaseService<
     }
   }
 
+  async findByQuest(questId: string): Promise<QuestAssignment[]> {
+    return this.findAssignmentsByQuest(questId);
+  }
+
   private async findAssignmentsByQuest(questId: string): Promise<QuestAssignment[]> {
     const all = await this.repository.findAll();
     return all.filter((assignment) => assignment.questId === questId);

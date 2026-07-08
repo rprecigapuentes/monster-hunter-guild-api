@@ -19,6 +19,7 @@ export const questAssignmentService = new QuestAssignmentService(
   questService,
   hunterService
 );
+questService.setQuestAssignmentService(questAssignmentService);
 const questAssignmentController = new QuestAssignmentController(questAssignmentService);
 
 router.post(
