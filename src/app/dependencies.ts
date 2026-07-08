@@ -23,8 +23,8 @@ const monsterService = new MonsterService(monsterRepository);
 export const monsterController = new MonsterController(monsterService);
 
 // Hunter
-const hunterRepository = new HunterRepository(prisma.hunter);
 const rankCalculator = new RankCalculator();
+const hunterRepository = new HunterRepository(prisma.hunter);
 const hunterService = new HunterService(hunterRepository, rankCalculator);
 export const hunterController = new HunterController(hunterService);
 
