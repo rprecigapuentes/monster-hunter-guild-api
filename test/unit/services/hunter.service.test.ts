@@ -37,11 +37,7 @@ describe("HunterService", () => {
         name: "Geralt",
         rank: 5,
         experiencePoints: 9999,
-        guild: {
-          connect: {
-            id: "guild-1",
-          },
-        },
+        guildId: "guild-1"
       };
 
       mockRankCalculator.calculate.mockReturnValue(1);
@@ -79,22 +75,14 @@ describe("HunterService", () => {
         name: "Geralt",
         rank: 999,
         experiencePoints: 999999,
-        guild: {
-          connect: {
-            id: "guild-1",
-          },
-        },
+        guildId: "guild-1"
       });
 
       expect(mockRepository.create).toHaveBeenCalledWith({
         name: "Geralt",
         rank: 1,
         experiencePoints: 0,
-        guild: {
-          connect: {
-            id: "guild-1",
-          },
-        },
+        guildId: "guild-1"
       });
     });
   });
