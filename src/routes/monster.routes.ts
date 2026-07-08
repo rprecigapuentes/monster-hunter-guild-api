@@ -1,16 +1,9 @@
 import { Router } from 'express';
-import { MonsterController } from '../controllers/monster.controller';
-import { MonsterRepository } from '../repositories/monster.repository';
-import { MonsterService } from '../services/monster.service';
-import { prisma } from '../lib/prisma';
 import { validate } from '../middlewares/validate.middleware';
 import { MonsterCreateInputSchema, MonsterUpdateInputSchema } from '../generated/zod';
+import { monsterController } from '../app/dependencies';
 
 const router = Router();
-
-const monsterRepository = new MonsterRepository(prisma.monster);
-export const monsterService = new MonsterService(monsterRepository);
-const monsterController = new MonsterController(monsterService);
 
 router.post('/', validate(MonsterCreateInputSchema), monsterController.create);
 router.get('/', monsterController.findAll);
