@@ -10,7 +10,7 @@ import { QuestUncheckedCreateInputSchema, QuestUncheckedUpdateInputSchema } from
 const router = Router();
 
 const questRepository = new QuestRepository(prisma.quest);
-const questService = new QuestService(questRepository, monsterService);
+export const questService = new QuestService(questRepository, monsterService);
 const questController = new QuestController(questService);
 
 router.post('/', validate(QuestUncheckedCreateInputSchema), questController.create);

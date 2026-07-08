@@ -9,7 +9,7 @@ import { HunterCreateInputSchema, HunterUpdateInputSchema } from '../generated/z
 const router = Router();
 
 const hunterRepository = new HunterRepository(prisma.hunter);
-const hunterService = new HunterService(hunterRepository);
+export const hunterService = new HunterService(hunterRepository);
 const hunterController = new HunterController(hunterService);
 
 router.post('/', validate(HunterCreateInputSchema), hunterController.create);

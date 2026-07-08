@@ -6,14 +6,14 @@ import {
 
 export class QuestAssignmentRepository extends PrismaBaseRepository<
   QuestAssignment,
-  Prisma.QuestUncheckedCreateInput,
-  Prisma.QuestUncheckedUpdateInput
+  Prisma.QuestAssignmentUncheckedCreateInput,
+  Prisma.QuestAssignmentUncheckedUpdateInput
 > {
   constructor(
     prismaModel: PrismaModelDelegate<
       QuestAssignment,
-      Prisma.QuestUncheckedCreateInput,
-      Prisma.QuestUncheckedUpdateInput
+      Prisma.QuestAssignmentUncheckedCreateInput,
+      Prisma.QuestAssignmentUncheckedUpdateInput
     >
   ) {
     super(prismaModel);
