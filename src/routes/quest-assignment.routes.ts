@@ -10,6 +10,7 @@ import {
   QuestAssignmentUncheckedCreateInputSchema,
   QuestAssignmentUncheckedUpdateInputSchema,
 } from '../generated/zod';
+import { RewardDistributionService } from '../services/reward-distribution.service';
 
 const router = Router();
 
@@ -20,6 +21,13 @@ export const questAssignmentService = new QuestAssignmentService(
   hunterService
 );
 questService.setQuestAssignmentService(questAssignmentService);
+
+const rewardDistributionService = new RewardDistributionService(
+  hunterService,
+  questAssignmentService
+);
+questService.setRewardDistributionService(rewardDistributionService);
+
 const questAssignmentController = new QuestAssignmentController(questAssignmentService);
 
 router.post(

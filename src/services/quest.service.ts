@@ -3,6 +3,7 @@ import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-bas
 import type { MonsterService } from './monster.service';
 import type { QuestAssignmentService } from './quest-assignment.service';
 import { BaseService } from './base-service.abstract';
+import type { RewardDistributionService } from './reward-distribution.service';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -23,7 +24,7 @@ export class QuestService extends BaseService<
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
-  private _validTransitions: Record<QuestStatus, QuestStatus[]> = {
+  private readonly _validTransitions: Record<QuestStatus, QuestStatus[]> = {
     PENDING: ['IN_PROGRESS'],
     IN_PROGRESS: ['COMPLETED', 'FAILED'],
     COMPLETED: [],
@@ -41,14 +42,34 @@ export class QuestService extends BaseService<
     super(repository);
   }
 
+  private rewardDistributionService?: RewardDistributionService;
   private questAssignmentService?: QuestAssignmentService;
 
   setQuestAssignmentService(service: QuestAssignmentService): void {
     this.questAssignmentService = service;
   }
 
+  setRewardDistributionService(service: RewardDistributionService): void {
+    this.rewardDistributionService = service;
+  }
+
   protected notFoundError(id: string): Error {
     return new QuestNotFoundError(id);
+  }
+
+  override async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
+    const existingQuest = await this.ensureExists(id);
+    await this.validateUpdate(existingQuest, data);
+    const updatedQuest = await this.repository.update(id, data);
+
+    if (data.status === 'COMPLETED') {
+      await this.rewardDistributionService!.distributeRewards(
+        updatedQuest.id,
+        updatedQuest.reward ?? 0
+      );
+    }
+
+    return updatedQuest;
   }
 
   protected override async validateCreate(data: Prisma.QuestUncheckedCreateInput): Promise<void> {
