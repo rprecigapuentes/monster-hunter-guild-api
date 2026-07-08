@@ -44,6 +44,8 @@ model Hunter {
 
   guildId String
   guild Guild @relation(fields: [guildId], references: [id])
+
+  assignments QuestAssignment[]
 }
 
 model Quest {
@@ -55,6 +57,8 @@ model Quest {
 
   monsterId String
   monster Monster @relation(fields: [monsterId], references: [id])
+
+  assignments QuestAssignment[]
 }
 
 enum QuestStatus {
@@ -62,4 +66,21 @@ enum QuestStatus {
   IN_PROGRESS
   COMPLETED
   FAILED
+}
+
+model QuestAssignment {
+  id String @id @default(uuid())
+  role QuestRole
+
+  hunterId String
+  hunter Hunter @relation(fields: [hunterId], references: [id])
+
+  questId String
+  quest Quest @relation(fields: [questId], references: [id])
+}
+
+enum QuestRole {
+  Leader
+  Support
+  Scout
 }

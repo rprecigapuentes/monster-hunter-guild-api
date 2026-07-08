@@ -1,6 +1,7 @@
 import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
 import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
 import type { MonsterService } from './monster.service';
+import type { QuestAssignmentService } from './quest-assignment.service';
 import { BaseService } from './base-service.abstract';
 
 export class QuestNotFoundError extends Error {
@@ -28,6 +29,7 @@ export class QuestService extends BaseService<
     COMPLETED: [],
     FAILED: ['PENDING'],
   };
+
   constructor(
     repository: PrismaBaseRepository<
       Quest,
@@ -37,6 +39,12 @@ export class QuestService extends BaseService<
     private readonly monsterService: MonsterService
   ) {
     super(repository);
+  }
+
+  private questAssignmentService?: QuestAssignmentService;
+
+  setQuestAssignmentService(service: QuestAssignmentService): void {
+    this.questAssignmentService = service;
   }
 
   protected notFoundError(id: string): Error {
@@ -69,6 +77,10 @@ export class QuestService extends BaseService<
 
     if (nextStatus && currentStatus !== nextStatus) {
       this.validateStatusTransition(currentStatus, nextStatus as QuestStatus);
+
+      if ((nextStatus as QuestStatus) === 'IN_PROGRESS') {
+        await this.ensureQuestHasHunters(existing.id);
+      }
     }
   }
 
@@ -99,6 +111,16 @@ export class QuestService extends BaseService<
       throw new QuestValidationError(
         `Provided status: ${currentStatus} can not be changed to ${nextStatus}`
       );
+    }
+  }
+
+  private async ensureQuestHasHunters(questId: string): Promise<void> {
+    if (!this.questAssignmentService) {
+      throw new Error('QuestAssignmentService is not wired into QuestService');
+    }
+    const assignments = await this.questAssignmentService.findByQuest(questId);
+    if (assignments.length === 0) {
+      throw new QuestValidationError('A quest needs at least one hunter before it can start');
     }
   }
 }
