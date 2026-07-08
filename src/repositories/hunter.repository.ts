@@ -6,11 +6,15 @@ import {
 
 export class HunterRepository extends PrismaBaseRepository<
   Hunter,
-  Prisma.HunterCreateInput,
-  Prisma.HunterUpdateInput
+  Prisma.HunterUncheckedCreateInput,
+  Prisma.HunterUncheckedUpdateInput
 > {
   constructor(
-    prismaModel: PrismaModelDelegate<Hunter, Prisma.HunterCreateInput, Prisma.HunterUpdateInput>
+    prismaModel: PrismaModelDelegate<
+      Hunter,
+      Prisma.HunterUncheckedCreateInput,
+      Prisma.HunterUncheckedUpdateInput
+    >
   ) {
     super(prismaModel);
   }

@@ -14,6 +14,7 @@ import { HunterService } from '../services/hunter.service';
 import { MonsterService } from '../services/monster.service';
 import { QuestService } from '../services/quest.service';
 import { QuestAssignmentService } from '../services/quest-assignment.service';
+import { RankCalculator } from '../services/rank-calculator';
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
@@ -21,8 +22,9 @@ const monsterService = new MonsterService(monsterRepository);
 export const monsterController = new MonsterController(monsterService);
 
 // Hunter
+const rankCalculator = new RankCalculator();
 const hunterRepository = new HunterRepository(prisma.hunter);
-const hunterService = new HunterService(hunterRepository);
+const hunterService = new HunterService(hunterRepository, rankCalculator);
 export const hunterController = new HunterController(hunterService);
 
 // Quest
