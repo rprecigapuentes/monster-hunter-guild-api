@@ -47,7 +47,7 @@ export class QuestAssignmentService extends BaseService<
     const { hunterId, questId, role } = data;
 
     this.validateRole(role);
-    await this.ensureHunterExists(questId);
+    await this.ensureQuestExists(questId);
     await this.ensureHunterExists(hunterId);
 
     const questAssignments = await this.findAssignmentsByQuest(questId);
@@ -92,7 +92,7 @@ export class QuestAssignmentService extends BaseService<
     try {
       await this.questService.ensureExists(questId);
     } catch {
-      throw new QuestAssignmentValidationError(`Monster with id ${questId} does not exist`);
+      throw new QuestAssignmentValidationError(`Quest with id ${questId} does not exist`);
     }
   }
 
@@ -100,7 +100,7 @@ export class QuestAssignmentService extends BaseService<
     try {
       await this.hunterService.ensureExists(hunterId);
     } catch {
-      throw new QuestAssignmentValidationError(`Hunterter with id ${hunterId} does not exist`);
+      throw new QuestAssignmentValidationError(`Hunter with id ${hunterId} does not exist`);
     }
   }
 
