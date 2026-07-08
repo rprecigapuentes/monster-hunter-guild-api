@@ -8,11 +8,12 @@ import {
   HunterUncheckedCreateInputSchema,
   HunterUncheckedUpdateInputSchema,
 } from '../generated/zod';
+import { RankCalculator } from '../services/rank-calculator';
 
 const router = Router();
-
 const hunterRepository = new HunterRepository(prisma.hunter);
-export const hunterService = new HunterService(hunterRepository);
+const rankCalculator = new RankCalculator();
+const hunterService = new HunterService(hunterRepository, rankCalculator);
 const hunterController = new HunterController(hunterService);
 
 router.post('/', validate(HunterUncheckedCreateInputSchema), hunterController.create);
