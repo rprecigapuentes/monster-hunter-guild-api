@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { questAssignmentController } from '../app/dependencies';
 import { validate } from '../middlewares/validate.middleware';
 import {
   QuestAssignmentUncheckedCreateInputSchema,
   QuestAssignmentUncheckedUpdateInputSchema,
 } from '../generated/zod';
+import { questAssignmentController } from '../app/dependencies';
 
 const router = Router();
 
