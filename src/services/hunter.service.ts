@@ -23,7 +23,11 @@ export class HunterService extends BaseService<
   Prisma.HunterUncheckedUpdateInput
 > {
   constructor(
-    repository: PrismaBaseRepository<Hunter, Prisma.HunterUncheckedCreateInput, Prisma.HunterUncheckedUpdateInput>,
+    repository: PrismaBaseRepository<
+      Hunter,
+      Prisma.HunterUncheckedCreateInput,
+      Prisma.HunterUncheckedUpdateInput
+    >,
     private readonly rankCalculator: IRankCalculator
   ) {
     super(repository);

@@ -4,7 +4,10 @@ import { HunterService } from '../services/hunter.service';
 import { HunterController } from '../controllers/hunter.controller';
 import { prisma } from '../lib/prisma';
 import { validate } from '../middlewares/validate.middleware';
-import { HunterUncheckedCreateInputSchema, HunterUncheckedUpdateInputSchema } from '../generated/zod';
+import {
+  HunterUncheckedCreateInputSchema,
+  HunterUncheckedUpdateInputSchema,
+} from '../generated/zod';
 import { RankCalculator } from '../services/rank-calculator';
 
 const router = Router();
