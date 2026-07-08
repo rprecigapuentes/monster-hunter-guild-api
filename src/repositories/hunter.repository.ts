@@ -10,7 +10,11 @@ export class HunterRepository extends PrismaBaseRepository<
   Prisma.HunterUncheckedUpdateInput
 > {
   constructor(
-    prismaModel: PrismaModelDelegate<Hunter, Prisma.HunterUncheckedCreateInput, Prisma.HunterUncheckedUpdateInput>
+    prismaModel: PrismaModelDelegate<
+      Hunter,
+      Prisma.HunterUncheckedCreateInput,
+      Prisma.HunterUncheckedUpdateInput
+    >
   ) {
     super(prismaModel);
   }
