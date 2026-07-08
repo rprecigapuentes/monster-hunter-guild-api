@@ -13,6 +13,8 @@ describe('QuestService', () => {
   let mockQuestRepository: jest.Mocked<QuestRepository>;
   let mockMonsterService: jest.Mocked<MonsterService>;
   let mockQuestAssignmentService: { findByQuest: jest.Mock };
+  let mockRewardDistributionService: {distributeRewards: jest.Mock;
+};
 
   const mockQuest: Quest = {
     id: '1',
@@ -47,6 +49,9 @@ describe('QuestService', () => {
     service = new QuestService(mockQuestRepository, mockMonsterService);
     mockQuestAssignmentService = { findByQuest: jest.fn().mockResolvedValue([]) };
     service.setQuestAssignmentService(mockQuestAssignmentService as any);
+
+    mockRewardDistributionService = {distributeRewards: jest.fn(),};
+    service.setRewardDistributionService(mockRewardDistributionService as any);
   });
 
   describe('Create Quest', () => {
@@ -216,6 +221,16 @@ describe('QuestService', () => {
         QuestValidationError
       );
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('Should distribute rewards when a quest is completed', async () => {
+      const currentQuest: Quest = {...mockQuest, status: 'IN_PROGRESS',};
+      const completedQuest: Quest = {...currentQuest, status: 'COMPLETED',};
+
+      mockQuestRepository.findById.mockResolvedValue( currentQuest as Quest);
+      mockQuestRepository.update.mockResolvedValue(completedQuest);
+      await service.update('1', { status: 'COMPLETED',});
+      expect(mockRewardDistributionService.distributeRewards).toHaveBeenCalledWith('1',5000);
     });
   });
 
