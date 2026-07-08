@@ -19,11 +19,11 @@ export class HunterValidationError extends Error {
 
 export class HunterService extends BaseService<
   Hunter,
-  Prisma.HunterCreateInput,
-  Prisma.HunterUpdateInput
+  Prisma.HunterUncheckedCreateInput,
+  Prisma.HunterUncheckedUpdateInput
 > {
   constructor(
-    repository: PrismaBaseRepository<Hunter, Prisma.HunterCreateInput, Prisma.HunterUpdateInput>,
+    repository: PrismaBaseRepository<Hunter, Prisma.HunterUncheckedCreateInput, Prisma.HunterUncheckedUpdateInput>,
     private readonly rankCalculator: IRankCalculator
   ) {
     super(repository);
@@ -33,11 +33,11 @@ export class HunterService extends BaseService<
     return new HunterNotFoundError(id);
   }
 
-  override async create(data: Prisma.HunterCreateInput): Promise<Hunter> {
+  override async create(data: Prisma.HunterUncheckedCreateInput): Promise<Hunter> {
     const initialExperience = 0;
     const initialRank = this.rankCalculator.calculate(initialExperience);
 
-    const safeData: Prisma.HunterCreateInput = {
+    const safeData: Prisma.HunterUncheckedCreateInput = {
       ...data,
       rank: initialRank,
       experiencePoints: initialExperience,
@@ -46,7 +46,7 @@ export class HunterService extends BaseService<
     return super.create(safeData);
   }
 
-  override async update(id: string, data: Prisma.HunterUpdateInput): Promise<Hunter> {
+  override async update(id: string, data: Prisma.HunterUncheckedUpdateInput): Promise<Hunter> {
     const { rank: _rank, experiencePoints: _experiencePoints, ...safeData } = data;
 
     return super.update(id, safeData);

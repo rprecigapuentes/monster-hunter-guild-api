@@ -4,8 +4,8 @@ import type { HunterService } from '../services/hunter.service';
 
 export class HunterController extends BaseController<
   Hunter,
-  Prisma.HunterCreateInput,
-  Prisma.HunterUpdateInput
+  Prisma.HunterUncheckedCreateInput,
+  Prisma.HunterUncheckedUpdateInput
 > {
   constructor(service: HunterService) {
     super(service);
