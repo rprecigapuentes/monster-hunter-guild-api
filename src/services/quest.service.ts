@@ -37,20 +37,11 @@ export class QuestService extends BaseService<
       Prisma.QuestUncheckedCreateInput,
       Prisma.QuestUncheckedUpdateInput
     >,
-    private readonly monsterService: MonsterService
+    private readonly monsterService: MonsterService,
+    private readonly getRewardDistributionService: () => RewardDistributionService,
+    private readonly getQuestAssignmentService: () => QuestAssignmentService
   ) {
     super(repository);
-  }
-
-  private rewardDistributionService?: RewardDistributionService;
-  private questAssignmentService?: QuestAssignmentService;
-
-  setQuestAssignmentService(service: QuestAssignmentService): void {
-    this.questAssignmentService = service;
-  }
-
-  setRewardDistributionService(service: RewardDistributionService): void {
-    this.rewardDistributionService = service;
   }
 
   protected notFoundError(id: string): Error {
@@ -59,14 +50,12 @@ export class QuestService extends BaseService<
 
   override async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
     const existingQuest = await this.ensureExists(id);
+    const rewardDistributionService = this.getRewardDistributionService();
     await this.validateUpdate(existingQuest, data);
     const updatedQuest = await this.repository.update(id, data);
 
     if (data.status === 'COMPLETED') {
-      await this.rewardDistributionService!.distributeRewards(
-        updatedQuest.id,
-        updatedQuest.reward ?? 0
-      );
+      await rewardDistributionService.distributeRewards(updatedQuest.id, updatedQuest.reward ?? 0);
     }
 
     return updatedQuest;
@@ -136,10 +125,8 @@ export class QuestService extends BaseService<
   }
 
   private async ensureQuestHasHunters(questId: string): Promise<void> {
-    if (!this.questAssignmentService) {
-      throw new Error('QuestAssignmentService is not wired into QuestService');
-    }
-    const assignments = await this.questAssignmentService.findByQuest(questId);
+    const questAssignmentService = this.getQuestAssignmentService();
+    const assignments = await questAssignmentService.findByQuest(questId);
     if (assignments.length === 0) {
       throw new QuestValidationError('A quest needs at least one hunter before it can start');
     }
