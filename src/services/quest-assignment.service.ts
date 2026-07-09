@@ -31,7 +31,7 @@ export class QuestAssignmentService extends BaseService<
       Prisma.QuestAssignmentUncheckedCreateInput,
       Prisma.QuestAssignmentUncheckedUpdateInput
     >,
-    private readonly questService: QuestService,
+    private readonly getQuestService: () => QuestService,
     private readonly hunterService: HunterService
   ) {
     super(repository);
@@ -89,8 +89,9 @@ export class QuestAssignmentService extends BaseService<
   }
 
   private async ensureQuestExists(questId: string): Promise<void> {
+    const questService = this.getQuestService();
     try {
-      await this.questService.ensureExists(questId);
+      await questService.ensureExists(questId);
     } catch {
       throw new QuestAssignmentValidationError(`Quest with id ${questId} does not exist`);
     }

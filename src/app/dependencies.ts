@@ -46,7 +46,7 @@ export const guildController = new GuildController(guildService);
 const questAssignmentRepository = new QuestAssignmentRepository(prisma.questAssignment);
 const questAssignmentService = new QuestAssignmentService(
   questAssignmentRepository,
-  questService,
+  () => questService,
   hunterService
 );
 questService.setQuestAssignmentService(questAssignmentService);
