@@ -1,5 +1,5 @@
 import type { Hunter, Prisma } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { IRankCalculator } from './rank-calculator.interface';
 
@@ -23,7 +23,7 @@ export class HunterService extends BaseService<
   Prisma.HunterUncheckedUpdateInput
 > {
   constructor(
-    repository: PrismaBaseRepository<
+    repository: IBasicRepository<
       Hunter,
       Prisma.HunterUncheckedCreateInput,
       Prisma.HunterUncheckedUpdateInput

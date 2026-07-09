@@ -1,8 +1,8 @@
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 
 export abstract class BaseService<TModel, TCreateInput, TUpdateInput> {
   constructor(
-    protected readonly repository: PrismaBaseRepository<TModel, TCreateInput, TUpdateInput>
+    protected readonly repository: IBasicRepository<TModel, TCreateInput, TUpdateInput>
   ) {}
 
   async create(data: TCreateInput): Promise<TModel> {

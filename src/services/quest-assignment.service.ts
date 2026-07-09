@@ -1,5 +1,5 @@
 import type { Prisma, QuestAssignment, QuestRole } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import type { HunterService } from './hunter.service';
 import type { QuestService } from './quest.service';
 import { BaseService } from './base-service.abstract';
@@ -26,7 +26,7 @@ export class QuestAssignmentService extends BaseService<
   private readonly _validRoles: QuestRole[] = ['Leader', 'Support', 'Scout'];
 
   constructor(
-    repository: PrismaBaseRepository<
+    repository: IBasicRepository<
       QuestAssignment,
       Prisma.QuestAssignmentUncheckedCreateInput,
       Prisma.QuestAssignmentUncheckedUpdateInput

@@ -1,5 +1,5 @@
 import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import type { MonsterService } from './monster.service';
 import type { QuestAssignmentService } from './quest-assignment.service';
 import { BaseService } from './base-service.abstract';
@@ -32,7 +32,7 @@ export class QuestService extends BaseService<
   };
 
   constructor(
-    repository: PrismaBaseRepository<
+    repository: IBasicRepository<
       Quest,
       Prisma.QuestUncheckedCreateInput,
       Prisma.QuestUncheckedUpdateInput
