@@ -14,7 +14,7 @@ export class RewardDistributionService {
 
   constructor(
     private readonly hunterService: HunterService,
-    private readonly questAssignmentService: QuestAssignmentService
+    private readonly getQuestAssignmentService: () => QuestAssignmentService
   ) {}
 
   async distributeRewards(questId: string, reward: number): Promise<void> {
@@ -22,7 +22,8 @@ export class RewardDistributionService {
       return;
     }
 
-    const assignments = await this.questAssignmentService.findByQuest(questId);
+    const questAssignmentService = this.getQuestAssignmentService();
+    const assignments = await questAssignmentService.findByQuest(questId);
     const leader = assignments.find((assignment) => assignment.role === 'Leader')!;
 
     const members = assignments.filter((assignment) => assignment.role !== 'Leader');
