@@ -1,29 +1,24 @@
+import { type HunterService } from '../../../src/services/hunter.service';
+import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
 import { RewardDistributionService } from '../../../src/services/reward-distribution.service';
 
 describe('RewardDistributionService', () => {
   let service: RewardDistributionService;
 
-  let mockHunterService: {
-    addExperience: jest.Mock;
-  };
+  let mockHunterService: jest.Mocked<HunterService>;
 
-  let mockQuestAssignmentService: {
-    findByQuest: jest.Mock;
-  };
+  let mockQuestAssignmentService: jest.Mocked<QuestAssignmentService>;
 
   beforeEach(() => {
     mockHunterService = {
       addExperience: jest.fn(),
-    };
+    } as unknown as jest.Mocked<HunterService>;
 
     mockQuestAssignmentService = {
       findByQuest: jest.fn(),
-    };
+    } as unknown as jest.Mocked<QuestAssignmentService>;
 
-    service = new RewardDistributionService(
-      mockHunterService as any,
-      mockQuestAssignmentService as any
-    );
+    service = new RewardDistributionService(mockHunterService, () => mockQuestAssignmentService);
   });
 
   it('Should distribute 40% reward to leader and remaining equally to members', async () => {

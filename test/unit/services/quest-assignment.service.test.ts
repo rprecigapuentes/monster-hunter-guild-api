@@ -50,7 +50,7 @@ describe('QuestAssignmentService', () => {
     mockQuestService = { ensureExists: jest.fn() } as unknown as jest.Mocked<QuestService>;
     mockHunterService = { ensureExists: jest.fn() } as unknown as jest.Mocked<HunterService>;
 
-    service = new QuestAssignmentService(mockRepository, mockQuestService, mockHunterService);
+    service = new QuestAssignmentService(mockRepository, () => mockQuestService, mockHunterService);
   });
 
   describe('Create assignment', () => {
