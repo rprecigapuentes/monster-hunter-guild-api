@@ -100,7 +100,7 @@ export class QuestService extends BaseService<
       this.validateStatusTransition(currentStatus, nextStatus as QuestStatus);
 
       if ((nextStatus as QuestStatus) === 'IN_PROGRESS') {
-        await this.ensureQuestHasHunters(existing.id);
+        await this.ensureQuestHasLeader(existing.id);
       }
     }
   }
@@ -135,13 +135,14 @@ export class QuestService extends BaseService<
     }
   }
 
-  private async ensureQuestHasHunters(questId: string): Promise<void> {
+  private async ensureQuestHasLeader(questId: string): Promise<void> {
     if (!this.questAssignmentService) {
       throw new Error('QuestAssignmentService is not wired into QuestService');
     }
     const assignments = await this.questAssignmentService.findByQuest(questId);
-    if (assignments.length === 0) {
-      throw new QuestValidationError('A quest needs at least one hunter before it can start');
+    const hasLeader = assignments.some((assignment) => assignment.role === 'Leader');
+    if (!hasLeader) {
+      throw new QuestValidationError('A quest needs at least one leader before it can start');
     }
   }
 }
