@@ -1,3 +1,3 @@
 export interface IExistenceChecker {
-    exists(id:string): Promise<Boolean>
+  exists(id: string): Promise<boolean>;
 }
