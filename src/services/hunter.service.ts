@@ -1,4 +1,4 @@
-import { CreateHunterDto, UpdateHunterDto } from '../dto/hunter.dto';
+import type { CreateHunterDto, UpdateHunterDto } from '../dto/hunter.dto';
 import type { Hunter, Prisma } from '../generated/prisma/client';
 import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
 import { BaseService } from './base-service.abstract';
@@ -24,7 +24,7 @@ export class HunterService extends BaseService<
   Prisma.HunterUncheckedUpdateInput
 > {
   private static readonly INITIAL_EXPERIENCE = 0;
-  
+
   constructor(
     repository: PrismaBaseRepository<
       Hunter,

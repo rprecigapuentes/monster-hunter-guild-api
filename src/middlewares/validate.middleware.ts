@@ -19,9 +19,7 @@ export function validate(schema: ZodType) {
 }
 
 function buildErrorMessage(error: z.ZodError): string {
-  const unrecognizedKeysIssue = error.issues.find(
-    (issue) => issue.code === 'unrecognized_keys'
-  );
+  const unrecognizedKeysIssue = error.issues.find((issue) => issue.code === 'unrecognized_keys');
 
   if (unrecognizedKeysIssue && 'keys' in unrecognizedKeysIssue) {
     const fields = unrecognizedKeysIssue.keys.join(', ');

@@ -1,4 +1,4 @@
-import { Prisma } from "../generated/prisma/client";
+import type { Prisma } from '../generated/prisma/client';
 
 export type CreateHunterDto = Omit<Prisma.HunterUncheckedCreateInput, 'rank' | 'experiencePoints'>;
 
