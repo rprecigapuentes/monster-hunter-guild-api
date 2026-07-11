@@ -16,11 +16,13 @@ import { QuestAssignmentService } from '../services/quest-assignment.service';
 import { QuestAssignmentController } from '../controllers/quest-assignment.controller';
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
 import { RewardDistributionService } from '../services/reward-distribution.service';
+import { EntityExistenceValidator } from '../services/entity-existence-validator';
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
 const monsterService = new MonsterService(monsterRepository);
 export const monsterController = new MonsterController(monsterService);
+const monsterExistence = new EntityExistenceValidator(monsterService, 'Monster');
 
 // Hunter
 const rankCalculator = new RankCalculator();
@@ -30,7 +32,7 @@ export const hunterController = new HunterController(hunterService);
 
 // Quest
 const questRepository = new QuestRepository(prisma.quest);
-const questService = new QuestService(questRepository, monsterService);
+const questService = new QuestService(questRepository, monsterExistence);
 export const questController = new QuestController(questService);
 
 // Guild

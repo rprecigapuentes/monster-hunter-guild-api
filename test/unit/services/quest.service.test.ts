@@ -7,11 +7,13 @@ import type { QuestRepository } from '../../../src/repositories/quest.repository
 import type { Monster, Quest, QuestStatus } from '../../../src/generated/prisma/client';
 import { type MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
 import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
+import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
+import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
 
 describe('QuestService', () => {
   let service: QuestService;
   let mockQuestRepository: jest.Mocked<QuestRepository>;
-  let mockMonsterService: jest.Mocked<MonsterService>;
+  let mockMonsterExistence: jest.Mocked<EntityExistenceValidator>;
   let mockQuestAssignmentService: { findByQuest: jest.Mock };
   let mockRewardDistributionService: {distributeRewards: jest.Mock;
 };
@@ -42,11 +44,11 @@ describe('QuestService', () => {
       findAll: jest.fn(),
     } as unknown as jest.Mocked<QuestRepository>;
 
-    mockMonsterService = {
-      ensureExists: jest.fn(),
-    } as unknown as jest.Mocked<MonsterService>;
+    mockMonsterExistence = {
+      ensure: jest.fn(),
+    } as unknown as jest.Mocked<EntityExistenceValidator>;
 
-    service = new QuestService(mockQuestRepository, mockMonsterService);
+    service = new QuestService(mockQuestRepository, mockMonsterExistence);
     mockQuestAssignmentService = { findByQuest: jest.fn().mockResolvedValue([]) };
     service.setQuestAssignmentService(mockQuestAssignmentService as any);
 
@@ -64,12 +66,12 @@ describe('QuestService', () => {
     };
 
     it('Should create a new quest when data is valid', async () => {
-      mockMonsterService.ensureExists.mockResolvedValue(mockMonster);
+      mockMonsterExistence.ensure.mockResolvedValue(undefined);
       mockQuestRepository.create.mockResolvedValue(mockQuest);
 
       const result = await service.create(input);
 
-      expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('m1');
+      expect(mockMonsterExistence.ensure).toHaveBeenCalledWith('m1');
       expect(mockQuestRepository.create).toHaveBeenCalledWith(input);
       expect(result).toEqual(mockQuest);
     });
@@ -87,12 +89,12 @@ describe('QuestService', () => {
     });
 
     it('Should throw validation error when the monster does not exist', async () => {
-      mockMonsterService.ensureExists.mockRejectedValue(new MonsterNotFoundError('m1'));
+      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'))
 
       await expect(service.create({ ...input, monsterId: 'ghost' })).rejects.toThrow(
-        QuestValidationError
+        RelatedEntityValidationError
       );
-      expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
+      expect(mockMonsterExistence.ensure).toHaveBeenCalledWith('ghost');
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
 
@@ -150,12 +152,12 @@ describe('QuestService', () => {
 
     it('Should throw validation error when the new monster does not exist', async () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
-      mockMonsterService.ensureExists.mockRejectedValue(new MonsterNotFoundError('m1'));
+      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'));
 
       await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(
-        QuestValidationError
+        RelatedEntityValidationError
       );
-      expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
+      expect(mockMonsterExistence.ensure).toHaveBeenCalledWith('ghost');
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
     });
 
