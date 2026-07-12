@@ -161,4 +161,24 @@ describe('MonsterService', () => {
       expect(result).toEqual(mockList);
     });
   });
+
+  describe('exist', () => {
+    it('should return exists === true when monster exists', async () => {
+      mockRepository.findById.mockResolvedValue(mockMonster);
+
+      const result = await service.exists('m1');
+
+      expect(mockRepository.findById).toHaveBeenCalledWith('m1');
+      expect(result).toBe(true);
+    });
+
+    it('should return exists === null when monster does not exists', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      const result = await service.exists('m1');
+
+      expect(mockRepository.findById).toHaveBeenCalledWith('m1');
+      expect(result).toEqual(false);
+    });
+  });
 });

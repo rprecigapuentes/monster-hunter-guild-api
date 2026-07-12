@@ -4,7 +4,7 @@ import {
   QuestValidationError,
 } from '../../../src/services/quest.service';
 import type { QuestRepository } from '../../../src/repositories/quest.repository';
-import type { Monster, Quest, QuestStatus } from '../../../src/generated/prisma/client';
+import type { Quest, QuestStatus } from '../../../src/generated/prisma/client';
 import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
 import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
 import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
@@ -24,14 +24,6 @@ describe('QuestService', () => {
     reward: 5000,
     status: 'PENDING',
     monsterId: 'm1',
-  };
-
-  const mockMonster: Monster = {
-    id: 'm1',
-    name: 'Rathalos',
-    species: 'Flying Wyvern',
-    dangerLevel: 7,
-    rewardValue: 5000,
   };
 
   beforeEach(() => {
