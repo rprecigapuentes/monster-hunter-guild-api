@@ -1,8 +1,7 @@
 import type { Prisma, QuestAssignment, QuestRole } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
-import type { HunterService } from './hunter.service';
-import type { QuestService } from './quest.service';
 import { BaseService } from './base-service.abstract';
+import type { EntityExistenceValidator } from './entity-existence-validator';
 
 export class QuestAssignmentNotFoundError extends Error {
   constructor(id: string) {
@@ -31,8 +30,8 @@ export class QuestAssignmentService extends BaseService<
       Prisma.QuestAssignmentUncheckedCreateInput,
       Prisma.QuestAssignmentUncheckedUpdateInput
     >,
-    private readonly questService: QuestService,
-    private readonly hunterService: HunterService
+    private readonly questExistence: EntityExistenceValidator,
+    private readonly hunterExistence: EntityExistenceValidator
   ) {
     super(repository);
   }
@@ -47,8 +46,8 @@ export class QuestAssignmentService extends BaseService<
     const { hunterId, questId, role } = data;
 
     this.validateRole(role);
-    await this.ensureQuestExists(questId);
-    await this.ensureHunterExists(hunterId);
+    await this.hunterExistence.ensure(hunterId);
+    await this.questExistence.ensure(questId);
 
     const questAssignments = await this.findAssignmentsByQuest(questId);
     this.ensureHunterNotAlreadyAssigned(questAssignments, hunterId);
@@ -67,10 +66,10 @@ export class QuestAssignmentService extends BaseService<
       this.validateRole(role);
     }
     if (typeof data.hunterId === 'string') {
-      await this.ensureHunterExists(hunterId);
+      await this.hunterExistence.ensure(hunterId);
     }
     if (typeof data.questId === 'string') {
-      await this.ensureQuestExists(questId);
+      await this.questExistence.ensure(questId);
     }
 
     const others = (await this.findAssignmentsByQuest(questId)).filter(
@@ -85,22 +84,6 @@ export class QuestAssignmentService extends BaseService<
       throw new QuestAssignmentValidationError(
         `Role must be one of: ${this._validRoles.join(', ')}`
       );
-    }
-  }
-
-  private async ensureQuestExists(questId: string): Promise<void> {
-    try {
-      await this.questService.ensureExists(questId);
-    } catch {
-      throw new QuestAssignmentValidationError(`Quest with id ${questId} does not exist`);
-    }
-  }
-
-  private async ensureHunterExists(hunterId: string): Promise<void> {
-    try {
-      await this.hunterService.ensureExists(hunterId);
-    } catch {
-      throw new QuestAssignmentValidationError(`Hunter with id ${hunterId} does not exist`);
     }
   }
 

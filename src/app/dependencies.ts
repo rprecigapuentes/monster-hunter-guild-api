@@ -29,11 +29,13 @@ const rankCalculator = new RankCalculator();
 const hunterRepository = new HunterRepository(prisma.hunter);
 const hunterService = new HunterService(hunterRepository, rankCalculator);
 export const hunterController = new HunterController(hunterService);
+const hunterExistence = new EntityExistenceValidator(hunterService, 'Hunter');
 
 // Quest
 const questRepository = new QuestRepository(prisma.quest);
 const questService = new QuestService(questRepository, monsterExistence);
 export const questController = new QuestController(questService);
+const questExistence = new EntityExistenceValidator(questService, 'Quest');
 
 // Guild
 const guildRepository = new GuildRepository(prisma.guild);
@@ -44,8 +46,8 @@ export const guildController = new GuildController(guildService);
 const questAssignmentRepository = new QuestAssignmentRepository(prisma.questAssignment);
 const questAssignmentService = new QuestAssignmentService(
   questAssignmentRepository,
-  questService,
-  hunterService
+  questExistence,
+  hunterExistence
 );
 questService.setQuestAssignmentService(questAssignmentService);
 

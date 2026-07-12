@@ -5,14 +5,14 @@ import {
 } from '../../../src/services/quest-assignment.service';
 import type { QuestAssignmentRepository } from '../../../src/repositories/quest-assignment.repository';
 import type { QuestAssignment, Hunter, Quest } from '../../../src/generated/prisma/client';
-import { type HunterService, HunterNotFoundError } from '../../../src/services/hunter.service';
-import { type QuestService, QuestNotFoundError } from '../../../src/services/quest.service';
+import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
+import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
 
 describe('QuestAssignmentService', () => {
   let service: QuestAssignmentService;
   let mockRepository: jest.Mocked<QuestAssignmentRepository>;
-  let mockQuestService: jest.Mocked<QuestService>;
-  let mockHunterService: jest.Mocked<HunterService>;
+  let mockQuestExistence: jest.Mocked<EntityExistenceValidator>;
+  let mockHunterExistence: jest.Mocked<EntityExistenceValidator>;
 
   const mockHunter: Hunter = {
     id: 'h1',
@@ -47,23 +47,23 @@ describe('QuestAssignmentService', () => {
       findAll: jest.fn(),
     } as unknown as jest.Mocked<QuestAssignmentRepository>;
 
-    mockQuestService = { ensureExists: jest.fn() } as unknown as jest.Mocked<QuestService>;
-    mockHunterService = { ensureExists: jest.fn() } as unknown as jest.Mocked<HunterService>;
+    mockQuestExistence = { ensure: jest.fn() } as unknown as jest.Mocked<EntityExistenceValidator>;
+    mockHunterExistence = { ensure: jest.fn() } as unknown as jest.Mocked<EntityExistenceValidator>;
 
-    service = new QuestAssignmentService(mockRepository, mockQuestService, mockHunterService);
+    service = new QuestAssignmentService(mockRepository, mockQuestExistence, mockHunterExistence);
   });
 
   describe('Create assignment', () => {
     it('Should create an assignment when data is valid', async () => {
-      mockQuestService.ensureExists.mockResolvedValue(mockQuest);
-      mockHunterService.ensureExists.mockResolvedValue(mockHunter);
+      mockQuestExistence.ensure.mockResolvedValue(undefined);
+      mockHunterExistence.ensure.mockResolvedValue(undefined);
       mockRepository.findAll.mockResolvedValue([]);
       mockRepository.create.mockResolvedValue(mockAssignment);
 
       const result = await service.create(input);
 
-      expect(mockQuestService.ensureExists).toHaveBeenCalledWith('q1');
-      expect(mockHunterService.ensureExists).toHaveBeenCalledWith('h1');
+      expect(mockQuestExistence.ensure).toHaveBeenCalledWith('q1');
+      expect(mockHunterExistence.ensure).toHaveBeenCalledWith('h1');
       expect(mockRepository.create).toHaveBeenCalledWith(input);
       expect(result).toEqual(mockAssignment);
     });
@@ -76,23 +76,23 @@ describe('QuestAssignmentService', () => {
     });
 
     it('Should throw when the quest does not exist', async () => {
-      mockQuestService.ensureExists.mockRejectedValue(new QuestNotFoundError('q1'));
+      mockQuestExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Quest', 'q1'));
 
-      await expect(service.create(input)).rejects.toThrow(QuestAssignmentValidationError);
+      await expect(service.create(input)).rejects.toThrow(RelatedEntityValidationError);
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
     it('Should throw when the hunter does not exist', async () => {
-      mockQuestService.ensureExists.mockResolvedValue(mockQuest);
-      mockHunterService.ensureExists.mockRejectedValue(new HunterNotFoundError('h1'));
+      mockQuestExistence.ensure.mockResolvedValue(undefined);
+      mockHunterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Hunter', 'h1'));
 
-      await expect(service.create(input)).rejects.toThrow(QuestAssignmentValidationError);
+      await expect(service.create(input)).rejects.toThrow(RelatedEntityValidationError);
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
     it('Should throw when the hunter is already assigned to the quest', async () => {
-      mockQuestService.ensureExists.mockResolvedValue(mockQuest);
-      mockHunterService.ensureExists.mockResolvedValue(mockHunter);
+      mockQuestExistence.ensure.mockResolvedValue(undefined);
+      mockHunterExistence.ensure.mockResolvedValue(undefined);
       mockRepository.findAll.mockResolvedValue([mockAssignment]);
 
       await expect(service.create(input)).rejects.toThrow(QuestAssignmentValidationError);
@@ -100,8 +100,8 @@ describe('QuestAssignmentService', () => {
     });
 
     it('Should throw when the quest already has a Leader', async () => {
-      mockQuestService.ensureExists.mockResolvedValue(mockQuest);
-      mockHunterService.ensureExists.mockResolvedValue(mockHunter);
+      mockQuestExistence.ensure.mockResolvedValue(undefined);
+      mockHunterExistence.ensure.mockResolvedValue(undefined);
       mockRepository.findAll.mockResolvedValue([
         { id: 'a0', hunterId: 'h2', questId: 'q1', role: 'Leader' },
       ]);
