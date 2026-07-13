@@ -18,7 +18,10 @@ describe('RewardDistributionService', () => {
       findByQuest: jest.fn(),
     } as unknown as jest.Mocked<QuestAssignmentService>;
 
-    service = new RewardDistributionService(mockHunterService, () => mockQuestAssignmentService);
+    service = new RewardDistributionService({
+      hunterService: mockHunterService,
+      getQuestAssignmentService: () => mockQuestAssignmentService,
+    });
   });
 
   it('Should distribute 40% reward to leader and remaining equally to members', async () => {

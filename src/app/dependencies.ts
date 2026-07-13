@@ -51,8 +51,8 @@ const questAssignmentService = new QuestAssignmentService(
   hunterService
 );
 
-const rewardDistributionService = new RewardDistributionService(
+const rewardDistributionService = new RewardDistributionService({
   hunterService,
-  (): QuestAssignmentService => questAssignmentService
-);
+  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+});
 export const questAssignmentController = new QuestAssignmentController(questAssignmentService);

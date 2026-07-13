@@ -9,13 +9,20 @@ export class RewardDistributionError extends Error {
   }
 }
 
+interface RewardDistributionServiceDependencies {
+  hunterService: HunterService;
+  getQuestAssignmentService: () => QuestAssignmentService;
+}
+
 export class RewardDistributionService {
   private static readonly LEADER_PERCENTAGE = 0.4;
+  private readonly hunterService: HunterService;
+  private readonly getQuestAssignmentService: () => QuestAssignmentService;
 
-  constructor(
-    private readonly hunterService: HunterService,
-    private readonly getQuestAssignmentService: () => QuestAssignmentService
-  ) {}
+  constructor(deps: RewardDistributionServiceDependencies) {
+    this.hunterService = deps.hunterService;
+    this.getQuestAssignmentService = deps.getQuestAssignmentService;
+  }
 
   async distributeRewards(questId: string, reward: number): Promise<void> {
     if (reward === 0) {
