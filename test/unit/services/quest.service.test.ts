@@ -47,12 +47,12 @@ describe('QuestService', () => {
       ensureExists: jest.fn(),
     } as unknown as jest.Mocked<MonsterService>;
 
-    service = new QuestService(
-      mockQuestRepository,
-      mockMonsterService,
-      () => mockRewardDistributionService,
-      () => mockQuestAssignmentService
-    );
+    service = new QuestService({
+      repository: mockQuestRepository,
+      monsterService: mockMonsterService,
+      getRewardDistributionService: () => mockRewardDistributionService,
+      getQuestAssignmentService: () => mockQuestAssignmentService,
+    });
     mockQuestAssignmentService = {
       findByQuest: jest.fn().mockResolvedValue([]),
     } as unknown as jest.Mocked<QuestAssignmentService>;

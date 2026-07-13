@@ -30,12 +30,12 @@ export const hunterController = new HunterController(hunterService);
 
 // Quest
 const questRepository = new QuestRepository(prisma.quest);
-const questService = new QuestService(
-  questRepository,
+const questService = new QuestService({
+  repository: questRepository,
+  getQuestAssignmentService: () => questAssignmentService,
+  getRewardDistributionService: () => rewardDistributionService,
   monsterService,
-  (): RewardDistributionService => rewardDistributionService,
-  (): QuestAssignmentService => questAssignmentService
-);
+});
 export const questController = new QuestController(questService);
 
 // Guild

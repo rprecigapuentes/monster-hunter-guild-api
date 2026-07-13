@@ -18,12 +18,24 @@ export class QuestValidationError extends Error {
     this.name = 'QuestValidationError';
   }
 }
-
+interface QuestServiceDependencies {
+  repository: PrismaBaseRepository<
+    Quest,
+    Prisma.QuestUncheckedCreateInput,
+    Prisma.QuestUncheckedUpdateInput
+  >;
+  monsterService: MonsterService;
+  getRewardDistributionService: () => RewardDistributionService;
+  getQuestAssignmentService: () => QuestAssignmentService;
+}
 export class QuestService extends BaseService<
   Quest,
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
+  private readonly monsterService: MonsterService;
+  private readonly getRewardDistributionService: () => RewardDistributionService;
+  private readonly getQuestAssignmentService: () => QuestAssignmentService;
   private readonly _validTransitions: Record<QuestStatus, QuestStatus[]> = {
     PENDING: ['IN_PROGRESS'],
     IN_PROGRESS: ['COMPLETED', 'FAILED'],
@@ -31,17 +43,11 @@ export class QuestService extends BaseService<
     FAILED: ['PENDING'],
   };
 
-  constructor(
-    repository: PrismaBaseRepository<
-      Quest,
-      Prisma.QuestUncheckedCreateInput,
-      Prisma.QuestUncheckedUpdateInput
-    >,
-    private readonly monsterService: MonsterService,
-    private readonly getRewardDistributionService: () => RewardDistributionService,
-    private readonly getQuestAssignmentService: () => QuestAssignmentService
-  ) {
-    super(repository);
+  constructor(deps: QuestServiceDependencies) {
+    super(deps.repository);
+    this.monsterService = deps.monsterService;
+    this.getRewardDistributionService = deps.getRewardDistributionService;
+    this.getQuestAssignmentService = deps.getQuestAssignmentService;
   }
 
   protected notFoundError(id: string): Error {
