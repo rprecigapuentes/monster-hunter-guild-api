@@ -36,8 +36,8 @@ const questRepository = new QuestRepository(prisma.quest);
 const questService = new QuestService({
   repository: questRepository,
   monsterExistence,
-  getQuestAssignmentService: () => questAssignmentService,
-  getRewardDistributionService: () => rewardDistributionService
+  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+  getRewardDistributionService: (): RewardDistributionService => rewardDistributionService,
 });
 export const questController = new QuestController(questService);
 const questExistence = new EntityExistenceValidator(questService, 'Quest');

@@ -33,8 +33,8 @@ export class QuestAssignmentService extends BaseService<
   Prisma.QuestAssignmentUncheckedUpdateInput
 > {
   private readonly _validRoles: QuestRole[] = ['Leader', 'Support', 'Scout'];
-  private readonly questExistence: EntityExistenceValidator,
-  private readonly hunterExistence: EntityExistenceValidator
+  private readonly questExistence: EntityExistenceValidator;
+  private readonly hunterExistence: EntityExistenceValidator;
 
   constructor(deps: QuestAssignmentServiceDependencies) {
     super(deps.repository);
