@@ -166,7 +166,7 @@ describe('QuestService', () => {
       mockQuestRepository.update.mockResolvedValue(updatedQuest);
 
       mockQuestAssignmentService.findByQuest.mockResolvedValue([
-        { id: 'a1', hunterId: 'h1', questId: '1', role: 'Support' },
+        { id: 'a1', hunterId: 'h1', questId: '1', role: 'Leader' },
       ]);
 
       const result = await service.update('1', updateData);
@@ -220,6 +220,20 @@ describe('QuestService', () => {
       await expect(service.update('1', { status: 'IN_PROGRESS' })).rejects.toThrow(
         QuestValidationError
       );
+      expect(mockQuestRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('Should throw an error when starting a quest with no hunters leaders are assigned', async () => {
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
+
+      mockQuestAssignmentService.findByQuest.mockResolvedValue([
+        { id: 'a1', hunterId: 'h1', questId: '1', role: 'Support' },
+      ]);
+
+      await expect(
+        service.update('1', { status: 'IN_PROGRESS' })
+      ).rejects.toThrow(QuestValidationError);
+
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
     });
 
