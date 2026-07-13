@@ -1,8 +1,7 @@
 import type { Prisma, QuestAssignment, QuestRole } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
-import type { HunterService } from './hunter.service';
-import type { QuestService } from './quest.service';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
+import type { EntityExistenceValidator } from './entity-existence-validator';
 
 export class QuestAssignmentNotFoundError extends Error {
   constructor(id: string) {
@@ -19,13 +18,13 @@ export class QuestAssignmentValidationError extends Error {
 }
 
 interface QuestAssignmentServiceDependencies {
-  repository: PrismaBaseRepository<
+  repository: IBasicRepository<
     QuestAssignment,
     Prisma.QuestAssignmentUncheckedCreateInput,
     Prisma.QuestAssignmentUncheckedUpdateInput
   >;
-  getQuestService: () => QuestService;
-  hunterService: HunterService;
+  questExistence: EntityExistenceValidator;
+  hunterExistence: EntityExistenceValidator;
 }
 
 export class QuestAssignmentService extends BaseService<
@@ -34,13 +33,13 @@ export class QuestAssignmentService extends BaseService<
   Prisma.QuestAssignmentUncheckedUpdateInput
 > {
   private readonly _validRoles: QuestRole[] = ['Leader', 'Support', 'Scout'];
-  private readonly getQuestService: () => QuestService;
-  private readonly hunterService: HunterService;
+  private readonly questExistence: EntityExistenceValidator;
+  private readonly hunterExistence: EntityExistenceValidator;
 
   constructor(deps: QuestAssignmentServiceDependencies) {
     super(deps.repository);
-    this.getQuestService = deps.getQuestService;
-    this.hunterService = deps.hunterService;
+    this.questExistence = deps.questExistence;
+    this.hunterExistence = deps.hunterExistence;
   }
 
   protected notFoundError(id: string): Error {
@@ -53,8 +52,8 @@ export class QuestAssignmentService extends BaseService<
     const { hunterId, questId, role } = data;
 
     this.validateRole(role);
-    await this.ensureQuestExists(questId);
-    await this.ensureHunterExists(hunterId);
+    await this.hunterExistence.ensure(hunterId);
+    await this.questExistence.ensure(questId);
 
     const questAssignments = await this.findAssignmentsByQuest(questId);
     this.ensureHunterNotAlreadyAssigned(questAssignments, hunterId);
@@ -73,10 +72,10 @@ export class QuestAssignmentService extends BaseService<
       this.validateRole(role);
     }
     if (typeof data.hunterId === 'string') {
-      await this.ensureHunterExists(hunterId);
+      await this.hunterExistence.ensure(hunterId);
     }
     if (typeof data.questId === 'string') {
-      await this.ensureQuestExists(questId);
+      await this.questExistence.ensure(questId);
     }
 
     const others = (await this.findAssignmentsByQuest(questId)).filter(
@@ -91,23 +90,6 @@ export class QuestAssignmentService extends BaseService<
       throw new QuestAssignmentValidationError(
         `Role must be one of: ${this._validRoles.join(', ')}`
       );
-    }
-  }
-
-  private async ensureQuestExists(questId: string): Promise<void> {
-    const questService = this.getQuestService();
-    try {
-      await questService.ensureExists(questId);
-    } catch {
-      throw new QuestAssignmentValidationError(`Quest with id ${questId} does not exist`);
-    }
-  }
-
-  private async ensureHunterExists(hunterId: string): Promise<void> {
-    try {
-      await this.hunterService.ensureExists(hunterId);
-    } catch {
-      throw new QuestAssignmentValidationError(`Hunter with id ${hunterId} does not exist`);
     }
   }
 

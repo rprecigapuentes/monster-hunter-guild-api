@@ -1,9 +1,9 @@
 import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
-import type { MonsterService } from './monster.service';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import type { QuestAssignmentService } from './quest-assignment.service';
 import { BaseService } from './base-service.abstract';
 import type { RewardDistributionService } from './reward-distribution.service';
+import type { EntityExistenceValidator } from './entity-existence-validator';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -18,22 +18,24 @@ export class QuestValidationError extends Error {
     this.name = 'QuestValidationError';
   }
 }
+
 interface QuestServiceDependencies {
-  repository: PrismaBaseRepository<
+  repository: IBasicRepository<
     Quest,
     Prisma.QuestUncheckedCreateInput,
     Prisma.QuestUncheckedUpdateInput
   >;
-  monsterService: MonsterService;
+  monsterExistence: EntityExistenceValidator;
   getRewardDistributionService: () => RewardDistributionService;
   getQuestAssignmentService: () => QuestAssignmentService;
 }
+
 export class QuestService extends BaseService<
   Quest,
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
-  private readonly monsterService: MonsterService;
+  private readonly monsterExistence: EntityExistenceValidator;
   private readonly getRewardDistributionService: () => RewardDistributionService;
   private readonly getQuestAssignmentService: () => QuestAssignmentService;
   private readonly _validTransitions: Record<QuestStatus, QuestStatus[]> = {
@@ -45,7 +47,7 @@ export class QuestService extends BaseService<
 
   constructor(deps: QuestServiceDependencies) {
     super(deps.repository);
-    this.monsterService = deps.monsterService;
+    this.monsterExistence = deps.monsterExistence;
     this.getRewardDistributionService = deps.getRewardDistributionService;
     this.getQuestAssignmentService = deps.getQuestAssignmentService;
   }
@@ -74,7 +76,7 @@ export class QuestService extends BaseService<
     if (status && status !== 'PENDING') {
       throw new QuestValidationError('A quest must be created with "PENDING" status.');
     }
-    await this.ensureMonsterExists(monsterId);
+    await this.monsterExistence.ensure(monsterId);
   }
 
   protected override async validateUpdate(
@@ -85,7 +87,7 @@ export class QuestService extends BaseService<
     const { monsterId, reward, status: nextStatus } = data;
 
     if (typeof monsterId === 'string') {
-      await this.ensureMonsterExists(monsterId);
+      await this.monsterExistence.ensure(monsterId);
     }
     if (typeof reward === 'number') {
       this.validateReward(reward);
@@ -109,14 +111,6 @@ export class QuestService extends BaseService<
   private validateReward(reward?: number | null): void {
     if (typeof reward === 'number' && reward < 0) {
       throw new QuestValidationError('Quest reward must be >= 0');
-    }
-  }
-
-  private async ensureMonsterExists(monsterId: string): Promise<void> {
-    try {
-      await this.monsterService.ensureExists(monsterId);
-    } catch {
-      throw new QuestValidationError(`Monster with id ${monsterId} does not exist`);
     }
   }
 
