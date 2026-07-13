@@ -33,7 +33,12 @@ const hunterExistence = new EntityExistenceValidator(hunterService, 'Hunter');
 
 // Quest
 const questRepository = new QuestRepository(prisma.quest);
-const questService = new QuestService(questRepository, monsterExistence);
+const questService = new QuestService({
+  repository: questRepository,
+  monsterExistence,
+  getQuestAssignmentService: () => questAssignmentService,
+  getRewardDistributionService: () => rewardDistributionService
+});
 export const questController = new QuestController(questService);
 const questExistence = new EntityExistenceValidator(questService, 'Quest');
 
@@ -44,16 +49,14 @@ export const guildController = new GuildController(guildService);
 
 //QuestAssignment
 const questAssignmentRepository = new QuestAssignmentRepository(prisma.questAssignment);
-const questAssignmentService = new QuestAssignmentService(
-  questAssignmentRepository,
+const questAssignmentService = new QuestAssignmentService({
+  repository: questAssignmentRepository,
   questExistence,
-  hunterExistence
-);
-questService.setQuestAssignmentService(questAssignmentService);
-
-const rewardDistributionService = new RewardDistributionService(
-  hunterService,
-  questAssignmentService
-);
-questService.setRewardDistributionService(rewardDistributionService);
+  hunterExistence,
+});
 export const questAssignmentController = new QuestAssignmentController(questAssignmentService);
+
+const rewardDistributionService = new RewardDistributionService({
+  hunterService,
+  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+});

@@ -17,23 +17,29 @@ export class QuestAssignmentValidationError extends Error {
   }
 }
 
+interface QuestAssignmentServiceDependencies {
+  repository: IBasicRepository<
+    QuestAssignment,
+    Prisma.QuestAssignmentUncheckedCreateInput,
+    Prisma.QuestAssignmentUncheckedUpdateInput
+  >;
+  questExistence: EntityExistenceValidator;
+  hunterExistence: EntityExistenceValidator;
+}
+
 export class QuestAssignmentService extends BaseService<
   QuestAssignment,
   Prisma.QuestAssignmentUncheckedCreateInput,
   Prisma.QuestAssignmentUncheckedUpdateInput
 > {
   private readonly _validRoles: QuestRole[] = ['Leader', 'Support', 'Scout'];
+  private readonly questExistence: EntityExistenceValidator,
+  private readonly hunterExistence: EntityExistenceValidator
 
-  constructor(
-    repository: IBasicRepository<
-      QuestAssignment,
-      Prisma.QuestAssignmentUncheckedCreateInput,
-      Prisma.QuestAssignmentUncheckedUpdateInput
-    >,
-    private readonly questExistence: EntityExistenceValidator,
-    private readonly hunterExistence: EntityExistenceValidator
-  ) {
-    super(repository);
+  constructor(deps: QuestAssignmentServiceDependencies) {
+    super(deps.repository);
+    this.questExistence = deps.questExistence;
+    this.hunterExistence = deps.hunterExistence;
   }
 
   protected notFoundError(id: string): Error {

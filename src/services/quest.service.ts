@@ -19,11 +19,25 @@ export class QuestValidationError extends Error {
   }
 }
 
+interface QuestServiceDependencies {
+  repository: IBasicRepository<
+    Quest,
+    Prisma.QuestUncheckedCreateInput,
+    Prisma.QuestUncheckedUpdateInput
+  >;
+  monsterExistence: EntityExistenceValidator;
+  getRewardDistributionService: () => RewardDistributionService;
+  getQuestAssignmentService: () => QuestAssignmentService;
+}
+
 export class QuestService extends BaseService<
   Quest,
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
+  private readonly monsterExistence: EntityExistenceValidator;
+  private readonly getRewardDistributionService: () => RewardDistributionService;
+  private readonly getQuestAssignmentService: () => QuestAssignmentService;
   private readonly _validTransitions: Record<QuestStatus, QuestStatus[]> = {
     PENDING: ['IN_PROGRESS'],
     IN_PROGRESS: ['COMPLETED', 'FAILED'],
@@ -31,26 +45,11 @@ export class QuestService extends BaseService<
     FAILED: ['PENDING'],
   };
 
-  constructor(
-    repository: IBasicRepository<
-      Quest,
-      Prisma.QuestUncheckedCreateInput,
-      Prisma.QuestUncheckedUpdateInput
-    >,
-    private readonly monsterExistence: EntityExistenceValidator
-  ) {
-    super(repository);
-  }
-
-  private rewardDistributionService?: RewardDistributionService;
-  private questAssignmentService?: QuestAssignmentService;
-
-  setQuestAssignmentService(service: QuestAssignmentService): void {
-    this.questAssignmentService = service;
-  }
-
-  setRewardDistributionService(service: RewardDistributionService): void {
-    this.rewardDistributionService = service;
+  constructor(deps: QuestServiceDependencies) {
+    super(deps.repository);
+    this.monsterExistence = deps.monsterExistence;
+    this.getRewardDistributionService = deps.getRewardDistributionService;
+    this.getQuestAssignmentService = deps.getQuestAssignmentService;
   }
 
   protected notFoundError(id: string): Error {
@@ -59,14 +58,12 @@ export class QuestService extends BaseService<
 
   override async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
     const existingQuest = await this.ensureExists(id);
+    const rewardDistributionService = this.getRewardDistributionService();
     await this.validateUpdate(existingQuest, data);
     const updatedQuest = await this.repository.update(id, data);
 
     if (data.status === 'COMPLETED') {
-      await this.rewardDistributionService!.distributeRewards(
-        updatedQuest.id,
-        updatedQuest.reward ?? 0
-      );
+      await rewardDistributionService.distributeRewards(updatedQuest.id, updatedQuest.reward ?? 0);
     }
 
     return updatedQuest;
@@ -128,10 +125,8 @@ export class QuestService extends BaseService<
   }
 
   private async ensureQuestHasHunters(questId: string): Promise<void> {
-    if (!this.questAssignmentService) {
-      throw new Error('QuestAssignmentService is not wired into QuestService');
-    }
-    const assignments = await this.questAssignmentService.findByQuest(questId);
+    const questAssignmentService = this.getQuestAssignmentService();
+    const assignments = await questAssignmentService.findByQuest(questId);
     if (assignments.length === 0) {
       throw new QuestValidationError('A quest needs at least one hunter before it can start');
     }

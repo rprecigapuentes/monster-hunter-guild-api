@@ -8,14 +8,15 @@ import type { Quest, QuestStatus } from '../../../src/generated/prisma/client';
 import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
 import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
 import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
+import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
+import { type RewardDistributionService } from '../../../src/services/reward-distribution.service';
 
 describe('QuestService', () => {
   let service: QuestService;
   let mockQuestRepository: jest.Mocked<QuestRepository>;
   let mockMonsterExistence: jest.Mocked<EntityExistenceValidator>;
-  let mockQuestAssignmentService: { findByQuest: jest.Mock };
-  let mockRewardDistributionService: {distributeRewards: jest.Mock;
-};
+  let mockQuestAssignmentService: jest.Mocked<QuestAssignmentService>;
+  let mockRewardDistributionService: jest.Mocked<RewardDistributionService>;
 
   const mockQuest: Quest = {
     id: '1',
@@ -39,12 +40,20 @@ describe('QuestService', () => {
       ensure: jest.fn(),
     } as unknown as jest.Mocked<EntityExistenceValidator>;
 
-    service = new QuestService(mockQuestRepository, mockMonsterExistence);
-    mockQuestAssignmentService = { findByQuest: jest.fn().mockResolvedValue([]) };
-    service.setQuestAssignmentService(mockQuestAssignmentService as any);
+    service = new QuestService({
+      repository: mockQuestRepository,
+      monsterExistence: mockMonsterExistence,
+      getRewardDistributionService: () => mockRewardDistributionService,
+      getQuestAssignmentService: () => mockQuestAssignmentService,
+    });
+    
+    mockQuestAssignmentService = {
+      findByQuest: jest.fn().mockResolvedValue([]),
+    } as unknown as jest.Mocked<QuestAssignmentService>;
 
-    mockRewardDistributionService = {distributeRewards: jest.fn(),};
-    service.setRewardDistributionService(mockRewardDistributionService as any);
+    mockRewardDistributionService = {
+      distributeRewards: jest.fn(),
+    } as unknown as jest.Mocked<RewardDistributionService>;
   });
 
   describe('Create Quest', () => {
@@ -207,7 +216,7 @@ describe('QuestService', () => {
     });
 
     it('Should throw when starting a quest with no hunters assigned', async () => {
-      mockQuestRepository.findById.mockResolvedValue(mockQuest); 
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockQuestAssignmentService.findByQuest.mockResolvedValue([]);
 
       await expect(service.update('1', { status: 'IN_PROGRESS' })).rejects.toThrow(
@@ -217,13 +226,13 @@ describe('QuestService', () => {
     });
 
     it('Should distribute rewards when a quest is completed', async () => {
-      const currentQuest: Quest = {...mockQuest, status: 'IN_PROGRESS',};
-      const completedQuest: Quest = {...currentQuest, status: 'COMPLETED',};
+      const currentQuest: Quest = { ...mockQuest, status: 'IN_PROGRESS' };
+      const completedQuest: Quest = { ...currentQuest, status: 'COMPLETED' };
 
-      mockQuestRepository.findById.mockResolvedValue( currentQuest as Quest);
+      mockQuestRepository.findById.mockResolvedValue(currentQuest as Quest);
       mockQuestRepository.update.mockResolvedValue(completedQuest);
-      await service.update('1', { status: 'COMPLETED',});
-      expect(mockRewardDistributionService.distributeRewards).toHaveBeenCalledWith('1',5000);
+      await service.update('1', { status: 'COMPLETED' });
+      expect(mockRewardDistributionService.distributeRewards).toHaveBeenCalledWith('1', 5000);
     });
   });
 

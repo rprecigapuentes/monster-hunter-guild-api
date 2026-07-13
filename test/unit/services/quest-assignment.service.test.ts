@@ -14,21 +14,6 @@ describe('QuestAssignmentService', () => {
   let mockQuestExistence: jest.Mocked<EntityExistenceValidator>;
   let mockHunterExistence: jest.Mocked<EntityExistenceValidator>;
 
-  const mockHunter: Hunter = {
-    id: 'h1',
-    name: 'Aiden',
-    rank: 5,
-    experiencePoints: 1000,
-    guildId: 'g1',
-  };
-  const mockQuest: Quest = {
-    id: 'q1',
-    title: 'Hunt the Rathalos',
-    location: 'Ancient Forest',
-    reward: 5000,
-    status: 'PENDING',
-    monsterId: 'm1',
-  };
   const mockAssignment: QuestAssignment = {
     id: 'a1',
     hunterId: 'h1',
@@ -50,7 +35,11 @@ describe('QuestAssignmentService', () => {
     mockQuestExistence = { ensure: jest.fn() } as unknown as jest.Mocked<EntityExistenceValidator>;
     mockHunterExistence = { ensure: jest.fn() } as unknown as jest.Mocked<EntityExistenceValidator>;
 
-    service = new QuestAssignmentService(mockRepository, mockQuestExistence, mockHunterExistence);
+    service = new QuestAssignmentService({
+      repository: mockRepository,
+      questExistence: mockQuestExistence,
+      hunterExistence: mockHunterExistence,
+    });
   });
 
   describe('Create assignment', () => {
