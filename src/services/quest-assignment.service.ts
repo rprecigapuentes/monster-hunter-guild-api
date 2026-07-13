@@ -18,23 +18,29 @@ export class QuestAssignmentValidationError extends Error {
   }
 }
 
+interface QuestAssignmentServiceDependencies {
+  repository: PrismaBaseRepository<
+    QuestAssignment,
+    Prisma.QuestAssignmentUncheckedCreateInput,
+    Prisma.QuestAssignmentUncheckedUpdateInput
+  >;
+  getQuestService: () => QuestService;
+  hunterService: HunterService;
+}
+
 export class QuestAssignmentService extends BaseService<
   QuestAssignment,
   Prisma.QuestAssignmentUncheckedCreateInput,
   Prisma.QuestAssignmentUncheckedUpdateInput
 > {
   private readonly _validRoles: QuestRole[] = ['Leader', 'Support', 'Scout'];
+  private readonly getQuestService: () => QuestService;
+  private readonly hunterService: HunterService;
 
-  constructor(
-    repository: PrismaBaseRepository<
-      QuestAssignment,
-      Prisma.QuestAssignmentUncheckedCreateInput,
-      Prisma.QuestAssignmentUncheckedUpdateInput
-    >,
-    private readonly questService: QuestService,
-    private readonly hunterService: HunterService
-  ) {
-    super(repository);
+  constructor(deps: QuestAssignmentServiceDependencies) {
+    super(deps.repository);
+    this.getQuestService = deps.getQuestService;
+    this.hunterService = deps.hunterService;
   }
 
   protected notFoundError(id: string): Error {
@@ -89,8 +95,9 @@ export class QuestAssignmentService extends BaseService<
   }
 
   private async ensureQuestExists(questId: string): Promise<void> {
+    const questService = this.getQuestService();
     try {
-      await this.questService.ensureExists(questId);
+      await questService.ensureExists(questId);
     } catch {
       throw new QuestAssignmentValidationError(`Quest with id ${questId} does not exist`);
     }
