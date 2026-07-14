@@ -6,5 +6,6 @@ const router = Router();
 router.get('/quest-average-reward', statisticsController.questAverageReward);
 router.get('/entities-count', statisticsController.entitiesCount);
 router.get('/completed-quests-count', statisticsController.completedQuestsCount);
+router.get('/hunter-leaderboard', statisticsController.hunterLeaderboard);
 
 export default router;

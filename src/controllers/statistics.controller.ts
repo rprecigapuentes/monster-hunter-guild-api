@@ -34,4 +34,13 @@ export class StatisticsController {
       next(error);
     }
   };
+
+  hunterLeaderboard = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const leaderboard = await this.service.getHunterLeaderboard();
+      res.status(200).json(leaderboard);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
