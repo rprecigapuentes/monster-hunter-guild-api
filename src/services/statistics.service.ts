@@ -35,4 +35,8 @@ export class StatisticsService {
 
     return { quests, hunters, guilds, monsters };
   }
+
+  async getCompletedQuestsCount(): Promise<number> {
+    return this.questRepository.countCompletedQuests();
+  }
 }
