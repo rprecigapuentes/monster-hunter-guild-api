@@ -13,18 +13,29 @@ interface QuestStateFactoryDeps {
 }
 
 export class QuestStateFactory {
-  private readonly states: Record<QuestStatus, IQuestState>;
+  private states: Record<QuestStatus, IQuestState> | null = null;
+  private readonly getQuestAssignmentService: () => QuestAssignmentService;
+  private readonly getRewardDistributionService: () => RewardDistributionService;
 
-  constructor(deps: QuestStateFactoryDeps) {
-    this.states = {
-      PENDING: new PendingQuestState(),
-      IN_PROGRESS: new InProgresQuestState(deps.getQuestAssignmentService()),
-      COMPLETED: new CompletedQuestState(deps.getRewardDistributionService()),
-      FAILED: new FailedQuestState(),
-    };
+  constructor(private readonly deps: QuestStateFactoryDeps) {
+    this.getQuestAssignmentService = deps.getQuestAssignmentService;
+    this.getRewardDistributionService = deps.getRewardDistributionService;
+  }
+
+  private initStates(): Record<QuestStatus, IQuestState> {
+    if (!this.states) {
+      this.states = {
+        PENDING: new PendingQuestState(),
+        IN_PROGRESS: new InProgresQuestState(this.getQuestAssignmentService()),
+        COMPLETED: new CompletedQuestState(this.getRewardDistributionService()),
+        FAILED: new FailedQuestState(),
+      };
+    }
+
+    return this.states;
   }
 
   getState(status: QuestStatus): IQuestState {
-    return this.states[status];
+    return this.initStates()[status];
   }
 }
