@@ -1,9 +1,8 @@
 import type { Prisma, Quest, QuestStatus } from '../../generated/prisma/client';
 import type { IBasicRepository } from '../../repositories/interfaces/basic-repository.interface';
-import type { QuestAssignmentService } from '../quest-assignment.service';
 import { BaseService } from '../base-service.abstract';
-import type { RewardDistributionService } from '../reward-distribution.service';
 import type { EntityExistenceValidator } from '../entity-existence-validator';
+import { type QuestStateFactory } from './quest-state-factory';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -26,8 +25,7 @@ interface QuestServiceDependencies {
     Prisma.QuestUncheckedUpdateInput
   >;
   monsterExistence: EntityExistenceValidator;
-  getRewardDistributionService: () => RewardDistributionService;
-  getQuestAssignmentService: () => QuestAssignmentService;
+  stateFactory: QuestStateFactory;
 }
 
 export class QuestService extends BaseService<
@@ -36,20 +34,12 @@ export class QuestService extends BaseService<
   Prisma.QuestUncheckedUpdateInput
 > {
   private readonly monsterExistence: EntityExistenceValidator;
-  private readonly getRewardDistributionService: () => RewardDistributionService;
-  private readonly getQuestAssignmentService: () => QuestAssignmentService;
-  private readonly _validTransitions: Record<QuestStatus, QuestStatus[]> = {
-    PENDING: ['IN_PROGRESS'],
-    IN_PROGRESS: ['COMPLETED', 'FAILED'],
-    COMPLETED: [],
-    FAILED: ['PENDING'],
-  };
+  private readonly stateFactory: QuestStateFactory;
 
   constructor(deps: QuestServiceDependencies) {
     super(deps.repository);
     this.monsterExistence = deps.monsterExistence;
-    this.getRewardDistributionService = deps.getRewardDistributionService;
-    this.getQuestAssignmentService = deps.getQuestAssignmentService;
+    this.stateFactory = deps.stateFactory;
   }
 
   protected notFoundError(id: string): Error {
@@ -58,12 +48,12 @@ export class QuestService extends BaseService<
 
   override async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
     const existingQuest = await this.ensureExists(id);
-    const rewardDistributionService = this.getRewardDistributionService();
     await this.validateUpdate(existingQuest, data);
     const updatedQuest = await this.repository.update(id, data);
 
-    if (data.status === 'COMPLETED') {
-      await rewardDistributionService.distributeRewards(updatedQuest.id, updatedQuest.reward ?? 0);
+    if (data.status && existingQuest.status !== data.status) {
+      const targetState = this.stateFactory.getState(data.status as QuestStatus);
+      await targetState.onEnter(existingQuest);
     }
 
     return updatedQuest;
