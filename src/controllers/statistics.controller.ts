@@ -12,4 +12,13 @@ export class StatisticsController {
       next(error);
     }
   };
+
+  entitiesCount = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const counts = await this.service.getEntitiesCount();
+      res.status(200).json(counts);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
