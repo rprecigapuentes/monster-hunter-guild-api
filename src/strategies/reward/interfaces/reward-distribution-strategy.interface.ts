@@ -2,5 +2,5 @@ import type { QuestAssignment } from "../../../generated/prisma/client"
 import type { RewardAllocation } from "./reward-allocation.interface"
 
 export interface IRewardDistributionStrategy{
-    distribution(reward: number, assignments: QuestAssignment): RewardAllocation[];
+    distribute(reward: number, assignments: QuestAssignment[]): RewardAllocation[];
 }
