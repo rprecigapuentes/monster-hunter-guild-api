@@ -17,6 +17,8 @@ import { QuestAssignmentController } from '../controllers/quest-assignment.contr
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
 import { RewardDistributionService } from '../services/reward-distribution.service';
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
+import { StatisticsService } from '../services/statistics.service';
+import { StatisticsController } from '../controllers/statistics.controller';
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
@@ -60,3 +62,7 @@ const rewardDistributionService = new RewardDistributionService({
   hunterService,
   getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
 });
+
+//Statistics
+const statisticsService = new StatisticsService(questRepository);
+export const statisticsController = new StatisticsController(statisticsService);
