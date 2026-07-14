@@ -17,6 +17,7 @@ import { QuestAssignmentController } from '../controllers/quest-assignment.contr
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
 import { RewardDistributionService } from '../services/reward-distribution.service';
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
+import { QuestStateFactory } from '../services/quest/quest-state-factory';
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
@@ -33,11 +34,14 @@ const hunterExistence = new EntityExistenceValidator(hunterService, 'Hunter');
 
 // Quest
 const questRepository = new QuestRepository(prisma.quest);
+const questStateFactory = new QuestStateFactory({
+  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+  getRewardDistributionService: (): RewardDistributionService => rewardDistributionService,
+});
 const questService = new QuestService({
   repository: questRepository,
   monsterExistence,
-  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
-  getRewardDistributionService: (): RewardDistributionService => rewardDistributionService,
+  stateFactory: questStateFactory,
 });
 export const questController = new QuestController(questService);
 const questExistence = new EntityExistenceValidator(questService, 'Quest');
