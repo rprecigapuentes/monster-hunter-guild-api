@@ -36,4 +36,14 @@ export class QuestRepository
 
     return result._avg.reward ?? 0;
   }
+
+  async countCompletedQuests(): Promise<number> {
+    const result = await this.model.count({
+      where: {
+        status: 'COMPLETED',
+      },
+    });
+
+    return result;
+  }
 }

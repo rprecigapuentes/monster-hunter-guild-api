@@ -7,4 +7,5 @@ export interface IQuestRepository extends IBasicRepository<
   Prisma.QuestUncheckedUpdateInput
 > {
   averageReward(): Promise<number>;
+  countCompletedQuests(): Promise<number>;
 }
