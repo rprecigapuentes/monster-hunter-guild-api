@@ -1,5 +1,5 @@
-import { StatisticsDto } from '../dto/statistics.dto';
-import { IQuestRepository } from '../repositories/interfaces/quest-repository.interface';
+import type { StatisticsDto } from '../dto/statistics.dto';
+import type { IQuestRepository } from '../repositories/interfaces/quest-repository.interface';
 
 export class StatisticsService {
   constructor(private readonly questRepository: IQuestRepository) {}
