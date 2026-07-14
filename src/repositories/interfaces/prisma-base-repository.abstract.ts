@@ -8,6 +8,7 @@ export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
   findUnique(args: { where: { id: string } }): Promise<TModel | null>;
   findMany(): Promise<TModel[]>;
   aggregate(args: unknown): Promise<unknown>;
+  count(args?: unknown): Promise<number>;
 }
 
 export abstract class PrismaBaseRepository<
@@ -46,5 +47,8 @@ export abstract class PrismaBaseRepository<
   }
   async findAll(): Promise<TModel[]> {
     return await this.model.findMany();
+  }
+  async count(): Promise<number> {
+    return await this.model.count();
   }
 }
