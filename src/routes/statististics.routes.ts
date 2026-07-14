@@ -1,6 +1,8 @@
 import { Router } from 'express';
-import { StatisticsController } from '../controllers/statistics.controller';
+import { statisticsController } from '../app/dependencies';
 
 const router = Router();
+
+router.get('/quest-average-reward', statisticsController.questAverageReward);
 
 export default router;

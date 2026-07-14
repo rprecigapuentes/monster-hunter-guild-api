@@ -4,7 +4,7 @@ import type { IQuestRepository } from '../repositories/interfaces/quest-reposito
 export class StatisticsService {
   constructor(private readonly questRepository: IQuestRepository) {}
 
-  async getAverageReward(): Promise<StatisticsDto> {
+  async getQuestAverageReward(): Promise<StatisticsDto> {
     const averageReward = await this.questRepository.averageReward();
     return { averageReward };
   }
