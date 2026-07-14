@@ -18,4 +18,18 @@ export class QuestRepository extends PrismaBaseRepository<
   ) {
     super(prismaModel);
   }
+
+  async averageReward(): Promise<number> {
+    const result = (await this.model.aggregate({
+      _avg: {
+        reward: true,
+      },
+    })) as {
+      _avg: {
+        reward: number | null;
+      };
+    };
+
+    return result._avg.reward ?? 0;
+  }
 }
