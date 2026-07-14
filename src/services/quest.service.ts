@@ -1,9 +1,9 @@
 import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
-import type { MonsterService } from './monster.service';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import type { QuestAssignmentService } from './quest-assignment.service';
 import { BaseService } from './base-service.abstract';
 import type { RewardDistributionService } from './reward-distribution.service';
+import type { EntityExistenceValidator } from './entity-existence-validator';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -19,11 +19,25 @@ export class QuestValidationError extends Error {
   }
 }
 
+interface QuestServiceDependencies {
+  repository: IBasicRepository<
+    Quest,
+    Prisma.QuestUncheckedCreateInput,
+    Prisma.QuestUncheckedUpdateInput
+  >;
+  monsterExistence: EntityExistenceValidator;
+  getRewardDistributionService: () => RewardDistributionService;
+  getQuestAssignmentService: () => QuestAssignmentService;
+}
+
 export class QuestService extends BaseService<
   Quest,
   Prisma.QuestUncheckedCreateInput,
   Prisma.QuestUncheckedUpdateInput
 > {
+  private readonly monsterExistence: EntityExistenceValidator;
+  private readonly getRewardDistributionService: () => RewardDistributionService;
+  private readonly getQuestAssignmentService: () => QuestAssignmentService;
   private readonly _validTransitions: Record<QuestStatus, QuestStatus[]> = {
     PENDING: ['IN_PROGRESS'],
     IN_PROGRESS: ['COMPLETED', 'FAILED'],
@@ -31,26 +45,11 @@ export class QuestService extends BaseService<
     FAILED: ['PENDING'],
   };
 
-  constructor(
-    repository: PrismaBaseRepository<
-      Quest,
-      Prisma.QuestUncheckedCreateInput,
-      Prisma.QuestUncheckedUpdateInput
-    >,
-    private readonly monsterService: MonsterService
-  ) {
-    super(repository);
-  }
-
-  private rewardDistributionService?: RewardDistributionService;
-  private questAssignmentService?: QuestAssignmentService;
-
-  setQuestAssignmentService(service: QuestAssignmentService): void {
-    this.questAssignmentService = service;
-  }
-
-  setRewardDistributionService(service: RewardDistributionService): void {
-    this.rewardDistributionService = service;
+  constructor(deps: QuestServiceDependencies) {
+    super(deps.repository);
+    this.monsterExistence = deps.monsterExistence;
+    this.getRewardDistributionService = deps.getRewardDistributionService;
+    this.getQuestAssignmentService = deps.getQuestAssignmentService;
   }
 
   protected notFoundError(id: string): Error {
@@ -59,14 +58,12 @@ export class QuestService extends BaseService<
 
   override async update(id: string, data: Prisma.QuestUncheckedUpdateInput): Promise<Quest> {
     const existingQuest = await this.ensureExists(id);
+    const rewardDistributionService = this.getRewardDistributionService();
     await this.validateUpdate(existingQuest, data);
     const updatedQuest = await this.repository.update(id, data);
 
     if (data.status === 'COMPLETED') {
-      await this.rewardDistributionService!.distributeRewards(
-        updatedQuest.id,
-        updatedQuest.reward ?? 0
-      );
+      await rewardDistributionService.distributeRewards(updatedQuest.id, updatedQuest.reward ?? 0);
     }
 
     return updatedQuest;
@@ -79,7 +76,7 @@ export class QuestService extends BaseService<
     if (status && status !== 'PENDING') {
       throw new QuestValidationError('A quest must be created with "PENDING" status.');
     }
-    await this.ensureMonsterExists(monsterId);
+    await this.monsterExistence.ensure(monsterId);
   }
 
   protected override async validateUpdate(
@@ -90,7 +87,7 @@ export class QuestService extends BaseService<
     const { monsterId, reward, status: nextStatus } = data;
 
     if (typeof monsterId === 'string') {
-      await this.ensureMonsterExists(monsterId);
+      await this.monsterExistence.ensure(monsterId);
     }
     if (typeof reward === 'number') {
       this.validateReward(reward);
@@ -117,14 +114,6 @@ export class QuestService extends BaseService<
     }
   }
 
-  private async ensureMonsterExists(monsterId: string): Promise<void> {
-    try {
-      await this.monsterService.ensureExists(monsterId);
-    } catch {
-      throw new QuestValidationError(`Monster with id ${monsterId} does not exist`);
-    }
-  }
-
   private validateStatusTransition(currentStatus: QuestStatus, nextStatus: QuestStatus): void {
     const allowedNextStatuses = this._validTransitions[currentStatus];
 
@@ -136,10 +125,8 @@ export class QuestService extends BaseService<
   }
 
   private async ensureQuestHasLeader(questId: string): Promise<void> {
-    if (!this.questAssignmentService) {
-      throw new Error('QuestAssignmentService is not wired into QuestService');
-    }
-    const assignments = await this.questAssignmentService.findByQuest(questId);
+    const questAssignmentService = this.getQuestAssignmentService();
+    const assignments = await questAssignmentService.findByQuest(questId);
     const hasLeader = assignments.some((assignment) => assignment.role === 'Leader');
     if (!hasLeader) {
       throw new QuestValidationError('A quest needs at least one leader before it can start');

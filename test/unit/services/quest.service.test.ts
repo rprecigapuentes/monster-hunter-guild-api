@@ -4,17 +4,19 @@ import {
   QuestValidationError,
 } from '../../../src/services/quest.service';
 import type { QuestRepository } from '../../../src/repositories/quest.repository';
-import type { Monster, Quest, QuestStatus } from '../../../src/generated/prisma/client';
-import { type MonsterService, MonsterNotFoundError } from '../../../src/services/monster.service';
+import type { Quest, QuestStatus } from '../../../src/generated/prisma/client';
 import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
+import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
+import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
+import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
+import { type RewardDistributionService } from '../../../src/services/reward-distribution.service';
 
 describe('QuestService', () => {
   let service: QuestService;
   let mockQuestRepository: jest.Mocked<QuestRepository>;
-  let mockMonsterService: jest.Mocked<MonsterService>;
-  let mockQuestAssignmentService: { findByQuest: jest.Mock };
-  let mockRewardDistributionService: {distributeRewards: jest.Mock;
-};
+  let mockMonsterExistence: jest.Mocked<EntityExistenceValidator>;
+  let mockQuestAssignmentService: jest.Mocked<QuestAssignmentService>;
+  let mockRewardDistributionService: jest.Mocked<RewardDistributionService>;
 
   const mockQuest: Quest = {
     id: '1',
@@ -23,14 +25,6 @@ describe('QuestService', () => {
     reward: 5000,
     status: 'PENDING',
     monsterId: 'm1',
-  };
-
-  const mockMonster: Monster = {
-    id: 'm1',
-    name: 'Rathalos',
-    species: 'Flying Wyvern',
-    dangerLevel: 7,
-    rewardValue: 5000,
   };
 
   beforeEach(() => {
@@ -42,16 +36,24 @@ describe('QuestService', () => {
       findAll: jest.fn(),
     } as unknown as jest.Mocked<QuestRepository>;
 
-    mockMonsterService = {
-      ensureExists: jest.fn(),
-    } as unknown as jest.Mocked<MonsterService>;
+    mockMonsterExistence = {
+      ensure: jest.fn(),
+    } as unknown as jest.Mocked<EntityExistenceValidator>;
 
-    service = new QuestService(mockQuestRepository, mockMonsterService);
-    mockQuestAssignmentService = { findByQuest: jest.fn().mockResolvedValue([]) };
-    service.setQuestAssignmentService(mockQuestAssignmentService as any);
+    service = new QuestService({
+      repository: mockQuestRepository,
+      monsterExistence: mockMonsterExistence,
+      getRewardDistributionService: () => mockRewardDistributionService,
+      getQuestAssignmentService: () => mockQuestAssignmentService,
+    });
+    
+    mockQuestAssignmentService = {
+      findByQuest: jest.fn().mockResolvedValue([]),
+    } as unknown as jest.Mocked<QuestAssignmentService>;
 
-    mockRewardDistributionService = {distributeRewards: jest.fn(),};
-    service.setRewardDistributionService(mockRewardDistributionService as any);
+    mockRewardDistributionService = {
+      distributeRewards: jest.fn(),
+    } as unknown as jest.Mocked<RewardDistributionService>;
   });
 
   describe('Create Quest', () => {
@@ -64,12 +66,12 @@ describe('QuestService', () => {
     };
 
     it('Should create a new quest when data is valid', async () => {
-      mockMonsterService.ensureExists.mockResolvedValue(mockMonster);
+      mockMonsterExistence.ensure.mockResolvedValue(undefined);
       mockQuestRepository.create.mockResolvedValue(mockQuest);
 
       const result = await service.create(input);
 
-      expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('m1');
+      expect(mockMonsterExistence.ensure).toHaveBeenCalledWith('m1');
       expect(mockQuestRepository.create).toHaveBeenCalledWith(input);
       expect(result).toEqual(mockQuest);
     });
@@ -87,12 +89,12 @@ describe('QuestService', () => {
     });
 
     it('Should throw validation error when the monster does not exist', async () => {
-      mockMonsterService.ensureExists.mockRejectedValue(new MonsterNotFoundError('m1'));
+      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'))
 
       await expect(service.create({ ...input, monsterId: 'ghost' })).rejects.toThrow(
-        QuestValidationError
+        RelatedEntityValidationError
       );
-      expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
+      expect(mockMonsterExistence.ensure).toHaveBeenCalledWith('ghost');
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
 
@@ -150,12 +152,12 @@ describe('QuestService', () => {
 
     it('Should throw validation error when the new monster does not exist', async () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
-      mockMonsterService.ensureExists.mockRejectedValue(new MonsterNotFoundError('m1'));
+      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'));
 
       await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(
-        QuestValidationError
+        RelatedEntityValidationError
       );
-      expect(mockMonsterService.ensureExists).toHaveBeenCalledWith('ghost');
+      expect(mockMonsterExistence.ensure).toHaveBeenCalledWith('ghost');
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
     });
 
@@ -214,7 +216,7 @@ describe('QuestService', () => {
     });
 
     it('Should throw when starting a quest with no hunters assigned', async () => {
-      mockQuestRepository.findById.mockResolvedValue(mockQuest); 
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockQuestAssignmentService.findByQuest.mockResolvedValue([]);
 
       await expect(service.update('1', { status: 'IN_PROGRESS' })).rejects.toThrow(
@@ -238,13 +240,13 @@ describe('QuestService', () => {
     });
 
     it('Should distribute rewards when a quest is completed', async () => {
-      const currentQuest: Quest = {...mockQuest, status: 'IN_PROGRESS',};
-      const completedQuest: Quest = {...currentQuest, status: 'COMPLETED',};
+      const currentQuest: Quest = { ...mockQuest, status: 'IN_PROGRESS' };
+      const completedQuest: Quest = { ...currentQuest, status: 'COMPLETED' };
 
-      mockQuestRepository.findById.mockResolvedValue( currentQuest as Quest);
+      mockQuestRepository.findById.mockResolvedValue(currentQuest as Quest);
       mockQuestRepository.update.mockResolvedValue(completedQuest);
-      await service.update('1', { status: 'COMPLETED',});
-      expect(mockRewardDistributionService.distributeRewards).toHaveBeenCalledWith('1',5000);
+      await service.update('1', { status: 'COMPLETED' });
+      expect(mockRewardDistributionService.distributeRewards).toHaveBeenCalledWith('1', 5000);
     });
   });
 

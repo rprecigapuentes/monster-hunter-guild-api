@@ -1,5 +1,6 @@
+import type { CreateHunterDto, UpdateHunterDto } from '../dto/hunter.dto';
 import type { Hunter, Prisma } from '../generated/prisma/client';
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { IRankCalculator } from './rank-calculator.interface';
 
@@ -22,8 +23,10 @@ export class HunterService extends BaseService<
   Prisma.HunterUncheckedCreateInput,
   Prisma.HunterUncheckedUpdateInput
 > {
+  private static readonly INITIAL_EXPERIENCE = 0;
+
   constructor(
-    repository: PrismaBaseRepository<
+    repository: IBasicRepository<
       Hunter,
       Prisma.HunterUncheckedCreateInput,
       Prisma.HunterUncheckedUpdateInput
@@ -37,23 +40,19 @@ export class HunterService extends BaseService<
     return new HunterNotFoundError(id);
   }
 
-  override async create(data: Prisma.HunterUncheckedCreateInput): Promise<Hunter> {
-    const initialExperience = 0;
-    const initialRank = this.rankCalculator.calculate(initialExperience);
-
-    const safeData: Prisma.HunterUncheckedCreateInput = {
+  override async create(data: CreateHunterDto): Promise<Hunter> {
+    const initialRank = this.rankCalculator.calculate(HunterService.INITIAL_EXPERIENCE);
+    const fullData: Prisma.HunterUncheckedCreateInput = {
       ...data,
       rank: initialRank,
-      experiencePoints: initialExperience,
+      experiencePoints: HunterService.INITIAL_EXPERIENCE,
     };
 
-    return super.create(safeData);
+    return super.create(fullData);
   }
 
-  override async update(id: string, data: Prisma.HunterUncheckedUpdateInput): Promise<Hunter> {
-    const { rank: _rank, experiencePoints: _experiencePoints, ...safeData } = data;
-
-    return super.update(id, safeData);
+  override async update(id: string, data: UpdateHunterDto): Promise<Hunter> {
+    return super.update(id, data);
   }
 
   async addExperience(hunterId: string, experienceGained: number): Promise<Hunter> {

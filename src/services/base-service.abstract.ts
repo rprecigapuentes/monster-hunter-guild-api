@@ -1,8 +1,9 @@
-import type { PrismaBaseRepository } from '../repositories/interfaces/prisma-base-repository.abstract';
+import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
+import type { IExistenceChecker } from './interfaces/existence-checker.interface';
 
-export abstract class BaseService<TModel, TCreateInput, TUpdateInput> {
+export abstract class BaseService<TModel, TCreateInput, TUpdateInput> implements IExistenceChecker {
   constructor(
-    protected readonly repository: PrismaBaseRepository<TModel, TCreateInput, TUpdateInput>
+    protected readonly repository: IBasicRepository<TModel, TCreateInput, TUpdateInput>
   ) {}
 
   async create(data: TCreateInput): Promise<TModel> {
@@ -35,6 +36,10 @@ export abstract class BaseService<TModel, TCreateInput, TUpdateInput> {
       throw this.notFoundError(id);
     }
     return entity;
+  }
+
+  async exists(id: string): Promise<boolean> {
+    return (await this.repository.findById(id)) !== null;
   }
 
   protected abstract notFoundError(id: string): Error;

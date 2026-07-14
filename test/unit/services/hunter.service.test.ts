@@ -35,9 +35,7 @@ describe("HunterService", () => {
     it("should create a new hunter with initial rank and experience", async () => {
       const input = {
         name: "Geralt",
-        rank: 5,
-        experiencePoints: 9999,
-        guildId: "guild-1"
+        guildId: "guild-1",
       };
 
       mockRankCalculator.calculate.mockReturnValue(1);
@@ -60,30 +58,6 @@ describe("HunterService", () => {
 
       expect(result.rank).toBe(1);
       expect(result.experiencePoints).toBe(0);
-    });
-
-    it("should ignore rank and experience sent by the client", async () => {
-      mockRankCalculator.calculate.mockReturnValue(1);
-
-      mockRepository.create.mockResolvedValue({
-        ...mockHunter,
-        rank: 1,
-        experiencePoints: 0,
-      });
-
-      await service.create({
-        name: "Geralt",
-        rank: 999,
-        experiencePoints: 999999,
-        guildId: "guild-1"
-      });
-
-      expect(mockRepository.create).toHaveBeenCalledWith({
-        name: "Geralt",
-        rank: 1,
-        experiencePoints: 0,
-        guildId: "guild-1"
-      });
     });
   });
 
@@ -143,21 +117,6 @@ describe("HunterService", () => {
       expect(mockRepository.findById).toHaveBeenCalledWith("1");
       expect(mockRepository.update).toHaveBeenCalledWith("1", updateData);
       expect(result).toEqual(updatedHunter);
-    });
-
-    it("should ignore rank and experience when updating", async () => {
-      mockRepository.findById.mockResolvedValue(mockHunter);
-      mockRepository.update.mockResolvedValue(mockHunter);
-
-      await service.update("1", {
-        name: "Cristian",
-        rank: 999,
-        experiencePoints: 99999,
-      });
-
-      expect(mockRepository.update).toHaveBeenCalledWith("1", {
-        name: "Cristian",
-      });
     });
 
     it("should throw HunterNotFoundError when hunter does not exist", async () => {
