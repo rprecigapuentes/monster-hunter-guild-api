@@ -12,3 +12,15 @@ export interface EntityCountsDto {
 export interface CompletedQuestsCountDto {
   completedQuests: number;
 }
+
+interface HunterDto {
+  id: string;
+  name: string;
+  rank: number;
+  experiencePoints: number;
+  guildId: string | null;
+}
+
+export interface HunterLeaderboardDto {
+  leaderboard: HunterDto[];
+}

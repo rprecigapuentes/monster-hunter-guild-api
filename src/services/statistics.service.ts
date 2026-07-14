@@ -2,20 +2,22 @@ import type {
   StatisticsDto,
   EntityCountsDto,
   CompletedQuestsCountDto,
+  HunterLeaderboardDto,
 } from '../dto/statistics.dto';
 import type { IQuestRepository } from '../repositories/interfaces/quest-repository.interface';
+import type { IHunterRepository } from '../repositories/interfaces/hunter-repository.interface';
 import type { ICountable } from '../repositories/interfaces/countable.interface';
 
 interface StatisticsServiceDependencies {
   questRepository: IQuestRepository;
-  hunterRepository: ICountable;
+  hunterRepository: IHunterRepository;
   guildRepository: ICountable;
   monsterRepository: ICountable;
 }
 
 export class StatisticsService {
   private readonly questRepository: IQuestRepository;
-  private readonly hunterRepository: ICountable;
+  private readonly hunterRepository: IHunterRepository;
   private readonly guildRepository: ICountable;
   private readonly monsterRepository: ICountable;
 
@@ -43,5 +45,19 @@ export class StatisticsService {
   async getCompletedQuestsCount(): Promise<CompletedQuestsCountDto> {
     const completedQuests = await this.questRepository.countCompletedQuests();
     return { completedQuests };
+  }
+
+  async getHunterLeaderboard(): Promise<HunterLeaderboardDto> {
+    const hunters = await this.hunterRepository.hunterLeaderboard();
+
+    const leaderboard = hunters.map((hunter) => ({
+      id: hunter.id,
+      name: hunter.name,
+      rank: hunter.rank,
+      experiencePoints: hunter.experiencePoints,
+      guildId: hunter.guildId,
+    }));
+
+    return { leaderboard };
   }
 }
