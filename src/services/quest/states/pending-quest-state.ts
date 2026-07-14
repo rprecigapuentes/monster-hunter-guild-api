@@ -6,14 +6,10 @@ export class PendingQuestState implements IQuestState {
   readonly status: QuestStatus = 'PENDING';
 
   getValidTransitions(): QuestStatus[] {
-    throw new Error('Method not implemented.');
+    return ['IN_PROGRESS'];
   }
 
-  async validateBefore(_quest: Quest): Promise<void> {
-    return;
-  }
+  async validateBefore(_quest: Quest): Promise<void> {}
 
-  async onEnter(_quest: Quest): Promise<void> {
-    return;
-  }
+  async onEnter(_quest: Quest): Promise<void> {}
 }
