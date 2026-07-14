@@ -24,9 +24,14 @@ export class HunterRepository
   }
   async hunterLeaderboard(): Promise<Hunter[]> {
     const hunters = await this.model.findMany({
-      orderBy: {
-        rank: 'desc',
-      },
+      orderBy: [
+        {
+          rank: 'desc',
+        },
+        {
+          experiencePoints: 'desc',
+        },
+      ],
     });
 
     return hunters;
