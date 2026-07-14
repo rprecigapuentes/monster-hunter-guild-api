@@ -5,7 +5,7 @@ import {
   QuestNotFoundError,
   QuestValidationError,
   type QuestService,
-} from '../../../src/services/quest.service';
+} from '../../../src/services/quest/quest.service';
 import type { Quest } from '../../../src/generated/prisma/client';
 import { errorHandler } from '../../../src/middlewares/error-handler.middleware';
 import { notFound } from '../../../src/middlewares/not-found.middleware';

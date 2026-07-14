@@ -2,7 +2,7 @@ import {
   QuestService,
   QuestNotFoundError,
   QuestValidationError,
-} from '../../../src/services/quest.service';
+} from '../../../src/services/quest/quest.service';
 import type { QuestRepository } from '../../../src/repositories/quest.repository';
 import type { Quest, QuestStatus } from '../../../src/generated/prisma/client';
 import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
@@ -46,7 +46,7 @@ describe('QuestService', () => {
       getRewardDistributionService: () => mockRewardDistributionService,
       getQuestAssignmentService: () => mockQuestAssignmentService,
     });
-    
+
     mockQuestAssignmentService = {
       findByQuest: jest.fn().mockResolvedValue([]),
     } as unknown as jest.Mocked<QuestAssignmentService>;
@@ -89,7 +89,9 @@ describe('QuestService', () => {
     });
 
     it('Should throw validation error when the monster does not exist', async () => {
-      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'))
+      mockMonsterExistence.ensure.mockRejectedValue(
+        new RelatedEntityValidationError('Monster', 'ghost')
+      );
 
       await expect(service.create({ ...input, monsterId: 'ghost' })).rejects.toThrow(
         RelatedEntityValidationError
@@ -152,7 +154,9 @@ describe('QuestService', () => {
 
     it('Should throw validation error when the new monster does not exist', async () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
-      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'));
+      mockMonsterExistence.ensure.mockRejectedValue(
+        new RelatedEntityValidationError('Monster', 'ghost')
+      );
 
       await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(
         RelatedEntityValidationError
@@ -232,9 +236,9 @@ describe('QuestService', () => {
         { id: 'a1', hunterId: 'h1', questId: '1', role: 'Support' },
       ]);
 
-      await expect(
-        service.update('1', { status: 'IN_PROGRESS' })
-      ).rejects.toThrow(QuestValidationError);
+      await expect(service.update('1', { status: 'IN_PROGRESS' })).rejects.toThrow(
+        QuestValidationError
+      );
 
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
     });

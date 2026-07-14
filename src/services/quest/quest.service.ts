@@ -1,9 +1,9 @@
-import type { Prisma, Quest, QuestStatus } from '../generated/prisma/client';
-import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
-import type { QuestAssignmentService } from './quest-assignment.service';
-import { BaseService } from './base-service.abstract';
-import type { RewardDistributionService } from './reward-distribution.service';
-import type { EntityExistenceValidator } from './entity-existence-validator';
+import type { Prisma, Quest, QuestStatus } from '../../generated/prisma/client';
+import type { IBasicRepository } from '../../repositories/interfaces/basic-repository.interface';
+import type { QuestAssignmentService } from '../quest-assignment.service';
+import { BaseService } from '../base-service.abstract';
+import type { RewardDistributionService } from '../reward-distribution.service';
+import type { EntityExistenceValidator } from '../entity-existence-validator';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {

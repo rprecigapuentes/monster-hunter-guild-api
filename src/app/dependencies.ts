@@ -10,7 +10,7 @@ import { QuestRepository } from '../repositories/quest.repository';
 import { GuildService } from '../services/guild.service';
 import { HunterService } from '../services/hunter.service';
 import { MonsterService } from '../services/monster.service';
-import { QuestService } from '../services/quest.service';
+import { QuestService } from '../services/quest/quest.service';
 import { RankCalculator } from '../services/rank-calculator';
 import { QuestAssignmentService } from '../services/quest-assignment.service';
 import { QuestAssignmentController } from '../controllers/quest-assignment.controller';
