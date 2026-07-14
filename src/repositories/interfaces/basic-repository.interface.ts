@@ -1,4 +1,4 @@
-import { ICountable } from './countable.interface';
+import type { ICountable } from './countable.interface';
 
 export interface IBasicRepository<TModel, TCreateInput, TUpdateInput> extends ICountable {
   create(data: TCreateInput): Promise<TModel>;
