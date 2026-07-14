@@ -8,3 +8,7 @@ export interface EntityCountsDto {
   guilds: number;
   monsters: number;
 }
+
+export interface CompletedQuestsCountDto {
+  completedQuests: number;
+}

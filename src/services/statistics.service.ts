@@ -1,4 +1,8 @@
-import type { StatisticsDto, EntityCountsDto } from '../dto/statistics.dto';
+import type {
+  StatisticsDto,
+  EntityCountsDto,
+  CompletedQuestsCountDto,
+} from '../dto/statistics.dto';
 import type { IQuestRepository } from '../repositories/interfaces/quest-repository.interface';
 import type { ICountable } from '../repositories/interfaces/countable.interface';
 
@@ -36,7 +40,8 @@ export class StatisticsService {
     return { quests, hunters, guilds, monsters };
   }
 
-  async getCompletedQuestsCount(): Promise<number> {
-    return this.questRepository.countCompletedQuests();
+  async getCompletedQuestsCount(): Promise<CompletedQuestsCountDto> {
+    const completedQuests = await this.questRepository.countCompletedQuests();
+    return { completedQuests };
   }
 }

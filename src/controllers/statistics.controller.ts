@@ -21,4 +21,17 @@ export class StatisticsController {
       next(error);
     }
   };
+
+  completedQuestsCount = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const completedQuestsCount = await this.service.getCompletedQuestsCount();
+      res.status(200).json(completedQuestsCount);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
