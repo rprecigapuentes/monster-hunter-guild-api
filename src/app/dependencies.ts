@@ -64,5 +64,10 @@ const rewardDistributionService = new RewardDistributionService({
 });
 
 //Statistics
-const statisticsService = new StatisticsService(questRepository);
+const statisticsService = new StatisticsService({
+  questRepository,
+  hunterRepository,
+  guildRepository,
+  monsterRepository,
+});
 export const statisticsController = new StatisticsController(statisticsService);
