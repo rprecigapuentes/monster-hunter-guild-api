@@ -7,7 +7,6 @@ export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
   delete(args: { where: { id: string } }): Promise<unknown>;
   findUnique(args: { where: { id: string } }): Promise<TModel | null>;
   findMany(): Promise<TModel[]>;
-  aggregate(args: unknown): Promise<unknown>;
 }
 
 export abstract class PrismaBaseRepository<
