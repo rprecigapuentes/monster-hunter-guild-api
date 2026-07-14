@@ -4,6 +4,6 @@ import { type QuestStatus } from '../../../generated/prisma/enums';
 export interface IQuestState {
   readonly status: QuestStatus;
   getValidTransitions(): QuestStatus[];
-  validateBefore(quest: Quest): Promise<void>;
-  onEnter(quest: Quest): Promise<void>;
+  validateBefore(_quest: Quest): Promise<void>;
+  onEnter(_quest: Quest): Promise<void>;
 }
