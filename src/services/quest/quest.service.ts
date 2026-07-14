@@ -75,6 +75,7 @@ export class QuestService extends BaseService<
   ): Promise<void> {
     const { status: currentStatus } = existing;
     const { monsterId, reward, status: nextStatus } = data;
+    const parsedNextStatus = nextStatus as QuestStatus;
 
     if (typeof monsterId === 'string') {
       await this.monsterExistence.ensure(monsterId);
@@ -83,12 +84,18 @@ export class QuestService extends BaseService<
       this.validateReward(reward);
     }
 
-    if (nextStatus && currentStatus !== nextStatus) {
-      this.validateStatusTransition(currentStatus, nextStatus as QuestStatus);
+    if (parsedNextStatus && currentStatus !== parsedNextStatus) {
+      const currentState = this.stateFactory.getState(currentStatus);
+      const allowedTransitions = currentState.getValidTransitions();
 
-      if ((nextStatus as QuestStatus) === 'IN_PROGRESS') {
-        await this.ensureQuestHasLeader(existing.id);
+      if (!allowedTransitions.includes(parsedNextStatus)) {
+        throw new QuestValidationError(
+          `Provided status: ${currentStatus} can not be changed to ${parsedNextStatus}`
+        );
       }
+
+      const targetState = this.stateFactory.getState(parsedNextStatus);
+      await targetState.validateBefore(existing);
     }
   }
 
@@ -101,25 +108,6 @@ export class QuestService extends BaseService<
   private validateReward(reward?: number | null): void {
     if (typeof reward === 'number' && reward < 0) {
       throw new QuestValidationError('Quest reward must be >= 0');
-    }
-  }
-
-  private validateStatusTransition(currentStatus: QuestStatus, nextStatus: QuestStatus): void {
-    const allowedNextStatuses = this._validTransitions[currentStatus];
-
-    if (!allowedNextStatuses.includes(nextStatus)) {
-      throw new QuestValidationError(
-        `Provided status: ${currentStatus} can not be changed to ${nextStatus}`
-      );
-    }
-  }
-
-  private async ensureQuestHasLeader(questId: string): Promise<void> {
-    const questAssignmentService = this.getQuestAssignmentService();
-    const assignments = await questAssignmentService.findByQuest(questId);
-    const hasLeader = assignments.some((assignment) => assignment.role === 'Leader');
-    if (!hasLeader) {
-      throw new QuestValidationError('A quest needs at least one leader before it can start');
     }
   }
 }
