@@ -1,5 +1,11 @@
-import type { QuestService } from './quest.service';
+import { StatisticsDto } from '../dto/statistics.dto';
+import { IQuestRepository } from '../repositories/interfaces/quest-repository.interface';
 
 export class StatisticsService {
-  constructor(private readonly questService: QuestService) {}
+  constructor(private readonly questRepository: IQuestRepository) {}
+
+  async getAverageReward(): Promise<StatisticsDto> {
+    const averageReward = await this.questRepository.averageReward();
+    return { averageReward };
+  }
 }
