@@ -1,0 +1,41 @@
+export interface DomainEvent {
+  operation: string;
+  entity: string;
+  entityId?: string;
+}
+
+export interface IObserver {
+  update(event: DomainEvent): Promise<void> | void;
+}
+
+const ALL = '*';
+
+export class EventManager {
+  private readonly observers = new Map<string, IObserver[]>();
+
+  subscribe(eventType: string, observer: IObserver): void {
+    const list = this.observers.get(eventType) ?? [];
+    list.push(observer);
+    this.observers.set(eventType, list);
+  }
+
+  unsubscribe(eventType: string, observer: IObserver): void {
+    const list = this.observers.get(eventType) ?? [];
+    this.observers.set(
+      eventType,
+      list.filter((currentObserver) => currentObserver !== observer)
+    );
+  }
+
+  async notify(eventType: string, event: DomainEvent): Promise<void> {
+    const targets = [...(this.observers.get(eventType) ?? []), ...(this.observers.get(ALL) ?? [])];
+
+    const results = await Promise.allSettled(targets.map((observer) => observer.update(event)));
+
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        console.error('Observer update failed:', result.reason);
+      }
+    }
+  }
+}

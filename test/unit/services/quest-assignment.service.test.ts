@@ -7,12 +7,14 @@ import type { QuestAssignmentRepository } from '../../../src/repositories/quest-
 import type { QuestAssignment, Hunter, Quest } from '../../../src/generated/prisma/client';
 import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
 import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
+import { EventManager } from '../../../src/events/event-manager';
 
 describe('QuestAssignmentService', () => {
   let service: QuestAssignmentService;
   let mockRepository: jest.Mocked<QuestAssignmentRepository>;
   let mockQuestExistence: jest.Mocked<EntityExistenceValidator>;
   let mockHunterExistence: jest.Mocked<EntityExistenceValidator>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   const mockAssignment: QuestAssignment = {
     id: 'a1',
@@ -34,11 +36,13 @@ describe('QuestAssignmentService', () => {
 
     mockQuestExistence = { ensure: jest.fn() } as unknown as jest.Mocked<EntityExistenceValidator>;
     mockHunterExistence = { ensure: jest.fn() } as unknown as jest.Mocked<EntityExistenceValidator>;
-
+    mockEvents = { notify: jest.fn() } as unknown as jest.Mocked<EventManager>;
+    
     service = new QuestAssignmentService({
       repository: mockRepository,
       questExistence: mockQuestExistence,
       hunterExistence: mockHunterExistence,
+      events: mockEvents,
     });
   });
 
