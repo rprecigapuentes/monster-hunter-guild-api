@@ -2,17 +2,17 @@ import {
   QuestService,
   QuestNotFoundError,
   QuestValidationError,
-} from '../../../src/services/quest/quest.service';
-import type { QuestRepository } from '../../../src/repositories/quest.repository';
-import type { Quest, QuestStatus } from '../../../src/generated/prisma/client';
-import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
-import { type EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
-import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
-import { type QuestStateFactory } from '../../../src/services/quest/quest-state-factory';
-import { type PendingQuestState } from '../../../src/services/quest/states/pending-quest-state';
-import { type InProgresQuestState } from '../../../src/services/quest/states/in-progress-quest-state';
-import { type CompletedQuestState } from '../../../src/services/quest/states/completed-quest-state';
-import { type FailedQuestState } from '../../../src/services/quest/states/failed-quest-state';
+} from '../../../../src/services/quest/quest.service';
+import type { QuestRepository } from '../../../../src/repositories/quest.repository';
+import type { Quest, QuestStatus } from '../../../../src/generated/prisma/client';
+import { type QuestUncheckedCreateInput } from '../../../../src/generated/prisma/models';
+import { type EntityExistenceValidator } from '../../../../src/services/entity-existence-validator';
+import { RelatedEntityValidationError } from '../../../../src/errors/related-entity-validation.error';
+import { type QuestStateFactory } from '../../../../src/services/quest/quest-state-factory';
+import { type PendingQuestState } from '../../../../src/services/quest/states/pending-quest-state';
+import { type InProgresQuestState } from '../../../../src/services/quest/states/in-progress-quest-state';
+import { type CompletedQuestState } from '../../../../src/services/quest/states/completed-quest-state';
+import { type FailedQuestState } from '../../../../src/services/quest/states/failed-quest-state';
 
 describe('QuestService', () => {
   let service: QuestService;

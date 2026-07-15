@@ -6,7 +6,7 @@ export class FailedQuestState implements IQuestState {
   readonly status: QuestStatus = 'FAILED';
 
   getValidTransitions(): QuestStatus[] {
-    return [];
+    return ['PENDING'];
   }
 
   async validateBefore(_quest: Quest): Promise<void> {}
