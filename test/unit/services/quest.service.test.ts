@@ -11,6 +11,7 @@ import { RelatedEntityValidationError } from '../../../src/errors/related-entity
 import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
 import { type RewardDistributionService } from '../../../src/services/reward-distribution.service';
 import { EventManager } from '../../../src/events/event-manager';
+import { mock } from 'node:test';
 
 describe('QuestService', () => {
   let service: QuestService;
@@ -44,6 +45,8 @@ describe('QuestService', () => {
 
     mockEvents = {
       notify: jest.fn(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
     } as unknown as jest.Mocked<EventManager>;
 
     service = new QuestService({
@@ -304,5 +307,35 @@ describe('QuestService', () => {
       expect(mockQuestRepository.findAll).toHaveBeenCalledTimes(1);
       expect(result).toEqual(quests);
     });
+  });
+
+  describe('notify events', () => {
+    it('emits quest.completed when a quest is completed', async () => {
+      const currentQuest: Quest = { ...mockQuest, status: 'IN_PROGRESS' };
+      mockQuestRepository.findById.mockResolvedValue(currentQuest as Quest);
+      mockQuestRepository.update.mockResolvedValue({ ...currentQuest, status: 'COMPLETED' });
+      
+      await service.update('1', { status: 'COMPLETED' });
+
+      expect(mockEvents.notify).toHaveBeenCalledWith('quest.completed', {
+        operation: 'COMPLETED',
+        entity: 'Quest',
+        entityId: '1',
+      });
+    });
+
+    it('emits entity.updated on a normal quest update', async () => {
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
+      mockQuestRepository.update.mockResolvedValue({ ...mockQuest, title: 'x' });
+      
+      await service.update('1', { title: 'x' });
+
+      expect(mockEvents.notify).toHaveBeenCalledWith('entity.updated', {
+        operation: 'UPDATED',
+        entity: 'Quest',
+        entityId: '1',
+      });
+    });
+
   });
 });

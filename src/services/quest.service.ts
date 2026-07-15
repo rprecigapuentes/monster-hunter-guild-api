@@ -70,6 +70,17 @@ export class QuestService extends BaseService<
 
     if (data.status === 'COMPLETED') {
       await rewardDistributionService.distributeRewards(updatedQuest.id, updatedQuest.reward ?? 0);
+      await this.events.notify('quest.completed', {
+        operation: 'COMPLETED',
+        entity: 'Quest',
+        entityId: updatedQuest.id,
+      });
+    } else {
+      await this.events.notify('entity.updated', {
+        operation: 'UPDATED',
+        entity: 'Quest',
+        entityId: updatedQuest.id,
+      });
     }
 
     return updatedQuest;
