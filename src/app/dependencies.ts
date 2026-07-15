@@ -36,6 +36,7 @@ events.subscribe('*', auditObserver);
 
 const auditService = new AuditService(auditRepository);
 export const auditController = new AuditController(auditService);
+import { DefaultRewardDistributionStrategy } from '../strategies/reward/default-reward-distribution.strategy';
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
@@ -81,7 +82,9 @@ const questAssignmentService = new QuestAssignmentService({
 });
 export const questAssignmentController = new QuestAssignmentController(questAssignmentService);
 
+const defaultRewardDistributionStrategy = new DefaultRewardDistributionStrategy();
 const rewardDistributionService = new RewardDistributionService({
   hunterService,
   getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+  strategy: defaultRewardDistributionStrategy,
 });
