@@ -89,5 +89,6 @@ model AuditLog {
   id String @id @default(uuid())
   operation String
   entity String
+  entityId String?
   timestamp DateTime @default(now())
 }
