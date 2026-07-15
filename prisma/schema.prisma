@@ -84,3 +84,10 @@ enum QuestRole {
   Support
   Scout
 }
+
+model AuditLog {
+  id String @id @default(uuid())
+  operation String
+  entity String
+  timestamp DateTime @default(now())
+}
