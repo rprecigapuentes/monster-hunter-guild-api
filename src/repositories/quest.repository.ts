@@ -28,11 +28,7 @@ export class QuestRepository
       _avg: {
         reward: true,
       },
-    })) as {
-      _avg: {
-        reward: number | null;
-      };
-    };
+    })) as { _avg: { reward: number | null } };
 
     return result._avg.reward ?? 0;
   }

@@ -7,7 +7,7 @@ export class StatisticsController {
   questAverageReward = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const averageReward = await this.service.getQuestAverageReward();
-      res.status(200).json({ averageReward });
+      res.status(200).json(averageReward);
     } catch (error) {
       next(error);
     }
