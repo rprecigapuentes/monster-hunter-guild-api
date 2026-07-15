@@ -7,6 +7,7 @@ import { GuildRepository } from '../repositories/guild.repository';
 import { HunterRepository } from '../repositories/hunter.repository';
 import { MonsterRepository } from '../repositories/monster.repository';
 import { QuestRepository } from '../repositories/quest.repository';
+import { AuditRepository } from '../repositories/audit.repository';
 import { GuildService } from '../services/guild.service';
 import { HunterService } from '../services/hunter.service';
 import { MonsterService } from '../services/monster.service';
@@ -18,10 +19,17 @@ import { QuestAssignmentRepository } from '../repositories/quest-assignment.repo
 import { RewardDistributionService } from '../services/reward-distribution.service';
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
 import { EventManager } from '../events/event-manager';
+import { AuditObserver } from '../events/observers/audit.observer';
 
-// EventManager instance
+// EventManager
 
 const events = new EventManager();
+
+// Audit
+
+const auditRepository = new AuditRepository(prisma.auditLog);
+const auditObserver = new AuditObserver(auditRepository);
+events.subscribe('*', auditObserver);
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
