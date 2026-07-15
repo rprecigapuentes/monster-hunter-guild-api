@@ -13,7 +13,7 @@ const ALL = '*';
 export class EventManager {
   private readonly observers = new Map<string, IObserver[]>();
 
-  suscribe(eventType: string, observer: IObserver): void {
+  subscribe(eventType: string, observer: IObserver): void {
     const list = this.observers.get(eventType) ?? [];
     list.push(observer);
     this.observers.set(eventType, list);
