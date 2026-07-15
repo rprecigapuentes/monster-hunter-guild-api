@@ -10,7 +10,7 @@ describe('EventManager', () => {
     observer = { update: jest.fn() };
   });
 
-  it('notifies a subscriber registered for the event type', async () => {
+  it('notifies a subscriber registered for a specific event type', async () => {
     manager.subscribe('entity.created', observer);
     await manager.notify('entity.created', event);
     expect(observer.update).toHaveBeenCalledWith(event);
@@ -22,7 +22,7 @@ describe('EventManager', () => {
     expect(observer.update).not.toHaveBeenCalled();
   });
 
-  it('notifies wildcard subscribers of every event type', async () => {
+  it('notifies subscribers of every event type', async () => {
     manager.subscribe('*', observer);
     await manager.notify('quest.completed', event);
     expect(observer.update).toHaveBeenCalledWith(event);

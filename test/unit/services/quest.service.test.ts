@@ -11,7 +11,6 @@ import { RelatedEntityValidationError } from '../../../src/errors/related-entity
 import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
 import { type RewardDistributionService } from '../../../src/services/reward-distribution.service';
 import { EventManager } from '../../../src/events/event-manager';
-import { mock } from 'node:test';
 
 describe('QuestService', () => {
   let service: QuestService;
