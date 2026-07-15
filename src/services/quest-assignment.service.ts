@@ -2,6 +2,7 @@ import type { Prisma, QuestAssignment, QuestRole } from '../generated/prisma/cli
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { EntityExistenceValidator } from './entity-existence-validator';
+import type { EventManager } from '../events/event-manager';
 
 export class QuestAssignmentNotFoundError extends Error {
   constructor(id: string) {
@@ -25,6 +26,7 @@ interface QuestAssignmentServiceDependencies {
   >;
   questExistence: EntityExistenceValidator;
   hunterExistence: EntityExistenceValidator;
+  events: EventManager;
 }
 
 export class QuestAssignmentService extends BaseService<
@@ -37,11 +39,14 @@ export class QuestAssignmentService extends BaseService<
   private readonly hunterExistence: EntityExistenceValidator;
 
   constructor(deps: QuestAssignmentServiceDependencies) {
-    super(deps.repository);
+    super(deps.repository, deps.events);
     this.questExistence = deps.questExistence;
     this.hunterExistence = deps.hunterExistence;
   }
 
+  protected get entityName(): string {
+    return 'QuestAssignment';
+  }
   protected notFoundError(id: string): Error {
     return new QuestAssignmentNotFoundError(id);
   }

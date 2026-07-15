@@ -4,10 +4,12 @@ import {
   MonsterService,
   MonsterValidationError,
 } from '../../../src/services/monster.service';
+import { EventManager } from '../../../src/events/event-manager';
 
 describe('MonsterService', () => {
   let service: MonsterService;
   let mockRepository: jest.Mocked<MonsterRepository>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   const mockMonster = {
     id: 'm1',
@@ -26,7 +28,11 @@ describe('MonsterService', () => {
       findAll: jest.fn(),
     } as unknown as jest.Mocked<MonsterRepository>;
 
-    service = new MonsterService(mockRepository);
+    mockEvents = {
+      notify: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
+    service = new MonsterService(mockRepository, mockEvents);
   });
 
   describe('create', () => {

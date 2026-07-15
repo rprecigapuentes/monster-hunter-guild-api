@@ -1,11 +1,13 @@
 import { HunterService, HunterNotFoundError } from "../../../src/services/hunter.service";
 import type { HunterRepository } from "../../../src/repositories/hunter.repository";
 import type { IRankCalculator } from "../../../src/services/rank-calculator.interface";
+import { EventManager } from '../../../src/events/event-manager';
 
 describe("HunterService", () => {
   let service: HunterService;
   let mockRepository: jest.Mocked<HunterRepository>;
   let mockRankCalculator: jest.Mocked<IRankCalculator>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   const mockHunter = {
     id: "1",
@@ -28,7 +30,11 @@ describe("HunterService", () => {
       calculate: jest.fn(),
     };
 
-    service = new HunterService(mockRepository, mockRankCalculator);
+    mockEvents = {
+      notify: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
+    service = new HunterService(mockRepository, mockRankCalculator, mockEvents);
   });
 
   describe("create", () => {

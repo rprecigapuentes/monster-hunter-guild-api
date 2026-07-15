@@ -4,6 +4,7 @@ import type { QuestAssignmentService } from './quest-assignment.service';
 import { BaseService } from './base-service.abstract';
 import type { RewardDistributionService } from './reward-distribution.service';
 import type { EntityExistenceValidator } from './entity-existence-validator';
+import type { EventManager } from '../events/event-manager';
 
 export class QuestNotFoundError extends Error {
   constructor(id: string) {
@@ -26,6 +27,7 @@ interface QuestServiceDependencies {
     Prisma.QuestUncheckedUpdateInput
   >;
   monsterExistence: EntityExistenceValidator;
+  events: EventManager;
   getRewardDistributionService: () => RewardDistributionService;
   getQuestAssignmentService: () => QuestAssignmentService;
 }
@@ -46,10 +48,14 @@ export class QuestService extends BaseService<
   };
 
   constructor(deps: QuestServiceDependencies) {
-    super(deps.repository);
+    super(deps.repository, deps.events);
     this.monsterExistence = deps.monsterExistence;
     this.getRewardDistributionService = deps.getRewardDistributionService;
     this.getQuestAssignmentService = deps.getQuestAssignmentService;
+  }
+
+  protected get entityName(): string {
+    return 'Quest';
   }
 
   protected notFoundError(id: string): Error {

@@ -10,6 +10,7 @@ import { EntityExistenceValidator } from '../../../src/services/entity-existence
 import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
 import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
 import { type RewardDistributionService } from '../../../src/services/reward-distribution.service';
+import { EventManager } from '../../../src/events/event-manager';
 
 describe('QuestService', () => {
   let service: QuestService;
@@ -17,6 +18,7 @@ describe('QuestService', () => {
   let mockMonsterExistence: jest.Mocked<EntityExistenceValidator>;
   let mockQuestAssignmentService: jest.Mocked<QuestAssignmentService>;
   let mockRewardDistributionService: jest.Mocked<RewardDistributionService>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   const mockQuest: Quest = {
     id: '1',
@@ -40,9 +42,14 @@ describe('QuestService', () => {
       ensure: jest.fn(),
     } as unknown as jest.Mocked<EntityExistenceValidator>;
 
+    mockEvents = {
+      notify: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
     service = new QuestService({
       repository: mockQuestRepository,
       monsterExistence: mockMonsterExistence,
+      events: mockEvents,
       getRewardDistributionService: () => mockRewardDistributionService,
       getQuestAssignmentService: () => mockQuestAssignmentService,
     });
