@@ -4,6 +4,7 @@ import type { IBasicRepository } from '../repositories/interfaces/basic-reposito
 import { BaseService } from './base-service.abstract';
 import type { IRankCalculator } from './rank-calculator.interface';
 import type { EventManager } from '../events/event-manager';
+import type { IRankCalculationStrategy } from '../strategies/rank/interfaces/rank-calculation-strategy.interface';
 
 export class HunterNotFoundError extends Error {
   constructor(id: string) {
@@ -32,8 +33,8 @@ export class HunterService extends BaseService<
       Prisma.HunterUncheckedCreateInput,
       Prisma.HunterUncheckedUpdateInput
     >,
-    private readonly rankCalculator: IRankCalculator,
-    events: EventManager
+    events: EventManager,
+    private readonly rankStrategy: IRankCalculationStrategy
   ) {
     super(repository, events);
   }
@@ -47,7 +48,7 @@ export class HunterService extends BaseService<
   }
 
   override async create(data: CreateHunterDto): Promise<Hunter> {
-    const initialRank = this.rankCalculator.calculate(HunterService.INITIAL_EXPERIENCE);
+    const initialRank = this.rankStrategy.calculate(HunterService.INITIAL_EXPERIENCE);
     const fullData: Prisma.HunterUncheckedCreateInput = {
       ...data,
       rank: initialRank,
@@ -65,7 +66,7 @@ export class HunterService extends BaseService<
     const hunter = await this.ensureExists(hunterId);
 
     const newExperience = hunter.experiencePoints + experienceGained;
-    const newRank = this.rankCalculator.calculate(newExperience);
+    const newRank = this.rankStrategy.calculate(newExperience);
 
     const updated = await this.repository.update(hunterId, {
       experiencePoints: newExperience,
