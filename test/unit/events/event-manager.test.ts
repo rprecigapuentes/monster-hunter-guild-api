@@ -34,4 +34,13 @@ describe('EventManager', () => {
     await manager.notify('entity.created', event);
     expect(observer.update).not.toHaveBeenCalled();
   });
+
+  it('runs every observer even if one fail', async () => {
+    const failingObserver: jest.Mocked<IObserver> = { update: jest.fn().mockRejectedValue(new Error('Update failed')) };
+    const ok: jest.Mocked<IObserver> = { update: jest.fn() };
+    manager.subscribe('entity.created', failingObserver);
+    manager.subscribe('entity.created', ok);
+    await expect(manager.notify('entity.created', event)).resolves.toBeUndefined();
+    expect(ok.update).toHaveBeenCalledWith(event);
+  });
 });

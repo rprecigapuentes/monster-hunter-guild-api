@@ -30,8 +30,12 @@ export class EventManager {
   async notify(eventType: string, event: DomainEvent): Promise<void> {
     const targets = [...(this.observers.get(eventType) ?? []), ...(this.observers.get(ALL) ?? [])];
 
-    for (const observer of targets) {
-      await observer.update(event);
+    const results = await Promise.allSettled(targets.map((observer) => observer.update(event)));
+
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        console.error('Observer update failed:', result.reason);
+      }
     }
   }
 }
