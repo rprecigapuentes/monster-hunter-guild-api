@@ -32,8 +32,8 @@ export class HunterService extends BaseService<
       Prisma.HunterUncheckedCreateInput,
       Prisma.HunterUncheckedUpdateInput
     >,
-    events: EventManager,
-    private readonly rankStrategy: IRankCalculationStrategy
+    private readonly rankStrategy: IRankCalculationStrategy,
+    events: EventManager
   ) {
     super(repository, events);
   }
