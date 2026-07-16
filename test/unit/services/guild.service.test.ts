@@ -1,9 +1,11 @@
 import { GuildService, GuildNotFoundError, GuildValidationError } from '../../../src/services/guild.service';
 import type { GuildRepository } from '../../../src/repositories/guild.repository';
+import { EventManager } from '../../../src/events/event-manager';
 
 describe('GuildService', () => {
   let service: GuildService;
   let mockRepository: jest.Mocked<GuildRepository>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   const mockGuild = {
     id: '1',
@@ -21,7 +23,11 @@ describe('GuildService', () => {
       findAll: jest.fn(),
     } as unknown as jest.Mocked<GuildRepository>;
 
-    service = new GuildService(mockRepository);
+    mockEvents = {
+      notify: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
+    service = new GuildService(mockRepository, mockEvents);
   });
 
   describe('Create Guild', () => {
