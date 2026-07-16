@@ -20,6 +20,8 @@ import { RewardDistributionService } from '../services/reward-distribution.servi
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
 import { EventManager } from '../events/event-manager';
 import { AuditObserver } from '../events/observers/audit.observer';
+import { AuditService } from '../services/audit.service';
+import { AuditController } from '../controllers/audit.controller';
 
 // EventManager
 
@@ -30,6 +32,9 @@ const events = new EventManager();
 const auditRepository = new AuditRepository(prisma.auditLog);
 const auditObserver = new AuditObserver(auditRepository);
 events.subscribe('*', auditObserver);
+
+const auditService = new AuditService(auditRepository);
+export const auditController = new AuditController(auditService);
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
