@@ -2,7 +2,6 @@ import type { CreateHunterDto, UpdateHunterDto } from '../dto/hunter.dto';
 import type { Hunter, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
-import type { IRankCalculator } from './rank-calculator.interface';
 import type { EventManager } from '../events/event-manager';
 import type { IRankCalculationStrategy } from '../strategies/rank/interfaces/rank-calculation-strategy.interface';
 
