@@ -1,5 +1,3 @@
-import { type ISearchResult } from './search-result.interface';
-
-export interface ISearchableRepository {
-  search(query: string): ISearchResult;
+export interface ISearchableRepository<TModel> {
+  search(query: string): Promise<TModel[]>;
 }
