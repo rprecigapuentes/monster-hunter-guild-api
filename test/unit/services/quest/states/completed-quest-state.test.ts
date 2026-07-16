@@ -1,3 +1,4 @@
+import { type EventManager } from '../../../../../src/events/event-manager';
 import { type Quest } from '../../../../../src/generated/prisma/client';
 import { CompletedQuestState } from '../../../../../src/services/quest/states/completed-quest-state';
 import { type RewardDistributionService } from '../../../../../src/services/reward-distribution.service';
@@ -5,6 +6,7 @@ import { type RewardDistributionService } from '../../../../../src/services/rewa
 describe('CompletedQuestState', () => {
   let state: CompletedQuestState;
   let mockRewardDistributionService: jest.Mocked<RewardDistributionService>;
+  let mockEvents: jest.Mocked<EventManager>;
   const mockQuest = { id: 'uuid-uuid-uuid-uuid', title: 'Gold Rush', reward: 5000 } as Quest;
 
   beforeEach(() => {
@@ -12,7 +14,13 @@ describe('CompletedQuestState', () => {
       distributeRewards: jest.fn(),
     } as unknown as jest.Mocked<RewardDistributionService>;
 
-    state = new CompletedQuestState(mockRewardDistributionService);
+    mockEvents = {
+      notify: jest.fn(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
+    state = new CompletedQuestState(mockRewardDistributionService, mockEvents);
   });
 
   it('should have COMPLETED status', () => {
@@ -37,6 +45,16 @@ describe('CompletedQuestState', () => {
         'uuid-uuid-uuid-uuid',
         5000
       );
+    });
+
+    it('emits quest.completed when entering', async () => {
+      await state.onEnter(mockQuest);
+
+      expect(mockEvents.notify).toHaveBeenCalledWith('quest.completed', {
+        operation: 'COMPLETED',
+        entity: 'Quest',
+        entityId: 'uuid-uuid-uuid-uuid',
+      });
     });
   });
 });

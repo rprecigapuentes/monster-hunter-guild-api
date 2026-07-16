@@ -1,6 +1,7 @@
 import type { Monster, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
+import type { EventManager } from '../events/event-manager';
 
 export class MonsterNotFoundError extends Error {
   constructor(id: string) {
@@ -22,9 +23,14 @@ export class MonsterService extends BaseService<
   Prisma.MonsterUpdateInput
 > {
   constructor(
-    repository: IBasicRepository<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>
+    repository: IBasicRepository<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>,
+    events: EventManager
   ) {
-    super(repository);
+    super(repository, events);
+  }
+
+  protected get entityName(): string {
+    return 'Monster';
   }
 
   protected notFoundError(id: string): Error {

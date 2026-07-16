@@ -13,12 +13,14 @@ import { type PendingQuestState } from '../../../../src/services/quest/states/pe
 import { type InProgresQuestState } from '../../../../src/services/quest/states/in-progress-quest-state';
 import { type CompletedQuestState } from '../../../../src/services/quest/states/completed-quest-state';
 import { type FailedQuestState } from '../../../../src/services/quest/states/failed-quest-state';
+import { type EventManager } from '../../../../src/events/event-manager';
 
 describe('QuestService', () => {
   let service: QuestService;
   let mockQuestRepository: jest.Mocked<QuestRepository>;
   let mockMonsterExistence: jest.Mocked<EntityExistenceValidator>;
   let mockStateFactory: jest.Mocked<QuestStateFactory>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   const mockQuest: Quest = {
     id: '1',
@@ -46,10 +48,17 @@ describe('QuestService', () => {
       ensure: jest.fn(),
     } as unknown as jest.Mocked<EntityExistenceValidator>;
 
+    mockEvents = {
+      notify: jest.fn(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
     service = new QuestService({
       repository: mockQuestRepository,
       monsterExistence: mockMonsterExistence,
       stateFactory: mockStateFactory,
+      events: mockEvents,
     });
   });
 
@@ -317,6 +326,21 @@ describe('QuestService', () => {
 
       expect(mockQuestRepository.findAll).toHaveBeenCalledTimes(1);
       expect(result).toEqual(quests);
+    });
+  });
+
+  describe('notify events', () => {
+    it('emits entity.updated on a normal quest update', async () => {
+      mockQuestRepository.findById.mockResolvedValue(mockQuest);
+      mockQuestRepository.update.mockResolvedValue({ ...mockQuest, title: 'x' });
+
+      await service.update('1', { title: 'x' });
+
+      expect(mockEvents.notify).toHaveBeenCalledWith('entity.updated', {
+        operation: 'UPDATED',
+        entity: 'Quest',
+        entityId: '1',
+      });
     });
   });
 });

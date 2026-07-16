@@ -3,6 +3,7 @@ import type { Hunter, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { IRankCalculator } from './rank-calculator.interface';
+import type { EventManager } from '../events/event-manager';
 
 export class HunterNotFoundError extends Error {
   constructor(id: string) {
@@ -31,9 +32,14 @@ export class HunterService extends BaseService<
       Prisma.HunterUncheckedCreateInput,
       Prisma.HunterUncheckedUpdateInput
     >,
-    private readonly rankCalculator: IRankCalculator
+    private readonly rankCalculator: IRankCalculator,
+    events: EventManager
   ) {
-    super(repository);
+    super(repository, events);
+  }
+
+  protected get entityName(): string {
+    return 'Hunter';
   }
 
   protected notFoundError(id: string): Error {

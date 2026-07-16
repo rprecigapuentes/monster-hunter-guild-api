@@ -1,3 +1,4 @@
+import { type EventManager } from '../../../../src/events/event-manager';
 import { type QuestAssignmentService } from '../../../../src/services/quest-assignment.service';
 import { QuestStateFactory } from '../../../../src/services/quest/quest-state-factory';
 import { CompletedQuestState } from '../../../../src/services/quest/states/completed-quest-state';
@@ -12,6 +13,7 @@ describe('QuestStateFactory', () => {
   let mockRewardDistributionService: jest.Mocked<RewardDistributionService>;
   let getQuestAssignmentServiceMock: jest.Mock<QuestAssignmentService>;
   let getRewardDistributionServiceMock: jest.Mock<RewardDistributionService>;
+  let mockEvents: jest.Mocked<EventManager>;
 
   beforeEach(() => {
     mockQuestAssignmentService = {} as jest.Mocked<QuestAssignmentService>;
@@ -20,9 +22,16 @@ describe('QuestStateFactory', () => {
     getQuestAssignmentServiceMock = jest.fn().mockReturnValue(mockQuestAssignmentService);
     getRewardDistributionServiceMock = jest.fn().mockReturnValue(mockRewardDistributionService);
 
+    mockEvents = {
+      notify: jest.fn(),
+      subscribe: jest.fn(),
+      unsubscribe: jest.fn(),
+    } as unknown as jest.Mocked<EventManager>;
+
     factory = new QuestStateFactory({
       getQuestAssignmentService: getQuestAssignmentServiceMock,
       getRewardDistributionService: getRewardDistributionServiceMock,
+      eventManager: mockEvents,
     });
   });
 

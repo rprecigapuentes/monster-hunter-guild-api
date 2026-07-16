@@ -1,3 +1,4 @@
+import { type EventManager } from '../../events/event-manager';
 import { type QuestStatus } from '../../generated/prisma/enums';
 import { type QuestAssignmentService } from '../quest-assignment.service';
 import { type RewardDistributionService } from '../reward-distribution.service';
@@ -10,14 +11,17 @@ import { type IQuestState } from './states/quest-state.interface';
 interface QuestStateFactoryDeps {
   getQuestAssignmentService: () => QuestAssignmentService;
   getRewardDistributionService: () => RewardDistributionService;
+  eventManager: EventManager;
 }
 
 export class QuestStateFactory {
   private states: Record<QuestStatus, IQuestState> | null = null;
+  private eventManager: EventManager;
   private readonly getQuestAssignmentService: () => QuestAssignmentService;
   private readonly getRewardDistributionService: () => RewardDistributionService;
 
   constructor(private readonly deps: QuestStateFactoryDeps) {
+    this.eventManager = deps.eventManager;
     this.getQuestAssignmentService = deps.getQuestAssignmentService;
     this.getRewardDistributionService = deps.getRewardDistributionService;
   }
@@ -27,7 +31,7 @@ export class QuestStateFactory {
       this.states = {
         PENDING: new PendingQuestState(),
         IN_PROGRESS: new InProgresQuestState(this.getQuestAssignmentService()),
-        COMPLETED: new CompletedQuestState(this.getRewardDistributionService()),
+        COMPLETED: new CompletedQuestState(this.getRewardDistributionService(), this.eventManager),
         FAILED: new FailedQuestState(),
       };
     }

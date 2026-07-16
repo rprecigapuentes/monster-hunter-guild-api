@@ -18,17 +18,22 @@ import { QuestAssignmentRepository } from '../repositories/quest-assignment.repo
 import { RewardDistributionService } from '../services/reward-distribution.service';
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
 import { QuestStateFactory } from '../services/quest/quest-state-factory';
+import { EventManager } from '../events/event-manager';
+
+// EventManager instance
+
+const events = new EventManager();
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
-const monsterService = new MonsterService(monsterRepository);
+const monsterService = new MonsterService(monsterRepository, events);
 export const monsterController = new MonsterController(monsterService);
 const monsterExistence = new EntityExistenceValidator(monsterService, 'Monster');
 
 // Hunter
 const rankCalculator = new RankCalculator();
 const hunterRepository = new HunterRepository(prisma.hunter);
-const hunterService = new HunterService(hunterRepository, rankCalculator);
+const hunterService = new HunterService(hunterRepository, rankCalculator, events);
 export const hunterController = new HunterController(hunterService);
 const hunterExistence = new EntityExistenceValidator(hunterService, 'Hunter');
 
@@ -37,10 +42,12 @@ const questRepository = new QuestRepository(prisma.quest);
 const questStateFactory = new QuestStateFactory({
   getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
   getRewardDistributionService: (): RewardDistributionService => rewardDistributionService,
+  eventManager: events,
 });
 const questService = new QuestService({
   repository: questRepository,
   monsterExistence,
+  events,
   stateFactory: questStateFactory,
 });
 export const questController = new QuestController(questService);
@@ -48,7 +55,7 @@ const questExistence = new EntityExistenceValidator(questService, 'Quest');
 
 // Guild
 const guildRepository = new GuildRepository(prisma.guild);
-const guildService = new GuildService(guildRepository);
+const guildService = new GuildService(guildRepository, events);
 export const guildController = new GuildController(guildService);
 
 //QuestAssignment
@@ -57,6 +64,7 @@ const questAssignmentService = new QuestAssignmentService({
   repository: questAssignmentRepository,
   questExistence,
   hunterExistence,
+  events,
 });
 export const questAssignmentController = new QuestAssignmentController(questAssignmentService);
 

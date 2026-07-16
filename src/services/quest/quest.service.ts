@@ -1,3 +1,4 @@
+import { type EventManager } from '../../events/event-manager';
 import type { Prisma, Quest, QuestStatus } from '../../generated/prisma/client';
 import type { IBasicRepository } from '../../repositories/interfaces/basic-repository.interface';
 import { BaseService } from '../base-service.abstract';
@@ -26,6 +27,7 @@ interface QuestServiceDependencies {
   >;
   monsterExistence: EntityExistenceValidator;
   stateFactory: QuestStateFactory;
+  events: EventManager;
 }
 
 export class QuestService extends BaseService<
@@ -37,9 +39,13 @@ export class QuestService extends BaseService<
   private readonly stateFactory: QuestStateFactory;
 
   constructor(deps: QuestServiceDependencies) {
-    super(deps.repository);
+    super(deps.repository, deps.events);
     this.monsterExistence = deps.monsterExistence;
     this.stateFactory = deps.stateFactory;
+  }
+
+  protected get entityName(): string {
+    return 'Quest';
   }
 
   protected notFoundError(id: string): Error {
@@ -55,6 +61,12 @@ export class QuestService extends BaseService<
       const targetState = this.stateFactory.getState(data.status as QuestStatus);
       await targetState.onEnter(existingQuest);
     }
+
+    await this.events.notify('entity.updated', {
+      operation: 'UPDATED',
+      entity: 'Quest',
+      entityId: updatedQuest.id,
+    });
 
     return updatedQuest;
   }

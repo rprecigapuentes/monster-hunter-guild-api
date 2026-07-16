@@ -1,6 +1,7 @@
 import type { Guild, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
+import type { EventManager } from '../events/event-manager';
 
 export class GuildNotFoundError extends Error {
   constructor(id: string) {
@@ -22,9 +23,14 @@ export class GuildService extends BaseService<
   Prisma.GuildUpdateInput
 > {
   constructor(
-    repository: IBasicRepository<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>
+    repository: IBasicRepository<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>,
+    events: EventManager
   ) {
-    super(repository);
+    super(repository, events);
+  }
+
+  protected get entityName(): string {
+    return 'Guild';
   }
 
   protected notFoundError(id: string): Error {
