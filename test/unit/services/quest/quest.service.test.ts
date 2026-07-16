@@ -2,22 +2,24 @@ import {
   QuestService,
   QuestNotFoundError,
   QuestValidationError,
-} from '../../../src/services/quest.service';
-import type { QuestRepository } from '../../../src/repositories/quest.repository';
-import type { Quest, QuestStatus } from '../../../src/generated/prisma/client';
-import { type QuestUncheckedCreateInput } from '../../../src/generated/prisma/models';
-import { EntityExistenceValidator } from '../../../src/services/entity-existence-validator';
-import { RelatedEntityValidationError } from '../../../src/errors/related-entity-validation.error';
-import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
-import { type RewardDistributionService } from '../../../src/services/reward-distribution.service';
-import { EventManager } from '../../../src/events/event-manager';
+} from '../../../../src/services/quest/quest.service';
+import type { QuestRepository } from '../../../../src/repositories/quest.repository';
+import type { Quest, QuestStatus } from '../../../../src/generated/prisma/client';
+import { type QuestUncheckedCreateInput } from '../../../../src/generated/prisma/models';
+import { type EntityExistenceValidator } from '../../../../src/services/entity-existence-validator';
+import { RelatedEntityValidationError } from '../../../../src/errors/related-entity-validation.error';
+import { type QuestStateFactory } from '../../../../src/services/quest/quest-state-factory';
+import { type PendingQuestState } from '../../../../src/services/quest/states/pending-quest-state';
+import { type InProgresQuestState } from '../../../../src/services/quest/states/in-progress-quest-state';
+import { type CompletedQuestState } from '../../../../src/services/quest/states/completed-quest-state';
+import { type FailedQuestState } from '../../../../src/services/quest/states/failed-quest-state';
+import { type EventManager } from '../../../../src/events/event-manager';
 
 describe('QuestService', () => {
   let service: QuestService;
   let mockQuestRepository: jest.Mocked<QuestRepository>;
   let mockMonsterExistence: jest.Mocked<EntityExistenceValidator>;
-  let mockQuestAssignmentService: jest.Mocked<QuestAssignmentService>;
-  let mockRewardDistributionService: jest.Mocked<RewardDistributionService>;
+  let mockStateFactory: jest.Mocked<QuestStateFactory>;
   let mockEvents: jest.Mocked<EventManager>;
 
   const mockQuest: Quest = {
@@ -38,6 +40,10 @@ describe('QuestService', () => {
       findAll: jest.fn(),
     } as unknown as jest.Mocked<QuestRepository>;
 
+    mockStateFactory = {
+      getState: jest.fn(),
+    } as unknown as jest.Mocked<QuestStateFactory>;
+
     mockMonsterExistence = {
       ensure: jest.fn(),
     } as unknown as jest.Mocked<EntityExistenceValidator>;
@@ -51,18 +57,9 @@ describe('QuestService', () => {
     service = new QuestService({
       repository: mockQuestRepository,
       monsterExistence: mockMonsterExistence,
+      stateFactory: mockStateFactory,
       events: mockEvents,
-      getRewardDistributionService: () => mockRewardDistributionService,
-      getQuestAssignmentService: () => mockQuestAssignmentService,
     });
-    
-    mockQuestAssignmentService = {
-      findByQuest: jest.fn().mockResolvedValue([]),
-    } as unknown as jest.Mocked<QuestAssignmentService>;
-
-    mockRewardDistributionService = {
-      distributeRewards: jest.fn(),
-    } as unknown as jest.Mocked<RewardDistributionService>;
   });
 
   describe('Create Quest', () => {
@@ -98,7 +95,9 @@ describe('QuestService', () => {
     });
 
     it('Should throw validation error when the monster does not exist', async () => {
-      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'))
+      mockMonsterExistence.ensure.mockRejectedValue(
+        new RelatedEntityValidationError('Monster', 'ghost')
+      );
 
       await expect(service.create({ ...input, monsterId: 'ghost' })).rejects.toThrow(
         RelatedEntityValidationError
@@ -132,6 +131,50 @@ describe('QuestService', () => {
   });
 
   describe('Update Quest', () => {
+    let mockPendingState: jest.Mocked<PendingQuestState>;
+    let mockInProgressState: jest.Mocked<InProgresQuestState>;
+    let mockCompletedState: jest.Mocked<CompletedQuestState>;
+    let mockFailedState: jest.Mocked<FailedQuestState>;
+
+    beforeEach(() => {
+      mockPendingState = {
+        getValidTransitions: jest.fn().mockReturnValue(['IN_PROGRESS']),
+        validateBefore: jest.fn().mockResolvedValue(undefined),
+        onEnter: jest.fn().mockResolvedValue(undefined),
+      } as unknown as jest.Mocked<PendingQuestState>;
+
+      mockInProgressState = {
+        getValidTransitions: jest.fn().mockReturnValue(['COMPLETED', 'FAILED']),
+        validateBefore: jest.fn().mockResolvedValue(undefined),
+        onEnter: jest.fn().mockResolvedValue(undefined),
+      } as unknown as jest.Mocked<InProgresQuestState>;
+
+      mockCompletedState = {
+        getValidTransitions: jest.fn().mockReturnValue([]),
+        validateBefore: jest.fn().mockResolvedValue(undefined),
+        onEnter: jest.fn().mockResolvedValue(undefined),
+      } as unknown as jest.Mocked<CompletedQuestState>;
+
+      mockFailedState = {
+        getValidTransitions: jest.fn().mockReturnValue([]),
+        validateBefore: jest.fn().mockResolvedValue(undefined),
+        onEnter: jest.fn().mockResolvedValue(undefined),
+      } as unknown as jest.Mocked<FailedQuestState>;
+
+      mockStateFactory.getState.mockImplementation((status) => {
+        switch (status) {
+          case 'PENDING':
+            return mockPendingState;
+          case 'IN_PROGRESS':
+            return mockInProgressState;
+          case 'COMPLETED':
+            return mockCompletedState;
+          case 'FAILED':
+            return mockFailedState;
+        }
+      });
+    });
+
     it('Should update an existing quest', async () => {
       const updateData = { title: 'Updated title', reward: 9000 };
       const updatedQuest = { ...mockQuest, ...updateData };
@@ -161,7 +204,9 @@ describe('QuestService', () => {
 
     it('Should throw validation error when the new monster does not exist', async () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
-      mockMonsterExistence.ensure.mockRejectedValue(new RelatedEntityValidationError('Monster', 'ghost'));
+      mockMonsterExistence.ensure.mockRejectedValue(
+        new RelatedEntityValidationError('Monster', 'ghost')
+      );
 
       await expect(service.update('1', { monsterId: 'ghost' })).rejects.toThrow(
         RelatedEntityValidationError
@@ -176,27 +221,32 @@ describe('QuestService', () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockQuestRepository.update.mockResolvedValue(updatedQuest);
 
-      mockQuestAssignmentService.findByQuest.mockResolvedValue([
-        { id: 'a1', hunterId: 'h1', questId: '1', role: 'Leader' },
-      ]);
-
       const result = await service.update('1', updateData);
 
       expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockPendingState.getValidTransitions).toHaveBeenCalled();
+      expect(mockInProgressState.validateBefore).toHaveBeenCalledWith(mockQuest);
+      expect(mockInProgressState.onEnter).toHaveBeenCalledWith(mockQuest);
+
       expect(mockQuestRepository.update).toHaveBeenCalledWith('1', updateData);
       expect(result).toEqual(updatedQuest);
     });
 
     it('Should change status from IN_PROGRESS to COMPLETED', async () => {
-      const currentData = { ...mockQuest, status: 'IN_PROGRESS' };
+      const currentData = { ...mockQuest, status: 'IN_PROGRESS' as QuestStatus };
       const updateData = { status: 'COMPLETED' } as { status: QuestStatus };
       const updatedQuest = { ...currentData, ...updateData };
+
       mockQuestRepository.findById.mockResolvedValue(currentData as Quest);
       mockQuestRepository.update.mockResolvedValue(updatedQuest);
 
       const result = await service.update('1', updateData);
 
       expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockInProgressState.getValidTransitions).toHaveBeenCalled();
+      expect(mockCompletedState.validateBefore).toHaveBeenCalledWith(currentData);
+      expect(mockCompletedState.onEnter).toHaveBeenCalledWith(currentData);
+
       expect(mockQuestRepository.update).toHaveBeenCalledWith('1', updateData);
       expect(result).toEqual(updatedQuest);
     });
@@ -211,6 +261,9 @@ describe('QuestService', () => {
       const result = await service.update('1', updateData);
 
       expect(mockQuestRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockInProgressState.getValidTransitions).toHaveBeenCalled();
+      expect(mockFailedState.validateBefore).toHaveBeenCalledWith(currentData);
+      expect(mockFailedState.onEnter).toHaveBeenCalledWith(currentData);
       expect(mockQuestRepository.update).toHaveBeenCalledWith('1', updateData);
       expect(result).toEqual(updatedQuest);
     });
@@ -221,41 +274,9 @@ describe('QuestService', () => {
       await expect(service.update('1', { status: 'COMPLETED' })).rejects.toThrow(
         QuestValidationError
       );
+      expect(mockPendingState.getValidTransitions).toHaveBeenCalled();
+      expect(mockCompletedState.validateBefore).not.toHaveBeenCalled();
       expect(mockQuestRepository.update).not.toHaveBeenCalled();
-    });
-
-    it('Should throw when starting a quest with no hunters assigned', async () => {
-      mockQuestRepository.findById.mockResolvedValue(mockQuest);
-      mockQuestAssignmentService.findByQuest.mockResolvedValue([]);
-
-      await expect(service.update('1', { status: 'IN_PROGRESS' })).rejects.toThrow(
-        QuestValidationError
-      );
-      expect(mockQuestRepository.update).not.toHaveBeenCalled();
-    });
-
-    it('Should throw an error when starting a quest with no hunters leaders are assigned', async () => {
-      mockQuestRepository.findById.mockResolvedValue(mockQuest);
-
-      mockQuestAssignmentService.findByQuest.mockResolvedValue([
-        { id: 'a1', hunterId: 'h1', questId: '1', role: 'Support' },
-      ]);
-
-      await expect(
-        service.update('1', { status: 'IN_PROGRESS' })
-      ).rejects.toThrow(QuestValidationError);
-
-      expect(mockQuestRepository.update).not.toHaveBeenCalled();
-    });
-
-    it('Should distribute rewards when a quest is completed', async () => {
-      const currentQuest: Quest = { ...mockQuest, status: 'IN_PROGRESS' };
-      const completedQuest: Quest = { ...currentQuest, status: 'COMPLETED' };
-
-      mockQuestRepository.findById.mockResolvedValue(currentQuest as Quest);
-      mockQuestRepository.update.mockResolvedValue(completedQuest);
-      await service.update('1', { status: 'COMPLETED' });
-      expect(mockRewardDistributionService.distributeRewards).toHaveBeenCalledWith('1', 5000);
     });
   });
 
@@ -309,24 +330,10 @@ describe('QuestService', () => {
   });
 
   describe('notify events', () => {
-    it('emits quest.completed when a quest is completed', async () => {
-      const currentQuest: Quest = { ...mockQuest, status: 'IN_PROGRESS' };
-      mockQuestRepository.findById.mockResolvedValue(currentQuest as Quest);
-      mockQuestRepository.update.mockResolvedValue({ ...currentQuest, status: 'COMPLETED' });
-      
-      await service.update('1', { status: 'COMPLETED' });
-
-      expect(mockEvents.notify).toHaveBeenCalledWith('quest.completed', {
-        operation: 'COMPLETED',
-        entity: 'Quest',
-        entityId: '1',
-      });
-    });
-
     it('emits entity.updated on a normal quest update', async () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
       mockQuestRepository.update.mockResolvedValue({ ...mockQuest, title: 'x' });
-      
+
       await service.update('1', { title: 'x' });
 
       expect(mockEvents.notify).toHaveBeenCalledWith('entity.updated', {
@@ -335,6 +342,5 @@ describe('QuestService', () => {
         entityId: '1',
       });
     });
-
   });
 });

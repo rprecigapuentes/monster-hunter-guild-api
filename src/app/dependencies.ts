@@ -10,13 +10,14 @@ import { QuestRepository } from '../repositories/quest.repository';
 import { GuildService } from '../services/guild.service';
 import { HunterService } from '../services/hunter.service';
 import { MonsterService } from '../services/monster.service';
-import { QuestService } from '../services/quest.service';
+import { QuestService } from '../services/quest/quest.service';
 import { RankCalculator } from '../services/rank-calculator';
 import { QuestAssignmentService } from '../services/quest-assignment.service';
 import { QuestAssignmentController } from '../controllers/quest-assignment.controller';
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
 import { RewardDistributionService } from '../services/reward-distribution.service';
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
+import { QuestStateFactory } from '../services/quest/quest-state-factory';
 import { EventManager } from '../events/event-manager';
 
 // EventManager instance
@@ -38,12 +39,16 @@ const hunterExistence = new EntityExistenceValidator(hunterService, 'Hunter');
 
 // Quest
 const questRepository = new QuestRepository(prisma.quest);
+const questStateFactory = new QuestStateFactory({
+  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+  getRewardDistributionService: (): RewardDistributionService => rewardDistributionService,
+  eventManager: events,
+});
 const questService = new QuestService({
   repository: questRepository,
   monsterExistence,
   events,
-  getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
-  getRewardDistributionService: (): RewardDistributionService => rewardDistributionService,
+  stateFactory: questStateFactory,
 });
 export const questController = new QuestController(questService);
 const questExistence = new EntityExistenceValidator(questService, 'Quest');
