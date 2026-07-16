@@ -7,10 +7,16 @@ import {
 export class MonsterRepository extends PrismaBaseRepository<
   Monster,
   Prisma.MonsterCreateInput,
-  Prisma.MonsterUpdateInput
+  Prisma.MonsterUpdateInput,
+  Prisma.MonsterWhereInput
 > {
   constructor(
-    prismaModel: PrismaModelDelegate<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>
+    prismaModel: PrismaModelDelegate<
+      Monster,
+      Prisma.MonsterCreateInput,
+      Prisma.MonsterUpdateInput,
+      Prisma.MonsterWhereInput
+    >
   ) {
     super(prismaModel);
   }

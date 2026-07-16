@@ -7,13 +7,15 @@ import {
 export class QuestRepository extends PrismaBaseRepository<
   Quest,
   Prisma.QuestUncheckedCreateInput,
-  Prisma.QuestUncheckedUpdateInput
+  Prisma.QuestUncheckedUpdateInput,
+  Prisma.QuestWhereInput
 > {
   constructor(
     prismaModel: PrismaModelDelegate<
       Quest,
       Prisma.QuestUncheckedCreateInput,
-      Prisma.QuestUncheckedUpdateInput
+      Prisma.QuestUncheckedUpdateInput,
+      Prisma.QuestWhereInput
     >
   ) {
     super(prismaModel);

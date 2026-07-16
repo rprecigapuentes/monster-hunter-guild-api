@@ -33,10 +33,18 @@ interface MockUpdateInput {
   headquarters?: string;
 }
 
+interface MockWhereInput {
+  OR?: Array<{
+    name?: { contains: string; mode?: string };
+    region?: { contains: string; mode?: string };
+  }>;
+}
+
 class TestGuildRepository extends PrismaBaseRepository<
   MockModel,
   MockCreateInput,
-  MockUpdateInput
+  MockUpdateInput,
+  MockWhereInput
 > {
   constructor() {
     super(prisma.guild);

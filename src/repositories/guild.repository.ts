@@ -7,10 +7,16 @@ import {
 export class GuildRepository extends PrismaBaseRepository<
   Guild,
   Prisma.GuildCreateInput,
-  Prisma.GuildUpdateInput
+  Prisma.GuildUpdateInput,
+  Prisma.GuildWhereInput
 > {
   constructor(
-    prismaModel: PrismaModelDelegate<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>
+    prismaModel: PrismaModelDelegate<
+      Guild,
+      Prisma.GuildCreateInput,
+      Prisma.GuildUpdateInput,
+      Prisma.GuildWhereInput
+    >
   ) {
     super(prismaModel);
   }
