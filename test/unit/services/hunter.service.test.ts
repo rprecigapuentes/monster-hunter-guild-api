@@ -1,13 +1,13 @@
 import { HunterService, HunterNotFoundError } from "../../../src/services/hunter.service";
 import type { HunterRepository } from "../../../src/repositories/hunter.repository";
-import type { IRankCalculator } from "../../../src/services/rank-calculator.interface";
 import { EventManager } from '../../../src/events/event-manager';
+import type { IRankCalculationStrategy } from "../../../src/strategies/rank/interfaces/rank-calculation-strategy.interface";
 
 describe("HunterService", () => {
   let service: HunterService;
   let mockRepository: jest.Mocked<HunterRepository>;
-  let mockRankCalculator: jest.Mocked<IRankCalculator>;
   let mockEvents: jest.Mocked<EventManager>;
+  let mockRankCalculator: jest.Mocked<IRankCalculationStrategy>;
 
   const mockHunter = {
     id: "1",
@@ -198,8 +198,8 @@ describe("HunterService", () => {
 
   describe('addExperience reward events', () => {
     it('emits hunter.rewarded when experience is added', async () => {
-      mockRepository.findById.mockResolvedValue(mockHunter);        
-      mockRankCalculator.calculate.mockReturnValue(3);              
+      mockRepository.findById.mockResolvedValue(mockHunter);
+      mockRankCalculator.calculate.mockReturnValue(3);
       mockRepository.update.mockResolvedValue({ ...mockHunter, experiencePoints: 1040 });
 
       await service.addExperience('1', 40);
@@ -212,8 +212,8 @@ describe("HunterService", () => {
     });
 
     it('does not emit hunter.ranked_up when the rank is unchanged', async () => {
-      mockRepository.findById.mockResolvedValue(mockHunter);      
-      mockRankCalculator.calculate.mockReturnValue(3);           
+      mockRepository.findById.mockResolvedValue(mockHunter);
+      mockRankCalculator.calculate.mockReturnValue(3);
       mockRepository.update.mockResolvedValue(mockHunter);
 
       await service.addExperience('1', 10);
@@ -222,8 +222,8 @@ describe("HunterService", () => {
     });
 
     it('emits hunter.ranked_up when the rank increases', async () => {
-      mockRepository.findById.mockResolvedValue(mockHunter);      
-      mockRankCalculator.calculate.mockReturnValue(4);         
+      mockRepository.findById.mockResolvedValue(mockHunter);
+      mockRankCalculator.calculate.mockReturnValue(4);
       mockRepository.update.mockResolvedValue({ ...mockHunter, rank: 4, experiencePoints: 2000 });
 
       await service.addExperience('1', 1000);
@@ -235,5 +235,4 @@ describe("HunterService", () => {
       });
     });
   });
-
 });

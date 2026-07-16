@@ -12,7 +12,6 @@ import { GuildService } from '../services/guild.service';
 import { HunterService } from '../services/hunter.service';
 import { MonsterService } from '../services/monster.service';
 import { QuestService } from '../services/quest/quest.service';
-import { RankCalculator } from '../services/rank-calculator';
 import { QuestAssignmentService } from '../services/quest-assignment.service';
 import { QuestAssignmentController } from '../controllers/quest-assignment.controller';
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
@@ -36,6 +35,8 @@ events.subscribe('*', auditObserver);
 
 const auditService = new AuditService(auditRepository);
 export const auditController = new AuditController(auditService);
+import { DefaultRewardDistributionStrategy } from '../strategies/reward/default-reward-distribution.strategy';
+import { DefaultRankCalculationStrategy } from '../strategies/rank/default-rank-calculation.strategy';
 
 // Monster
 const monsterRepository = new MonsterRepository(prisma.monster);
@@ -44,9 +45,9 @@ export const monsterController = new MonsterController(monsterService);
 const monsterExistence = new EntityExistenceValidator(monsterService, 'Monster');
 
 // Hunter
-const rankCalculator = new RankCalculator();
+const rankStrategy = new DefaultRankCalculationStrategy();
 const hunterRepository = new HunterRepository(prisma.hunter);
-const hunterService = new HunterService(hunterRepository, rankCalculator, events);
+const hunterService = new HunterService(hunterRepository, rankStrategy, events);
 export const hunterController = new HunterController(hunterService);
 const hunterExistence = new EntityExistenceValidator(hunterService, 'Hunter');
 
@@ -71,7 +72,7 @@ const guildRepository = new GuildRepository(prisma.guild);
 const guildService = new GuildService(guildRepository, events);
 export const guildController = new GuildController(guildService);
 
-//QuestAssignment
+// QuestAssignment
 const questAssignmentRepository = new QuestAssignmentRepository(prisma.questAssignment);
 const questAssignmentService = new QuestAssignmentService({
   repository: questAssignmentRepository,
@@ -81,7 +82,10 @@ const questAssignmentService = new QuestAssignmentService({
 });
 export const questAssignmentController = new QuestAssignmentController(questAssignmentService);
 
+// Reward Distribution
+const defaultRewardDistributionStrategy = new DefaultRewardDistributionStrategy();
 const rewardDistributionService = new RewardDistributionService({
   hunterService,
   getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
+  strategy: defaultRewardDistributionStrategy,
 });

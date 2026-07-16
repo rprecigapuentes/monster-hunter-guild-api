@@ -1,6 +1,11 @@
-import type { IRankCalculator, RankThreshold } from './rank-calculator.interface';
+import type { IRankCalculationStrategy } from './interfaces/rank-calculation-strategy.interface';
 
-export class RankCalculator implements IRankCalculator {
+interface RankThreshold {
+  rank: number;
+  requiredExperience: number;
+}
+
+export class DefaultRankCalculationStrategy implements IRankCalculationStrategy {
   private static readonly RANK_PROGRESS: ReadonlyArray<RankThreshold> = [
     { rank: 1, requiredExperience: 0 },
     { rank: 2, requiredExperience: 500 },
@@ -10,13 +15,14 @@ export class RankCalculator implements IRankCalculator {
   ];
 
   calculate(experiencePoints: number): number {
-    let currentRank = RankCalculator.RANK_PROGRESS[0].rank;
+    let currentRank = DefaultRankCalculationStrategy.RANK_PROGRESS[0].rank;
 
-    for (const progress of RankCalculator.RANK_PROGRESS) {
+    for (const progress of DefaultRankCalculationStrategy.RANK_PROGRESS) {
       if (experiencePoints >= progress.requiredExperience) {
         currentRank = progress.rank;
       }
     }
+
     return currentRank;
   }
 }
