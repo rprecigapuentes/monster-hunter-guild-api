@@ -6,17 +6,33 @@ export class DefaultRewardDistributionStrategy implements IRewardDistributionStr
   private static readonly LEADER_PERCENTAGE = 0.4;
 
   distribute(reward: number, assignments: QuestAssignment[]): RewardAllocation[] {
-    const leader = assignments.find((assignment) => assignment.role === 'Leader');
+    const leader = this.findLeader(assignments);
 
     if (!leader) {
       return [];
     }
 
-    const members = assignments.filter((assignment) => assignment.role !== 'Leader');
+    const members = this.findMembers(assignments);
 
+    return this.buildAllocations(reward, leader, members);
+  }
+
+  private findLeader(assignments: QuestAssignment[]): QuestAssignment | undefined {
+    return assignments.find((assignment) => assignment.role === 'Leader');
+  }
+
+  private findMembers(assignments: QuestAssignment[]): QuestAssignment[] {
+    return assignments.filter((assignment) => assignment.role !== 'Leader');
+  }
+
+  private buildAllocations(
+    reward: number,
+    leader: QuestAssignment,
+    members: QuestAssignment[]
+  ): RewardAllocation[] {
     const allocations: RewardAllocation[] = [];
 
-    const leaderReward = Math.floor(reward * DefaultRewardDistributionStrategy.LEADER_PERCENTAGE);
+    const leaderReward = this.calculateLeaderReward(reward);
 
     allocations.push({
       hunterId: leader.hunterId,
@@ -27,17 +43,27 @@ export class DefaultRewardDistributionStrategy implements IRewardDistributionStr
       return allocations;
     }
 
-    const remainingReward = reward - leaderReward;
-
-    const rewardPerHunter = Math.floor(remainingReward / members.length);
+    const memberReward = this.calculateMemberReward(reward, leaderReward, members.length);
 
     for (const member of members) {
       allocations.push({
         hunterId: member.hunterId,
-        experience: rewardPerHunter,
+        experience: memberReward,
       });
     }
 
     return allocations;
+  }
+
+  private calculateLeaderReward(reward: number): number {
+    return Math.floor(reward * DefaultRewardDistributionStrategy.LEADER_PERCENTAGE);
+  }
+
+  private calculateMemberReward(
+    reward: number,
+    leaderReward: number,
+    membersCount: number
+  ): number {
+    return Math.floor((reward - leaderReward) / membersCount);
   }
 }
