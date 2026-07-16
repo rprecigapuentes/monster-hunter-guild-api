@@ -67,9 +67,25 @@ export class HunterService extends BaseService<
     const newExperience = hunter.experiencePoints + experienceGained;
     const newRank = this.rankCalculator.calculate(newExperience);
 
-    return this.repository.update(hunterId, {
+    const updated = await this.repository.update(hunterId, {
       experiencePoints: newExperience,
       rank: newRank,
     });
+
+    await this.events.notify(`hunter.rewarded`, {
+      operation: 'REWARDED',
+      entity: this.entityName,
+      entityId: hunterId,
+    });
+
+    if (newRank !== hunter.rank) {
+      await this.events.notify(`hunter.ranked_up`, {
+        operation: 'RANKED_UP',
+        entity: this.entityName,
+        entityId: hunterId,
+      });
+    }
+
+    return updated;
   }
 }
