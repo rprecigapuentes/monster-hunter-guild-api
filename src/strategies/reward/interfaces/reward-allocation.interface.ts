@@ -1,4 +1,4 @@
-export interface RewardAllocation{
-    hunterId: string;
-    experience: number
+export interface RewardAllocation {
+  hunterId: string;
+  experience: number;
 }

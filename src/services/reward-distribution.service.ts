@@ -34,16 +34,10 @@ export class RewardDistributionService {
     const questAssignmentService = this.getQuestAssignmentService();
     const assignments = await questAssignmentService.findByQuest(questId);
 
-    const distribution = this.strategy.distribute(
-      reward,
-      assignments
-    );
+    const distribution = this.strategy.distribute(reward, assignments);
 
     for (const allocation of distribution) {
-      await this.hunterService.addExperience(
-        allocation.hunterId,
-        allocation.experience
-      );
+      await this.hunterService.addExperience(allocation.hunterId, allocation.experience);
     }
   }
 }

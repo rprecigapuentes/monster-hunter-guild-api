@@ -12,7 +12,6 @@ import { GuildService } from '../services/guild.service';
 import { HunterService } from '../services/hunter.service';
 import { MonsterService } from '../services/monster.service';
 import { QuestService } from '../services/quest/quest.service';
-import { RankCalculator } from '../services/rank-calculator';
 import { QuestAssignmentService } from '../services/quest-assignment.service';
 import { QuestAssignmentController } from '../controllers/quest-assignment.controller';
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
@@ -73,7 +72,7 @@ const guildRepository = new GuildRepository(prisma.guild);
 const guildService = new GuildService(guildRepository, events);
 export const guildController = new GuildController(guildService);
 
-//QuestAssignment
+// QuestAssignment
 const questAssignmentRepository = new QuestAssignmentRepository(prisma.questAssignment);
 const questAssignmentService = new QuestAssignmentService({
   repository: questAssignmentRepository,
@@ -83,6 +82,7 @@ const questAssignmentService = new QuestAssignmentService({
 });
 export const questAssignmentController = new QuestAssignmentController(questAssignmentService);
 
+// Reward Distribution
 const defaultRewardDistributionStrategy = new DefaultRewardDistributionStrategy();
 const rewardDistributionService = new RewardDistributionService({
   hunterService,
