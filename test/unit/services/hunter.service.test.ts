@@ -195,4 +195,45 @@ describe("HunterService", () => {
       expect(mockRepository.update).not.toHaveBeenCalled();
     });
   });
+
+  describe('addExperience reward events', () => {
+    it('emits hunter.rewarded when experience is added', async () => {
+      mockRepository.findById.mockResolvedValue(mockHunter);        
+      mockRankCalculator.calculate.mockReturnValue(3);              
+      mockRepository.update.mockResolvedValue({ ...mockHunter, experiencePoints: 1040 });
+
+      await service.addExperience('1', 40);
+
+      expect(mockEvents.notify).toHaveBeenCalledWith('hunter.rewarded', {
+        operation: 'REWARDED',
+        entity: 'Hunter',
+        entityId: '1',
+      });
+    });
+
+    it('does not emit hunter.ranked_up when the rank is unchanged', async () => {
+      mockRepository.findById.mockResolvedValue(mockHunter);      
+      mockRankCalculator.calculate.mockReturnValue(3);           
+      mockRepository.update.mockResolvedValue(mockHunter);
+
+      await service.addExperience('1', 10);
+
+      expect(mockEvents.notify).not.toHaveBeenCalledWith('hunter.ranked_up', expect.anything());
+    });
+
+    it('emits hunter.ranked_up when the rank increases', async () => {
+      mockRepository.findById.mockResolvedValue(mockHunter);      
+      mockRankCalculator.calculate.mockReturnValue(4);         
+      mockRepository.update.mockResolvedValue({ ...mockHunter, rank: 4, experiencePoints: 2000 });
+
+      await service.addExperience('1', 1000);
+
+      expect(mockEvents.notify).toHaveBeenCalledWith('hunter.ranked_up', {
+        operation: 'RANKED_UP',
+        entity: 'Hunter',
+        entityId: '1',
+      });
+    });
+  });
+
 });
