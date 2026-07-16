@@ -1,44 +1,41 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { StatisticsService } from '../services/statistics.service';
+
+import type { StatisticsService } from '../services/statistics/statistics.service';
 
 export class StatisticsController {
   constructor(private readonly service: StatisticsService) {}
 
-  questAverageReward = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  entityStatistics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const averageReward = await this.service.getQuestAverageReward();
-      res.status(200).json(averageReward);
+      const { entity } = req.params;
+
+      const statistics = await this.service.getStatistics(entity as string);
+
+      res.status(200).json(statistics);
     } catch (error) {
       next(error);
     }
   };
 
-  entitiesCount = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  entityStatistic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const counts = await this.service.getEntitiesCount();
-      res.status(200).json(counts);
+      const { entity, statistic } = req.params;
+
+      const result = await this.service.getStatistic(entity as string, statistic as string);
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
   };
 
-  completedQuestsCount = async (
-    _req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  globalStatistic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const completedQuestsCount = await this.service.getCompletedQuestsCount();
-      res.status(200).json(completedQuestsCount);
-    } catch (error) {
-      next(error);
-    }
-  };
+      const { statistic } = req.params;
 
-  hunterLeaderboard = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const leaderboard = await this.service.getHunterLeaderboard();
-      res.status(200).json(leaderboard);
+      const result = await this.service.getGlobalStatistic(statistic as string);
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
