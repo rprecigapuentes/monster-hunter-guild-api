@@ -16,7 +16,7 @@ export function errorHandler(
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    logger.warn('Database request error', { code: error.code, path: req.path });
+    logger.warn('Database request error', { code: error.code, path: req.path, method: req.method });
     res.status(400).json({ message: 'Database request error', code: error.code });
     return;
   }

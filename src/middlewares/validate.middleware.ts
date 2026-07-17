@@ -1,11 +1,14 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z, type ZodType } from 'zod';
+import { logger } from '../lib/logger';
 
 export function validate(schema: ZodType) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
+      const message = buildErrorMessage(result.error);
+      logger.warn(message, { method: req.method, path: req.originalUrl });
       res.status(400).json({
         message: buildErrorMessage(result.error),
         errors: z.treeifyError(result.error),
