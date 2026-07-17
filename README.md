@@ -1,96 +1,116 @@
+
 # Monster Hunter Guild API
 
 ## Overview
 
-The world is plagued by dangerous monsters that threaten villages, cities, and trade routes.
+The **Monster Hunter Guild API** is a RESTful backend application developed with **TypeScript**, **Express**, **Prisma ORM**, and **MySQL**.
 
-The Monster Hunter Guild is responsible for coordinating hunters, managing quests, tracking monster sightings, and distributing rewards.
-
-Your team has been hired to develop the backend platform that powers the Guild's operations.
-
-The system will evolve over multiple iterations, requiring the team to design a flexible and maintainable architecture capable of supporting new business requirements.
+The project manages the core operations of a fictional Monster Hunter Guild, including hunters, monsters, guilds, quests, quest assignments, audit history, global search, and statistics. The architecture emphasizes maintainability, extensibility, and testability by applying object-oriented programming principles, SOLID principles, dependency injection, and design patterns.
 
 ---
 
-### 1. Project Overview
+# Technologies
 
-#### Brief introduction to the project.
+- TypeScript
+- Node.js
+- Express
+- Prisma ORM
+- MySQL
+- Jest
 
-Include:
+---
 
-Project purpose
-Main technologies
-Overall architecture
-Sprint goals achieved
+# Getting Started
 
-Example topics:
+## Prerequisites
 
-REST API for Monster Hunter Guild Management
-TypeScript
-Express
-Prisma ORM
-MySQL
+- Node.js 20+
+- MySQL
+- npm
 
-## Getting Started
+## Installation
 
-### Prerequisites
-- Node.js v20 or higher
-
-### Installation and Usage
-
-1. Clone the repository
 ```bash
-   git clone https://gitlab.com/josecarlosgvr/monster-hunter-guild.git
-   cd monster-hunter-guild
+git clone https://gitlab.com/josecarlosgvr/monster-hunter-guild.git
+cd monster-hunter-guild
+npm install
 ```
 
-2. Install dependencies
+## Configure Environment
+
+Create a `.env` file with your database connection string.
+
+## Prisma Commands
+
+Generate Prisma Client
+
 ```bash
-   npm install
+npx prisma generate
 ```
 
-3. Generate prisma client
+Run migrations
+
 ```bash
-   npx prisma generate
+npx prisma migrate dev
 ```
 
-4. Sinchronize local db with schema (using migrations)
+Start the application
+
 ```bash
-   npx prisma migrate dev
+npm run dev
 ```
 
-3. Run in development mode
-```bash
-   npm run dev
-```
+Build
 
-4. Run compiled app (requires build first)
 ```bash
-   npm run build
-   npm start
-```
-
-5. Run tests
-```bash
-    npm test
+npm run build
+npm start
 ```
 
 ---
 
-# Sprint 1 Scope
+# Database
 
-Implement CRUD operations for the following entities:
+The project uses **MySQL** together with **Prisma ORM**.
 
-* Hunters
-* Monsters
-* Quests
-* Guilds
+```
+Application
+      │
+      ▼
+ Prisma Client
+      │
+      ▼
+    MySQL
+```
 
 ---
 
-# Domain Model
+# Prisma Schema
+
+## Guild
+
+Represents a hunter guild.
+
+Main attributes:
+
+| Field        | Type   |
+| ------------ | ------ |
+| id           | UUID   |
+| name         | string |
+| region       | string |
+| headquarters | string |
+
+Rules:
+
+* Name required
+
+---
 
 ## Hunter
+
+Represents a guild hunter.
+
+Main attributes:
 
 | Field            | Type   |
 | ---------------- | ------ |
@@ -110,6 +130,10 @@ Rules:
 
 ## Monster
 
+Represents huntable monsters.
+
+Main attributes:
+
 | Field       | Type   |
 | ----------- | ------ |
 | id          | UUID   |
@@ -128,6 +152,10 @@ Rules:
 
 ## Quest
 
+Represents hunting missions.
+
+Main attributes:
+
 | Field     | Type   |
 | --------- | ------ |
 | id        | UUID   |
@@ -143,76 +171,417 @@ Rules:
 * Reward >= 0
 * Title required
 
+Supported states:
+
+- Pending
+- In Progress
+- Completed
+- Failed
+
 ---
 
-## Guild
+## QuestAssignment
 
-| Field        | Type   |
-| ------------ | ------ |
-| id           | UUID   |
-| name         | string |
-| region       | string |
-| headquarters | string |
+Associates hunters with quests.
+
+| Field    | Type   |
+| -------- | ------ |
+| id       | UUID   |
+| hunterId | UUID   |
+| questId  | UUID   |
+| role     | string |
+
+Allowed roles:
+
+* Leader
+* Support
+* Scout
 
 Rules:
 
-* Name required
+* Hunter must exist.
+* Quest must exist.
+* A hunter cannot be assigned twice to the same quest.
+* Every quest must have exactly one Leader.
+* A quest must contain at least one hunter before it can be started.
+---
+
+## Audit
+
+Stores read-only audit history.
+
+Fields:
+
+- id
+- operation
+- entity
+- timestamp
 
 ---
 
-# API Requirements
+# Architecture Overview
 
-CRUD endpoints for all entities.
+The application follows a layered architecture.
 
-Example:
+```
+Routes
+   │
+Controllers
+   │
+Services
+   │
+Repositories
+   │
+Prisma
+   │
+MySQL
+```
 
-GET /hunters
+## Layer Responsibilities
 
-GET /hunters/{id}
+### Routes
 
-POST /hunters
+Define API endpoints.
 
-PUT /hunters/{id}
+### Controllers
 
-DELETE /hunters/{id}
+Handle HTTP requests and responses.
+
+No business logic is implemented here.
+
+### Services
+
+Contain business rules and coordinate workflows.
+
+### Repositories
+
+Encapsulate all persistence logic.
+
+### Middlewares
+
+- Request validation
+- Global exception handling
+
+### Dependencies
+
+Dependency injection is centralized inside:
+
+```
+src/app/dependencies.ts
+```
+
+This reduces coupling and simplifies testing.
 
 ---
 
-# Testing Requirements
+# Folder Structure
 
-Minimum:
+```text
+src/
+├── app/
+├── config/
+├── controllers/
+├── dto/
+├── errors/
+├── events/
+├── entities/
+├── events/
+├── generated/
+├── middlewares/
+├── repositories/
+├── routes/
+├── services/
+├── utils/
 
-* Unit Tests
-* Validation Tests
-* Service Tests
-
-Coverage Target:
-
-80%
+tests/
+├── controllers/
+├── repositories/
+├── services/
+```
 
 ---
 
-## Continuous Integration
+# Project Abstractions
+---
+## Repository layer
+---
 
-Every Pull Request must execute:
+### ICountable
 
-* Dependency installation
-* Linting
-* Tests
-* Build validation
+- The ICountable interface defines a common contract for repositories that can return the total number of stored records.
 
-The Pull Request must not be merged if the pipeline fails.
+### IBasicRepository
+
+- IBasicRepository defines the common CRUD operations shared by every repository.
+
+### PrismaModelDelegate
+
+- This interface abstracts the Prisma client.
+
+- Instead of coupling the base repository directly to Prisma's generated delegates, it only requires the operations that are actually used.
+
+### PrismaBaseRepository
+
+- PrismaBaseRepository is an abstract class that provides the implementation for all generic CRUD operations defined in IBasicRepository.
+- It implements:
+
+   create()
+   update()
+   delete()
+   findById()
+   findAll()
+   count()
+
+- using the injected Prisma delegate.
+- Instead of implementing these methods repeatedly for every entity, repositories simply inherit from this class.
+
+### Specialized Repositories
+
+Some entities require queries that are specific to their business logic.
+
+These repositories extend IBasicRepository and define only the additional methods they need. (IHuunterRepository, IQuestRepository)
+
+---
+## Service Layer
+---
+
+### BaseService
+
+- BaseService provides the common implementation shared by every service.
+
+- It implements:
+
+   create()
+   update()
+   delete()
+   findById()
+   findAll()
+   exists()
+
+- using an injected repository.
+
+### IExistenceChecker
+
+- Some services expose only the capability of verifying whether an entity exists.
+
+### Entity Statistics
+
+- Some services expose aggregated information instead of CRUD operations.
+
+- For these cases, the project defines the IEntityStatistics contract.
+
+### BaseStatisticsService
+
+- BaseStatisticsService provides a generic mechanism for registering and exposing statistics.
+
+- Each statistic is associated with a function stored in a map.
+
+### State Abstractions
+
+- Some services use the State pattern to model entity lifecycles.
+
+- Each state implements the same contract
+
+### Strategy Abstractions
+
+- Some business rules may evolve over time or require multiple implementations. Instead of hardcoding these algorithms into services, the project uses the Strategy Pattern to encapsulate interchangeable behaviors behind interfaces.
+
+---
+## Controller Layer
+---
+
+### BaseService
+
+- BaseController provides the common implementation for the standard REST endpoints shared by all entities.
+
+- Each controller receives its corresponding service through dependency injection.
 
 ---
 
-# Future Iterations
+# Core Features
 
-Future requirements may include:
+## CRUD Operations
 
-* Hunter assignments
-* Equipment
-* Quest completion
-* Reward calculations
-* Guild rankings
-* Monster weaknesses
-* Hunter progression
+Complete CRUD support for:
+
+- Hunters
+- Monsters
+- Guilds
+- Quests
+
+## Quest Assignment
+
+Hunters can participate in multiple quests through the QuestAssignment entity.
+Business rules ensure:
+
+- Hunters and quests exist before assignment.
+- A hunter cannot be assigned twice to the same quest.
+- Each quest has exactly one Leader.
+- A quest must have at least one assigned hunter before it can start (A leader at least).
+
+## Quest Lifecycle Management
+
+Quests follow a controlled lifecycle:
+- Pending
+- In Progress
+- Completed
+- Failed
+Invalid state transitions are prevented through business validation.
+
+## Reward Distribution
+
+- When a quest is completed, rewards are automatically distributed among participating hunters.
+- The leader receives 40% of the reward.
+- The remaining reward is divided equally among the other participants.
+- Rewards are converted into hunter experience points.
+
+## Automatic Rank Progression
+
+- Hunter ranks are calculated automatically based on accumulated experience.
+- Rank updates occur whenever experience changes.
+- Rank values cannot be modified directly through the API.
+
+## Audit History
+
+Every important business operation generates an audit record.
+
+Tracked operations include:
+
+- Entity Created
+- Entity Updated
+- Entity Deleted
+- Quest Completed
+- Assignment Completed
+
+## Global Search
+
+Searches across:
+
+- Hunters
+- Monsters
+- Guilds
+- Quests
+
+## Statistics Dashboard
+
+Provides:
+
+- Total entities
+- Average quest reward
+- Completed quests
+- Hunter leaderboard
+
+---
+
+# Design Patterns
+
+## State Pattern
+
+Manages the Quest lifecycle.
+
+- Pending
+- In Progress
+- Completed
+- Failed
+
+Each state encapsulates transitions and validations.
+
+## Factory Pattern
+
+QuestStateFactory creates the appropriate state object.
+
+## Strategy Pattern
+
+RewardDistributionStrategy allows reward algorithms to be replaced without modifying the service.
+
+## Observer Pattern
+
+Business events are published through EventManager.
+
+Observers generate audit records while remaining decoupled from business services.
+
+---
+
+# Object-Oriented Programming
+
+## Encapsulation
+
+Business rules are hidden inside services.
+
+## Abstraction
+
+Interfaces define repository and service contracts.
+
+## Inheritance
+
+Implemented through BaseService and BaseRepository.
+
+## Polymorphism
+
+Services depend on abstractions rather than concrete implementations.
+
+---
+
+# SOLID Principles
+
+## Single Responsibility Principle
+
+Each layer and classes have one responsibility.
+
+## Open/Closed Principle
+
+New quest states and reward strategies can be added without modifying existing code.
+
+## Liskov Substitution Principle
+
+Concrete repositories and services can replace their abstractions.
+
+## Interface Segregation Principle
+
+Specialized repositories expose only methods relevant to their entity.
+
+## Dependency Inversion Principle
+
+High-level modules depend on interfaces.
+
+Dependency injection is configured centrally.
+
+---
+
+# Exception Handling
+
+A global middleware handles application exceptions.
+
+Benefits:
+
+- No repetitive try/catch blocks
+- Consistent API responses
+- Cleaner controllers
+
+---
+
+# Unit Testing
+
+Run all tests
+
+```bash
+npm test
+```
+
+Tests cover:
+
+- CRUD operations
+- Validation failures
+- Business rules
+- Exception handling
+- State transitions
+- Strategy implementations
+- Observer notifications
+
+---
+
+# Known Limitations
+
+- Statistics expose predefined metrics only.
+- Search supports only implemented entities.
+- Folder organization is getting bigger and could be changed.
