@@ -2,18 +2,17 @@ import type { Monster, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { EventManager } from '../events/event-manager';
+import { NotFoundError, ValidationError } from '../errors';
 
-export class MonsterNotFoundError extends Error {
+export class MonsterNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Monster with id ${id} was not found`);
-    this.name = 'MonsterNotFoundError';
   }
 }
 
-export class MonsterValidationError extends Error {
+export class MonsterValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = 'MonsterValidationError';
   }
 }
 

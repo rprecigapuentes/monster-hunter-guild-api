@@ -4,18 +4,17 @@ import type { IBasicRepository } from '../repositories/interfaces/basic-reposito
 import { BaseService } from './base-service.abstract';
 import type { EventManager } from '../events/event-manager';
 import type { IRankCalculationStrategy } from '../strategies/rank/interfaces/rank-calculation-strategy.interface';
+import { NotFoundError, ValidationError } from '../errors';
 
-export class HunterNotFoundError extends Error {
+export class HunterNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Hunter with id ${id} not found`);
-    this.name = `HunterNotFoundError`;
   }
 }
 
-export class HunterValidationError extends Error {
+export class HunterValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = `HunterValidationError`;
   }
 }
 

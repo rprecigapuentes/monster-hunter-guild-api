@@ -2,18 +2,17 @@ import type { Guild, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { EventManager } from '../events/event-manager';
+import { NotFoundError, ValidationError } from '../errors';
 
-export class GuildNotFoundError extends Error {
+export class GuildNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Guild with id ${id} was not found`);
-    this.name = 'GuildNotFoundError';
   }
 }
 
-export class GuildValidationError extends Error {
+export class GuildValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = 'GuildValidationError';
   }
 }
 

@@ -3,18 +3,23 @@ import type { IBasicRepository } from '../repositories/interfaces/basic-reposito
 import { BaseService } from './base-service.abstract';
 import type { EntityExistenceValidator } from './entity-existence-validator';
 import type { EventManager } from '../events/event-manager';
+import { NotFoundError, ValidationError, ConflictError } from '../errors';
 
-export class QuestAssignmentNotFoundError extends Error {
+export class QuestAssignmentNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`QuestAssignment with id ${id} was not found`);
-    this.name = 'QuestAssignmentNotFoundError';
   }
 }
 
-export class QuestAssignmentValidationError extends Error {
+export class QuestAssignmentValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = 'QuestAssignmentValidationError';
+  }
+}
+
+export class QuestAssignmentConflictError extends ConflictError {
+  constructor(message: string) {
+    super(message);
   }
 }
 
@@ -112,13 +117,12 @@ export class QuestAssignmentService extends BaseService<
     hunterId: string
   ): void {
     if (questAssignments.some((assignment) => assignment.hunterId === hunterId)) {
-      throw new QuestAssignmentValidationError('Hunter is already assigned to this quest');
+      throw new QuestAssignmentConflictError('Hunter is already assigned to this quest');
     }
   }
 
   private ensureQuestHasNoLeaderYet(questAssignments: QuestAssignment[], role: QuestRole): void {
     if (role === 'Leader' && questAssignments.some((a) => a.role === 'Leader')) {
-      throw new QuestAssignmentValidationError('Quest already has a Leader');
-    }
+      throw new QuestAssignmentConflictError('Quest already has a Leader');    }
   }
 }

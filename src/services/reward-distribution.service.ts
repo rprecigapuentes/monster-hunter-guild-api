@@ -1,11 +1,11 @@
 import type { IRewardDistributionStrategy } from '../strategies/reward/interfaces/reward-distribution-strategy.interface';
 import type { HunterService } from './hunter.service';
 import type { QuestAssignmentService } from './quest-assignment.service';
+import { BusinessRuleError } from '../errors';
 
-export class RewardDistributionError extends Error {
+export class RewardDistributionError extends BusinessRuleError {
   constructor(message: string) {
     super(message);
-    this.name = 'RewardDistributionError';
   }
 }
 
@@ -33,6 +33,10 @@ export class RewardDistributionService {
 
     const questAssignmentService = this.getQuestAssignmentService();
     const assignments = await questAssignmentService.findByQuest(questId);
+
+    if (assignments.length === 0) {
+      throw new RewardDistributionError(`Cannot distribute reward: quest ${questId} has no assignments`);
+    }
 
     const distribution = this.strategy.distribute(reward, assignments);
 

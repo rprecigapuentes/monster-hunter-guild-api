@@ -4,18 +4,23 @@ import type { IBasicRepository } from '../../repositories/interfaces/basic-repos
 import { BaseService } from '../base-service.abstract';
 import type { EntityExistenceValidator } from '../entity-existence-validator';
 import { type QuestStateFactory } from './quest-state-factory';
+import { NotFoundError, ValidationError, ConflictError } from '../../errors';
 
-export class QuestNotFoundError extends Error {
+export class QuestNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Quest with id ${id} was not found`);
-    this.name = 'QuestNotFoundError';
   }
 }
 
-export class QuestValidationError extends Error {
+export class QuestValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = 'QuestValidationError';
+  }
+}
+
+export class QuestTransitionError extends ConflictError {
+  constructor(message: string) {
+    super(message);
   }
 }
 
@@ -100,11 +105,11 @@ export class QuestService extends BaseService<
       const currentState = this.stateFactory.getState(currentStatus);
       const allowedTransitions = currentState.getValidTransitions();
 
-      if (!allowedTransitions.includes(parsedNextStatus)) {
-        throw new QuestValidationError(
-          `Provided status: ${currentStatus} can not be changed to ${parsedNextStatus}`
-        );
-      }
+    if (!allowedTransitions.includes(parsedNextStatus)) {
+      throw new QuestTransitionError(
+        `Provided status: ${currentStatus} can not be changed to ${parsedNextStatus}`
+      );
+    }
 
       const targetState = this.stateFactory.getState(parsedNextStatus);
       await targetState.validateBefore(existing);

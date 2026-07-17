@@ -1,11 +1,11 @@
+import { NotFoundError } from '../errors';
 import type { AuditLog, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import type { IReadableService } from './interfaces/readable-service.interface';
 
-export class AuditNotFoundError extends Error {
+export class AuditNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Audit log with ID ${id} was not found.`);
-    this.name = 'AuditNotFoundError';
   }
 }
 
