@@ -2,6 +2,7 @@ import {
   QuestService,
   QuestNotFoundError,
   QuestValidationError,
+  QuestTransitionError,
 } from '../../../../src/services/quest/quest.service';
 import type { QuestRepository } from '../../../../src/repositories/quest.repository';
 import type { Quest, QuestStatus } from '../../../../src/generated/prisma/client';
@@ -110,6 +111,7 @@ describe('QuestService', () => {
       await expect(service.create({ ...input, status: 'COMPLETED' })).rejects.toThrow(
         QuestValidationError
       );
+
       expect(mockQuestRepository.create).not.toHaveBeenCalled();
     });
 
@@ -268,11 +270,11 @@ describe('QuestService', () => {
       expect(result).toEqual(updatedQuest);
     });
 
-    it('Should throw a QuestValidationError when changing status from PENDING to COMPLETED', async () => {
+    it('Should throw a QuestTransitionError when changing status from PENDING to COMPLETED', async () => {
       mockQuestRepository.findById.mockResolvedValue(mockQuest);
 
       await expect(service.update('1', { status: 'COMPLETED' })).rejects.toThrow(
-        QuestValidationError
+        QuestTransitionError
       );
       expect(mockPendingState.getValidTransitions).toHaveBeenCalled();
       expect(mockCompletedState.validateBefore).not.toHaveBeenCalled();

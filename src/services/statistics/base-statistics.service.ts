@@ -1,9 +1,9 @@
 import type { IEntityStatistics } from './entity-statistics.interface';
+import { NotFoundError } from '../../errors';
 
-export class StatisticNotFoundError extends Error {
+export class StatisticNotFoundError extends NotFoundError {
   constructor(statistic: string, entity: string) {
     super(`Statistic '${statistic}' not found for entity '${entity}'`);
-    this.name = 'StatisticNotFoundError';
   }
 }
 
