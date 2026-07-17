@@ -1,8 +1,11 @@
 import { type EventManager } from '../../events/event-manager';
 import type { Prisma, Quest, QuestStatus } from '../../generated/prisma/client';
 import type { IBasicRepository } from '../../repositories/interfaces/basic-repository.interface';
+import { type ISearchableRepository } from '../../repositories/interfaces/searchable-repository.interface';
 import { BaseService } from '../base-service.abstract';
 import type { EntityExistenceValidator } from '../entity-existence-validator';
+import { type ISearchResult } from '../interfaces/search-result.interface';
+import { type ISearchableService } from '../interfaces/searchable-service.interface';
 import { type QuestStateFactory } from './quest-state-factory';
 
 export class QuestNotFoundError extends Error {
@@ -19,22 +22,29 @@ export class QuestValidationError extends Error {
   }
 }
 
+type QuestRepositoryType = IBasicRepository<
+  Quest,
+  Prisma.QuestUncheckedCreateInput,
+  Prisma.QuestUncheckedUpdateInput
+> &
+  ISearchableRepository<Quest>;
+
 interface QuestServiceDependencies {
-  repository: IBasicRepository<
-    Quest,
-    Prisma.QuestUncheckedCreateInput,
-    Prisma.QuestUncheckedUpdateInput
-  >;
+  repository: QuestRepositoryType;
   monsterExistence: EntityExistenceValidator;
   stateFactory: QuestStateFactory;
   events: EventManager;
 }
 
-export class QuestService extends BaseService<
-  Quest,
-  Prisma.QuestUncheckedCreateInput,
-  Prisma.QuestUncheckedUpdateInput
-> {
+export class QuestService
+  extends BaseService<
+    Quest,
+    Prisma.QuestUncheckedCreateInput,
+    Prisma.QuestUncheckedUpdateInput,
+    QuestRepositoryType
+  >
+  implements ISearchableService
+{
   private readonly monsterExistence: EntityExistenceValidator;
   private readonly stateFactory: QuestStateFactory;
 
@@ -42,6 +52,16 @@ export class QuestService extends BaseService<
     super(deps.repository, deps.events);
     this.monsterExistence = deps.monsterExistence;
     this.stateFactory = deps.stateFactory;
+  }
+
+  async search(query: string): Promise<ISearchResult> {
+    const trimed = query.trim();
+    const data = await this.repository.search(trimed);
+
+    return {
+      resourceName: 'Quests',
+      result: data,
+    };
   }
 
   protected get entityName(): string {
