@@ -55,8 +55,7 @@ export class QuestService
   }
 
   async search(query: string): Promise<ISearchResult> {
-    const trimed = query.trim();
-    const data = await this.repository.search(trimed);
+    const data = await this.repository.search(query);
 
     return {
       resourceName: 'Quests',
