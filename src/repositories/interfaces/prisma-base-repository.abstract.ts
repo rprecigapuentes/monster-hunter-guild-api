@@ -1,12 +1,12 @@
 import { Prisma } from '../../generated/prisma/client';
 import type { IBasicRepository } from './basic-repository.interface';
 
-export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
+export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput, TWhereInput> {
   create(args: { data: TCreateInput }): Promise<TModel>;
   update(args: { where: { id: string }; data: TUpdateInput }): Promise<TModel>;
   delete(args: { where: { id: string } }): Promise<unknown>;
   findUnique(args: { where: { id: string } }): Promise<TModel | null>;
-  findMany(args?: unknown): Promise<TModel[]>;
+  findMany(args?: { where?: TWhereInput; orderBy?: unknown }): Promise<TModel[]>;
   aggregate(args: unknown): Promise<unknown>;
   count(args?: unknown): Promise<number>;
 }
@@ -15,8 +15,11 @@ export abstract class PrismaBaseRepository<
   TModel,
   TCreateInput,
   TUpdateInput,
+  TWhereInput,
 > implements IBasicRepository<TModel, TCreateInput, TUpdateInput> {
-  constructor(protected model: PrismaModelDelegate<TModel, TCreateInput, TUpdateInput>) {}
+  constructor(
+    protected model: PrismaModelDelegate<TModel, TCreateInput, TUpdateInput, TWhereInput>
+  ) {}
 
   async create(data: TCreateInput): Promise<TModel> {
     return await this.model.create({ data });

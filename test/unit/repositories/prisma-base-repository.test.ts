@@ -34,13 +34,21 @@ interface MockUpdateInput {
   headquarters?: string;
 }
 
+interface MockWhereInput {
+  OR?: Array<{
+    name?: { contains: string; mode?: string };
+    region?: { contains: string; mode?: string };
+  }>;
+}
+
 class TestGuildRepository extends PrismaBaseRepository<
   MockModel,
   MockCreateInput,
-  MockUpdateInput
+  MockUpdateInput,
+  MockWhereInput
 > {
   constructor() {
-    super(prisma.guild);
+    super(prisma.guild as any);
   }
 }
 
@@ -153,18 +161,18 @@ describe('PrismaRepository', () => {
   describe('count', () => {
     it('should call prisma.guild.count and return the total amount of records', async () => {
       mockGuildModel.count.mockResolvedValue(12);
- 
+
       const result = await repository.count();
- 
+
       expect(mockGuildModel.count).toHaveBeenCalledTimes(1);
       expect(result).toBe(12);
     });
- 
+
     it('should return 0 when the table is empty', async () => {
       mockGuildModel.count.mockResolvedValue(0);
- 
+
       const result = await repository.count();
- 
+
       expect(result).toBe(0);
     });
   });

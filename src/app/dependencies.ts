@@ -28,6 +28,8 @@ import { MonsterStatisticsService } from '../services/statistics/monster-statist
 import { AuditObserver } from '../events/observers/audit.observer';
 import { AuditService } from '../services/audit.service';
 import { AuditController } from '../controllers/audit.controller';
+import { SearchService } from '../services/search.service';
+import { SearchController } from '../controllers/search.controller';
 
 // EventManager
 
@@ -96,6 +98,15 @@ const rewardDistributionService = new RewardDistributionService({
   strategy: defaultRewardDistributionStrategy,
 });
 
+// Search
+const searchService = new SearchService([
+  hunterService,
+  monsterService,
+  guildService,
+  questService,
+]);
+
+export const searchController = new SearchController(searchService);
 //Statistics
 const statisticsService = new StatisticsService({
   statistics: [

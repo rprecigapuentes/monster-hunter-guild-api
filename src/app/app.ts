@@ -7,6 +7,7 @@ import questRoutes from '../routes/quest.routes';
 import questAssignmentRoutes from '../routes/quest-assignment.routes';
 import statisticsRoutes from '../routes/statistics.routes';
 import auditRoutes from '../routes/audit.routes';
+import searchRoutes from '../routes/search.routes';
 import { errorHandler } from '../middlewares/error-handler.middleware';
 import { notFound } from '../middlewares/not-found.middleware';
 
@@ -27,6 +28,7 @@ app.use('/quest-assignments', questAssignmentRoutes);
 app.use('/stats', statisticsRoutes);
 
 app.use('/audits', auditRoutes);
+app.use('/search', searchRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

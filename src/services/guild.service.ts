@@ -2,6 +2,9 @@ import type { Guild, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { EventManager } from '../events/event-manager';
+import { type ISearchableRepository } from '../repositories/interfaces/searchable-repository.interface';
+import { type ISearchableService } from './interfaces/searchable-service.interface';
+import { type ISearchResult } from './interfaces/search-result.interface';
 import { NotFoundError, ValidationError } from '../errors';
 
 export class GuildNotFoundError extends NotFoundError {
@@ -15,17 +18,25 @@ export class GuildValidationError extends ValidationError {
     super(message);
   }
 }
-
-export class GuildService extends BaseService<
+type GuildRepositoryType = IBasicRepository<
   Guild,
   Prisma.GuildCreateInput,
   Prisma.GuildUpdateInput
-> {
-  constructor(
-    repository: IBasicRepository<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput>,
-    events: EventManager
-  ) {
+> &
+  ISearchableRepository<Guild>;
+export class GuildService
+  extends BaseService<Guild, Prisma.GuildCreateInput, Prisma.GuildUpdateInput, GuildRepositoryType>
+  implements ISearchableService
+{
+  constructor(repository: GuildRepositoryType, events: EventManager) {
     super(repository, events);
+  }
+  async search(query: string): Promise<ISearchResult> {
+    const data = await this.repository.search(query);
+    return {
+      resourceName: 'Guilds',
+      result: data,
+    };
   }
 
   protected get entityName(): string {

@@ -2,6 +2,9 @@ import type { Monster, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { EventManager } from '../events/event-manager';
+import { type ISearchableRepository } from '../repositories/interfaces/searchable-repository.interface';
+import { type ISearchableService } from './interfaces/searchable-service.interface';
+import { type ISearchResult } from './interfaces/search-result.interface';
 import { NotFoundError, ValidationError } from '../errors';
 
 export class MonsterNotFoundError extends NotFoundError {
@@ -16,16 +19,32 @@ export class MonsterValidationError extends ValidationError {
   }
 }
 
-export class MonsterService extends BaseService<
+type MonsterRepositoryType = IBasicRepository<
   Monster,
   Prisma.MonsterCreateInput,
   Prisma.MonsterUpdateInput
-> {
-  constructor(
-    repository: IBasicRepository<Monster, Prisma.MonsterCreateInput, Prisma.MonsterUpdateInput>,
-    events: EventManager
-  ) {
+> &
+  ISearchableRepository<Monster>;
+
+export class MonsterService
+  extends BaseService<
+    Monster,
+    Prisma.MonsterCreateInput,
+    Prisma.MonsterUpdateInput,
+    MonsterRepositoryType
+  >
+  implements ISearchableService
+{
+  constructor(repository: MonsterRepositoryType, events: EventManager) {
     super(repository, events);
+  }
+  async search(query: string): Promise<ISearchResult> {
+    const data = await this.repository.search(query);
+
+    return {
+      resourceName: 'Monsters',
+      result: data,
+    };
   }
 
   protected get entityName(): string {

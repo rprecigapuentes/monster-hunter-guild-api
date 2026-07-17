@@ -3,6 +3,9 @@ import type { Hunter, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
 import type { EventManager } from '../events/event-manager';
+import { type ISearchableRepository } from '../repositories/interfaces/searchable-repository.interface';
+import { type ISearchableService } from './interfaces/searchable-service.interface';
+import { type ISearchResult } from './interfaces/search-result.interface';
 import type { IRankCalculationStrategy } from '../strategies/rank/interfaces/rank-calculation-strategy.interface';
 import { NotFoundError, ValidationError } from '../errors';
 
@@ -18,23 +21,38 @@ export class HunterValidationError extends ValidationError {
   }
 }
 
-export class HunterService extends BaseService<
+type HunterRepositoryType = IBasicRepository<
   Hunter,
   Prisma.HunterUncheckedCreateInput,
   Prisma.HunterUncheckedUpdateInput
-> {
+> &
+  ISearchableRepository<Hunter>;
+
+export class HunterService
+  extends BaseService<
+    Hunter,
+    Prisma.HunterUncheckedCreateInput,
+    Prisma.HunterUncheckedUpdateInput,
+    HunterRepositoryType
+  >
+  implements ISearchableService
+{
   private static readonly INITIAL_EXPERIENCE = 0;
 
   constructor(
-    repository: IBasicRepository<
-      Hunter,
-      Prisma.HunterUncheckedCreateInput,
-      Prisma.HunterUncheckedUpdateInput
-    >,
+    repository: HunterRepositoryType,
     private readonly rankStrategy: IRankCalculationStrategy,
     events: EventManager
   ) {
     super(repository, events);
+  }
+  async search(query: string): Promise<ISearchResult> {
+    const data = await this.repository.search(query);
+
+    return {
+      resourceName: 'Hunters',
+      result: data,
+    };
   }
 
   protected get entityName(): string {

@@ -1,17 +1,8 @@
 import { HunterRepository } from '../../../src/repositories/hunter.repository';
-import type { PrismaModelDelegate } from '../../../src/repositories/interfaces/prisma-base-repository.abstract';
-import type { Hunter, Prisma } from '../../../src/generated/prisma/client';
 
 describe('HunterRepository', () => {
   let repository: HunterRepository;
-  let mockHunterModel: jest.Mocked<
-    PrismaModelDelegate<
-      Hunter,
-      Prisma.HunterUncheckedCreateInput,
-      Prisma.HunterUncheckedUpdateInput
-    >
-  >;
-
+  let mockPrismaModel: any;
   const mockHunters = [
     { id: '1', name: 'Aiden', rank: 2, experiencePoints: 2000, guildId: 'g1' },
     { id: '2', name: 'Rin', rank: 2, experiencePoints: 1500, guildId: 'g2' },
@@ -19,38 +10,54 @@ describe('HunterRepository', () => {
   ];
 
   beforeEach(() => {
-    mockHunterModel = {
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      findUnique: jest.fn(),
+    mockPrismaModel = {
       findMany: jest.fn(),
-      count: jest.fn(),
-    } as unknown as jest.Mocked<
-      PrismaModelDelegate<
-        Hunter,
-        Prisma.HunterUncheckedCreateInput,
-        Prisma.HunterUncheckedUpdateInput
-      >
-    >;
+    };
+    repository = new HunterRepository(mockPrismaModel);
+  });
 
-    repository = new HunterRepository(mockHunterModel);
+  describe('search', () => {
+    it('should search by name when query is NOT a number', async () => {
+      mockPrismaModel.findMany.mockResolvedValue([]);
+
+      const query = 'Aiden';
+      await repository.search(query);
+
+      expect(mockPrismaModel.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ name: { contains: query } }],
+        },
+      });
+    });
+
+    it('should append numeric conditions for rank and experiencePoints', async () => {
+      mockPrismaModel.findMany.mockResolvedValue([]);
+
+      const query = '12';
+      await repository.search(query);
+
+      expect(mockPrismaModel.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ name: { contains: query } }, { rank: 12 }, { experiencePoints: 12 }],
+        },
+      });
+    });
   });
 
   describe('hunterLeaderboard', () => {
     it('Should call prisma.hunter.findMany ordered by rank and experience points descending', async () => {
-      mockHunterModel.findMany.mockResolvedValue(mockHunters as never);
+      mockPrismaModel.findMany.mockResolvedValue(mockHunters as never);
 
       const result = await repository.hunterLeaderboard();
 
-      expect(mockHunterModel.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaModel.findMany).toHaveBeenCalledWith({
         orderBy: [{ rank: 'desc' }, { experiencePoints: 'desc' }],
       });
       expect(result).toEqual(mockHunters);
     });
 
     it('Should return an empty array when there are no hunters', async () => {
-      mockHunterModel.findMany.mockResolvedValue([]);
+      mockPrismaModel.findMany.mockResolvedValue([]);
 
       const result = await repository.hunterLeaderboard();
 

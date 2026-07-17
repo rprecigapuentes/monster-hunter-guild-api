@@ -2,9 +2,18 @@ import type { IBasicRepository } from '../repositories/interfaces/basic-reposito
 import type { IExistenceChecker } from './interfaces/existence-checker.interface';
 import type { EventManager } from '../events/event-manager';
 
-export abstract class BaseService<TModel, TCreateInput, TUpdateInput> implements IExistenceChecker {
+export abstract class BaseService<
+  TModel,
+  TCreateInput,
+  TUpdateInput,
+  TRepository extends IBasicRepository<TModel, TCreateInput, TUpdateInput> = IBasicRepository<
+    TModel,
+    TCreateInput,
+    TUpdateInput
+  >,
+> implements IExistenceChecker {
   constructor(
-    protected readonly repository: IBasicRepository<TModel, TCreateInput, TUpdateInput>,
+    protected readonly repository: TRepository,
     protected readonly events: EventManager
   ) {}
 
