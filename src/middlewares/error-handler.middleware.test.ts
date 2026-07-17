@@ -1,6 +1,18 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Prisma } from '../generated/prisma/client';
 import { errorHandler } from './error-handler.middleware';
+import { NotFoundError, ValidationError } from '../errors';
+import { logger } from '../lib/logger';
+
+jest.mock('../lib/logger', () => ({
+  logger: {
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+class TestNotFoundError extends NotFoundError {}
+class TestValidationError extends ValidationError {}
 
 describe('errorHandler', () => {
   let req: Request;
@@ -8,24 +20,18 @@ describe('errorHandler', () => {
   let next: NextFunction;
   let jsonMock: jest.Mock;
   let statusMock: jest.Mock;
-  let consoleSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     jsonMock = jest.fn();
     statusMock = jest.fn().mockReturnValue({ json: jsonMock });
-    req = {} as Request;
+    req = { path: '/test', method: 'GET' } as Request;
     res = { status: statusMock } as unknown as Response;
     next = jest.fn();
-    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  afterEach(() => {
-    consoleSpy.mockRestore();
-  });
-
-  it('responds with 404 when the error name ends with NotFoundError', () => {
-    const error = new Error('Hunter with id 1 was not found');
-    error.name = 'HunterNotFoundError';
+  it('responds with 404 when the error is a NotFoundError subclass', () => {
+    const error = new TestNotFoundError('Hunter with id 1 was not found');
 
     errorHandler(error, req, res, next);
 
@@ -33,9 +39,8 @@ describe('errorHandler', () => {
     expect(jsonMock).toHaveBeenCalledWith({ message: 'Hunter with id 1 was not found' });
   });
 
-  it('responds with 400 when the error name ends with ValidationError', () => {
-    const error = new Error('Name is required');
-    error.name = 'HunterValidationError';
+  it('responds with 400 when the error is a ValidationError subclass', () => {
+    const error = new TestValidationError('Name is required');
 
     errorHandler(error, req, res, next);
 
@@ -63,7 +68,10 @@ describe('errorHandler', () => {
 
     errorHandler(error, req, res, next);
 
-    expect(consoleSpy).toHaveBeenCalledWith(error);
+    expect(logger.error).toHaveBeenCalledWith(
+      'Unhandled error',
+      expect.objectContaining({ error })
+    );
     expect(statusMock).toHaveBeenCalledWith(500);
     expect(jsonMock).toHaveBeenCalledWith({ message: 'Internal server error' });
   });

@@ -2,6 +2,7 @@ import {
   QuestAssignmentService,
   QuestAssignmentNotFoundError,
   QuestAssignmentValidationError,
+  QuestAssignmentConflictError,
 } from '../../../src/services/quest-assignment.service';
 import type { QuestAssignmentRepository } from '../../../src/repositories/quest-assignment.repository';
 import type { QuestAssignment, Hunter, Quest } from '../../../src/generated/prisma/client';
@@ -88,7 +89,7 @@ describe('QuestAssignmentService', () => {
       mockHunterExistence.ensure.mockResolvedValue(undefined);
       mockRepository.findAll.mockResolvedValue([mockAssignment]);
 
-      await expect(service.create(input)).rejects.toThrow(QuestAssignmentValidationError);
+      await expect(service.create(input)).rejects.toThrow(QuestAssignmentConflictError);
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
@@ -101,7 +102,7 @@ describe('QuestAssignmentService', () => {
 
       await expect(
         service.create({ hunterId: 'h1', questId: 'q1', role: 'Leader' })
-      ).rejects.toThrow(QuestAssignmentValidationError);
+      ).rejects.toThrow(QuestAssignmentConflictError);
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
   });
@@ -146,7 +147,7 @@ describe('QuestAssignmentService', () => {
       ]);
 
       await expect(service.update('a1', { role: 'Leader' })).rejects.toThrow(
-        QuestAssignmentValidationError
+        QuestAssignmentConflictError
       );
       expect(mockRepository.update).not.toHaveBeenCalled();
     });
