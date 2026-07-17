@@ -18,6 +18,10 @@ export class SearchService implements ISearchService {
     });
 
     const results = await Promise.all(searchPromises);
-    return results.flat();
+    return results
+      .flat()
+      .filter(
+        (searchResult) => searchResult && searchResult.result && searchResult.result.length > 0
+      );
   }
 }
