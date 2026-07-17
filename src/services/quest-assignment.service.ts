@@ -123,6 +123,7 @@ export class QuestAssignmentService extends BaseService<
 
   private ensureQuestHasNoLeaderYet(questAssignments: QuestAssignment[], role: QuestRole): void {
     if (role === 'Leader' && questAssignments.some((a) => a.role === 'Leader')) {
-      throw new QuestAssignmentConflictError('Quest already has a Leader');    }
+      throw new QuestAssignmentConflictError('Quest already has a Leader');
+    }
   }
 }

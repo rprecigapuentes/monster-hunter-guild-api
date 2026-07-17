@@ -1,11 +1,11 @@
-export abstract class ApplicationError extends Error{
-    abstract readonly statusCode: number;
-    readonly isOperational = true;
+export abstract class ApplicationError extends Error {
+  abstract readonly statusCode: number;
+  readonly isOperational = true;
 
-    constructor(message: string) {
-        super(message);
-        this.name = this.constructor.name;
-        Object.setPrototypeOf(this, new.target.prototype);
-        Error.captureStackTrace?.(this, this.constructor);
-    }
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+    Object.setPrototypeOf(this, new.target.prototype);
+    Error.captureStackTrace?.(this, this.constructor);
+  }
 }

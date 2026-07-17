@@ -35,7 +35,9 @@ export class RewardDistributionService {
     const assignments = await questAssignmentService.findByQuest(questId);
 
     if (assignments.length === 0) {
-      throw new RewardDistributionError(`Cannot distribute reward: quest ${questId} has no assignments`);
+      throw new RewardDistributionError(
+        `Cannot distribute reward: quest ${questId} has no assignments`
+      );
     }
 
     const distribution = this.strategy.distribute(reward, assignments);

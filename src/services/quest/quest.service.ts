@@ -105,11 +105,11 @@ export class QuestService extends BaseService<
       const currentState = this.stateFactory.getState(currentStatus);
       const allowedTransitions = currentState.getValidTransitions();
 
-    if (!allowedTransitions.includes(parsedNextStatus)) {
-      throw new QuestTransitionError(
-        `Provided status: ${currentStatus} can not be changed to ${parsedNextStatus}`
-      );
-    }
+      if (!allowedTransitions.includes(parsedNextStatus)) {
+        throw new QuestTransitionError(
+          `Provided status: ${currentStatus} can not be changed to ${parsedNextStatus}`
+        );
+      }
 
       const targetState = this.stateFactory.getState(parsedNextStatus);
       await targetState.validateBefore(existing);
