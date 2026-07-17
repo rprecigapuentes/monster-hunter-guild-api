@@ -1,10 +1,10 @@
 import type { Request, Response, NextFunction } from 'express';
-import { Prisma } from '../generated/prisma/client';
-import { errorHandler } from './error-handler.middleware';
-import { NotFoundError, ValidationError } from '../errors';
-import { logger } from '../lib/logger';
+import { Prisma } from '../../../src/generated/prisma/client';
+import { errorHandler } from '../../../src/middlewares/error-handler.middleware';
+import { NotFoundError, ValidationError } from '../../../src/errors';
+import { logger } from '../../../src/lib/logger';
 
-jest.mock('../lib/logger', () => ({
+jest.mock('../../../src/lib/logger', () => ({
   logger: {
     warn: jest.fn(),
     error: jest.fn(),

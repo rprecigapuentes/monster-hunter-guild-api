@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { notFound } from './not-found.middleware';
+import { notFound } from '../../../src/middlewares/not-found.middleware';
 
 describe('notFound', () => {
   it('responds with 404 and a route-not-found message', () => {

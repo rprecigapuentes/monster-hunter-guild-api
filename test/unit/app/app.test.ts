@@ -1,5 +1,6 @@
 import request, { type Response } from 'supertest';
-import app from './app';
+import app from '../../../src/app/app';
+
 
 describe('GET /', () => {
   let response: Response;
