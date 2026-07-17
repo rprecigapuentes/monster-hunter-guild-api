@@ -4,6 +4,7 @@ import { StatisticsController } from '../../../src/controllers/statistics.contro
 import { StatisticsService } from '../../../src/services/statistics/statistics.service';
 import { errorHandler } from '../../../src/middlewares/error-handler.middleware';
 import { notFound } from '../../../src/middlewares/not-found.middleware';
+import { StatisticNotFoundError } from '../../../src/services/statistics/base-statistics.service';
 
 describe('StatisticsController', () => {
   let app: Express;
@@ -60,13 +61,15 @@ describe('StatisticsController', () => {
       expect(response.body).toBe(1250.5);
     });
 
-    it('Should respond with 200 and null when the statistic does not exist', async () => {
-      mockStatisticsService.getStatistic.mockResolvedValue(null);
+    it('Should call next(error) when the service rejects with StatisticNotFoundError', async () => {
+      mockStatisticsService.getStatistic.mockRejectedValue(
+        new StatisticNotFoundError('unknownStat', 'quests')
+      );
 
       const response = await request(app).get('/statistics/quests/unknownStat');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toBeNull();
+      expect(mockStatisticsService.getStatistic).toHaveBeenCalledWith('quests', 'unknownStat');
+      expect(response.status).not.toBe(200);
     });
 
     it('Should respond with 500 when an unexpected error occurs', async () => {

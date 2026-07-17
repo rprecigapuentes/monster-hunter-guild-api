@@ -5,11 +5,15 @@ import type { StatisticsService } from '../services/statistics/statistics.servic
 export class StatisticsController {
   constructor(private readonly service: StatisticsService) {}
 
-  entityStatistics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  entityStatistics = async (
+    req: Request<{ entity: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { entity } = req.params;
 
-      const statistics = await this.service.getStatistics(entity as string);
+      const statistics = await this.service.getStatistics(entity);
 
       res.status(200).json(statistics);
     } catch (error) {
@@ -17,11 +21,15 @@ export class StatisticsController {
     }
   };
 
-  entityStatistic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  entityStatistic = async (
+    req: Request<{ entity: string; statistic: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { entity, statistic } = req.params;
 
-      const result = await this.service.getStatistic(entity as string, statistic as string);
+      const result = await this.service.getStatistic(entity, statistic);
 
       res.status(200).json(result);
     } catch (error) {
@@ -29,11 +37,15 @@ export class StatisticsController {
     }
   };
 
-  globalStatistic = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  globalStatistic = async (
+    req: Request<{ statistic: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { statistic } = req.params;
 
-      const result = await this.service.getGlobalStatistic(statistic as string);
+      const result = await this.service.getGlobalStatistic(statistic);
 
       res.status(200).json(result);
     } catch (error) {
