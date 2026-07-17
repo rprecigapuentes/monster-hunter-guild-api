@@ -1,5 +1,6 @@
 import type { Hunter, Prisma } from '../generated/prisma/client';
 import { isStrictNumber } from '../utils/verify-strict-number';
+import type { IHunterRepository } from './interfaces/hunter-repository.interface';
 import {
   type PrismaModelDelegate,
   PrismaBaseRepository,
@@ -13,7 +14,7 @@ export class HunterRepository
     Prisma.HunterUncheckedUpdateInput,
     Prisma.HunterWhereInput
   >
-  implements ISearchableRepository<Hunter>
+  implements ISearchableRepository<Hunter>, IHunterRepository
 {
   constructor(
     prismaModel: PrismaModelDelegate<
@@ -38,5 +39,19 @@ export class HunterRepository
         OR: orConditions,
       },
     });
+  }
+  async hunterLeaderboard(): Promise<Hunter[]> {
+    const hunters = await this.model.findMany({
+      orderBy: [
+        {
+          rank: 'desc',
+        },
+        {
+          experiencePoints: 'desc',
+        },
+      ],
+    });
+
+    return hunters;
   }
 }

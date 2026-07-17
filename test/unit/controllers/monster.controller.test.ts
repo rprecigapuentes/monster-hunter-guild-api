@@ -9,27 +9,16 @@ import {
 import { errorHandler } from '../../../src/middlewares/error-handler.middleware';
 import { notFound } from '../../../src/middlewares/not-found.middleware';
 
-jest.mock('../../../src/services/monster.service', () => {
-  return {
-    MonsterNotFoundError: class MonsterNotFoundError extends Error {
-      constructor(id: string) {
-        super(`Monster with id ${id} was not found`);
-        this.name = 'MonsterNotFoundError';
-      }
-    },
-    MonsterValidationError: class MonsterValidationError extends Error {
-      constructor(message: string) {
-        super(message);
-        this.name = 'MonsterValidationError';
-      }
-    },
-  };
-});
+jest.mock('../../../src/lib/logger', () => ({
+  logger: {
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
 
 describe('MonsterController', () => {
   let app: Express;
   let mockMonsterService: jest.Mocked<MonsterService>;
-  let consoleSpy: jest.SpyInstance;
 
   const mockMonster = {
     id: 'm1',
@@ -38,14 +27,6 @@ describe('MonsterController', () => {
     rewardValue: 1500,
     species: 'undead',
   };
-
-  beforeAll(() => {
-    consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  });
-
-  afterAll(() => {
-    consoleSpy.mockRestore();
-  });
 
   beforeEach(() => {
     jest.clearAllMocks();

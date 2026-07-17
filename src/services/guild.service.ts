@@ -5,18 +5,17 @@ import type { EventManager } from '../events/event-manager';
 import { type ISearchableRepository } from '../repositories/interfaces/searchable-repository.interface';
 import { type ISearchableService } from './interfaces/searchable-service.interface';
 import { type ISearchResult } from './interfaces/search-result.interface';
+import { NotFoundError, ValidationError } from '../errors';
 
-export class GuildNotFoundError extends Error {
+export class GuildNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Guild with id ${id} was not found`);
-    this.name = 'GuildNotFoundError';
   }
 }
 
-export class GuildValidationError extends Error {
+export class GuildValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = 'GuildValidationError';
   }
 }
 type GuildRepositoryType = IBasicRepository<

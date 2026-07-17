@@ -10,6 +10,7 @@ jest.mock('../../../src/lib/prisma', () => ({
       delete: jest.fn(),
       findUnique: jest.fn(),
       findMany: jest.fn(),
+      count: jest.fn(),
     },
   },
 }));
@@ -47,7 +48,7 @@ class TestGuildRepository extends PrismaBaseRepository<
   MockWhereInput
 > {
   constructor() {
-    super(prisma.guild);
+    super(prisma.guild as any);
   }
 }
 
@@ -154,6 +155,25 @@ describe('PrismaRepository', () => {
 
       expect(mockGuildModel.findMany).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockList);
+    });
+  });
+
+  describe('count', () => {
+    it('should call prisma.guild.count and return the total amount of records', async () => {
+      mockGuildModel.count.mockResolvedValue(12);
+
+      const result = await repository.count();
+
+      expect(mockGuildModel.count).toHaveBeenCalledTimes(1);
+      expect(result).toBe(12);
+    });
+
+    it('should return 0 when the table is empty', async () => {
+      mockGuildModel.count.mockResolvedValue(0);
+
+      const result = await repository.count();
+
+      expect(result).toBe(0);
     });
   });
 });

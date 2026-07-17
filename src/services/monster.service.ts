@@ -5,18 +5,17 @@ import type { EventManager } from '../events/event-manager';
 import { type ISearchableRepository } from '../repositories/interfaces/searchable-repository.interface';
 import { type ISearchableService } from './interfaces/searchable-service.interface';
 import { type ISearchResult } from './interfaces/search-result.interface';
+import { NotFoundError, ValidationError } from '../errors';
 
-export class MonsterNotFoundError extends Error {
+export class MonsterNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Monster with id ${id} was not found`);
-    this.name = 'MonsterNotFoundError';
   }
 }
 
-export class MonsterValidationError extends Error {
+export class MonsterValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = 'MonsterValidationError';
   }
 }
 

@@ -1,3 +1,4 @@
+import { DefaultRewardDistributionStrategy } from '../../../src/strategies/reward/default-reward-distribution.strategy';
 import { type HunterService } from '../../../src/services/hunter.service';
 import { type QuestAssignmentService } from '../../../src/services/quest-assignment.service';
 import { RewardDistributionService } from '../../../src/services/reward-distribution.service';
@@ -6,7 +7,6 @@ describe('RewardDistributionService', () => {
   let service: RewardDistributionService;
 
   let mockHunterService: jest.Mocked<HunterService>;
-
   let mockQuestAssignmentService: jest.Mocked<QuestAssignmentService>;
 
   beforeEach(() => {
@@ -21,6 +21,7 @@ describe('RewardDistributionService', () => {
     service = new RewardDistributionService({
       hunterService: mockHunterService,
       getQuestAssignmentService: () => mockQuestAssignmentService,
+      strategy: new DefaultRewardDistributionStrategy(),
     });
   });
 
@@ -47,6 +48,7 @@ describe('RewardDistributionService', () => {
     ]);
 
     await service.distributeRewards('quest-1', 1000);
+
     expect(mockHunterService.addExperience).toHaveBeenCalledWith('hunter-1', 400);
     expect(mockHunterService.addExperience).toHaveBeenCalledWith('hunter-2', 300);
     expect(mockHunterService.addExperience).toHaveBeenCalledWith('hunter-3', 300);
@@ -54,6 +56,7 @@ describe('RewardDistributionService', () => {
 
   it('Should not distribute rewards when reward is zero', async () => {
     await service.distributeRewards('quest-1', 0);
+
     expect(mockQuestAssignmentService.findByQuest).not.toHaveBeenCalled();
     expect(mockHunterService.addExperience).not.toHaveBeenCalled();
   });
@@ -69,6 +72,7 @@ describe('RewardDistributionService', () => {
     ]);
 
     await service.distributeRewards('quest-1', 1000);
+
     expect(mockHunterService.addExperience).toHaveBeenCalledWith('hunter-1', 400);
   });
 });

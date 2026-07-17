@@ -2,23 +2,22 @@ import type { CreateHunterDto, UpdateHunterDto } from '../dto/hunter.dto';
 import type { Hunter, Prisma } from '../generated/prisma/client';
 import type { IBasicRepository } from '../repositories/interfaces/basic-repository.interface';
 import { BaseService } from './base-service.abstract';
-import type { IRankCalculator } from './rank-calculator.interface';
 import type { EventManager } from '../events/event-manager';
 import { type ISearchableRepository } from '../repositories/interfaces/searchable-repository.interface';
 import { type ISearchableService } from './interfaces/searchable-service.interface';
 import { type ISearchResult } from './interfaces/search-result.interface';
+import type { IRankCalculationStrategy } from '../strategies/rank/interfaces/rank-calculation-strategy.interface';
+import { NotFoundError, ValidationError } from '../errors';
 
-export class HunterNotFoundError extends Error {
+export class HunterNotFoundError extends NotFoundError {
   constructor(id: string) {
     super(`Hunter with id ${id} not found`);
-    this.name = `HunterNotFoundError`;
   }
 }
 
-export class HunterValidationError extends Error {
+export class HunterValidationError extends ValidationError {
   constructor(message: string) {
     super(message);
-    this.name = `HunterValidationError`;
   }
 }
 
@@ -42,7 +41,7 @@ export class HunterService
 
   constructor(
     repository: HunterRepositoryType,
-    private readonly rankCalculator: IRankCalculator,
+    private readonly rankStrategy: IRankCalculationStrategy,
     events: EventManager
   ) {
     super(repository, events);
@@ -65,7 +64,7 @@ export class HunterService
   }
 
   override async create(data: CreateHunterDto): Promise<Hunter> {
-    const initialRank = this.rankCalculator.calculate(HunterService.INITIAL_EXPERIENCE);
+    const initialRank = this.rankStrategy.calculate(HunterService.INITIAL_EXPERIENCE);
     const fullData: Prisma.HunterUncheckedCreateInput = {
       ...data,
       rank: initialRank,
@@ -83,7 +82,7 @@ export class HunterService
     const hunter = await this.ensureExists(hunterId);
 
     const newExperience = hunter.experiencePoints + experienceGained;
-    const newRank = this.rankCalculator.calculate(newExperience);
+    const newRank = this.rankStrategy.calculate(newExperience);
 
     const updated = await this.repository.update(hunterId, {
       experiencePoints: newExperience,

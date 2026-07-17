@@ -5,6 +5,7 @@ import {
   PrismaBaseRepository,
 } from './interfaces/prisma-base-repository.abstract';
 import { type ISearchableRepository } from './interfaces/searchable-repository.interface';
+import type { IQuestRepository } from './interfaces/quest-repository.interface';
 
 export class QuestRepository
   extends PrismaBaseRepository<
@@ -13,7 +14,7 @@ export class QuestRepository
     Prisma.QuestUncheckedUpdateInput,
     Prisma.QuestWhereInput
   >
-  implements ISearchableRepository<Quest>
+  implements ISearchableRepository<Quest>, IQuestRepository
 {
   constructor(
     prismaModel: PrismaModelDelegate<
@@ -49,5 +50,25 @@ export class QuestRepository
         OR: orConditions,
       },
     });
+  }
+
+  async averageReward(): Promise<number> {
+    const result = (await this.model.aggregate({
+      _avg: {
+        reward: true,
+      },
+    })) as { _avg: { reward: number | null } };
+
+    return result._avg.reward ?? 0;
+  }
+
+  async countCompletedQuests(): Promise<number> {
+    const result = await this.model.count({
+      where: {
+        status: 'COMPLETED',
+      },
+    });
+
+    return result;
   }
 }

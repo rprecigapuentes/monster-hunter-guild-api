@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { validate } from './validate.middleware';
+import { validate } from '../../../src/middlewares/validate.middleware';
 
 describe('validate', () => {
   const schema = z.object({ name: z.string().min(1) });
