@@ -17,8 +17,14 @@ import { QuestAssignmentController } from '../controllers/quest-assignment.contr
 import { QuestAssignmentRepository } from '../repositories/quest-assignment.repository';
 import { RewardDistributionService } from '../services/reward-distribution.service';
 import { EntityExistenceValidator } from '../services/entity-existence-validator';
+import { StatisticsService } from '../services/statistics/statistics.service';
+import { StatisticsController } from '../controllers/statistics.controller';
 import { QuestStateFactory } from '../services/quest/quest-state-factory';
 import { EventManager } from '../events/event-manager';
+import { QuestStatisticsService } from '../services/statistics/quest-statistics.service';
+import { HunterStatisticsService } from '../services/statistics/hunter-statistics.service';
+import { GuildStatisticsService } from '../services/statistics/guild-statistics.service';
+import { MonsterStatisticsService } from '../services/statistics/monster-statistics.service';
 import { AuditObserver } from '../events/observers/audit.observer';
 import { AuditService } from '../services/audit.service';
 import { AuditController } from '../controllers/audit.controller';
@@ -89,3 +95,14 @@ const rewardDistributionService = new RewardDistributionService({
   getQuestAssignmentService: (): QuestAssignmentService => questAssignmentService,
   strategy: defaultRewardDistributionStrategy,
 });
+
+//Statistics
+const statisticsService = new StatisticsService({
+  statistics: [
+    new QuestStatisticsService(questRepository),
+    new HunterStatisticsService(hunterRepository),
+    new GuildStatisticsService(guildRepository),
+    new MonsterStatisticsService(monsterRepository),
+  ],
+});
+export const statisticsController = new StatisticsController(statisticsService);

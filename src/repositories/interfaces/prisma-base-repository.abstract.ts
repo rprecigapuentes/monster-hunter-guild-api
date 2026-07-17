@@ -6,7 +6,9 @@ export interface PrismaModelDelegate<TModel, TCreateInput, TUpdateInput> {
   update(args: { where: { id: string }; data: TUpdateInput }): Promise<TModel>;
   delete(args: { where: { id: string } }): Promise<unknown>;
   findUnique(args: { where: { id: string } }): Promise<TModel | null>;
-  findMany(): Promise<TModel[]>;
+  findMany(args?: unknown): Promise<TModel[]>;
+  aggregate(args: unknown): Promise<unknown>;
+  count(args?: unknown): Promise<number>;
 }
 
 export abstract class PrismaBaseRepository<
@@ -45,5 +47,8 @@ export abstract class PrismaBaseRepository<
   }
   async findAll(): Promise<TModel[]> {
     return await this.model.findMany();
+  }
+  async count(): Promise<number> {
+    return await this.model.count();
   }
 }
