@@ -1,7 +1,7 @@
 import { type ISearchResult } from './interfaces/search-result.interface';
 import { type ISearchableService } from './interfaces/searchable-service.interface';
 
-interface ISearchService {
+export interface ISearchService {
   globalSearch(query: string): Promise<ISearchResult[]>;
 }
 
