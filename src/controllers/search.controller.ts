@@ -4,7 +4,7 @@ import { type ISearchService } from '../services/search.service';
 export class SearchController {
   constructor(private readonly searchService: ISearchService) {}
 
-  async globalSearch(req: Request, res: Response, next: NextFunction) {
+  globalSearch = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { query } = req.query;
       if (!query || typeof query !== 'string') {
@@ -15,5 +15,5 @@ export class SearchController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
