@@ -24,6 +24,7 @@ model Guild {
   headquarters String?
 
   hunters Hunter[]
+  @@map("guild")
 }
 
 model Monster {
@@ -34,6 +35,7 @@ model Monster {
   rewardValue Int?
 
   quests      Quest[]
+  @@map("monster")
 }
 
 model Hunter {
@@ -46,6 +48,7 @@ model Hunter {
   guild Guild @relation(fields: [guildId], references: [id])
 
   assignments QuestAssignment[]
+  @@map("hunter")
 }
 
 model Quest {
@@ -59,6 +62,7 @@ model Quest {
   monster Monster @relation(fields: [monsterId], references: [id])
 
   assignments QuestAssignment[]
+  @@map("quest")
 }
 
 enum QuestStatus {
@@ -77,6 +81,7 @@ model QuestAssignment {
 
   questId String
   quest Quest @relation(fields: [questId], references: [id])
+  @@map("quest_assignment")
 }
 
 enum QuestRole {
@@ -91,4 +96,5 @@ model AuditLog {
   entity String
   entityId String?
   timestamp DateTime @default(now())
+  @@map("audit_log")
 }
