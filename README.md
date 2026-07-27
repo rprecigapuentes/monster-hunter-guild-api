@@ -20,20 +20,6 @@ Access the wiki here:
 
 ---
 
-## Wiki
-
-The complete project documentation is available in the Monster Hunter Guild Wiki, including:
-
-- Business rules
-- API endpoint reference
-- Additional technical documentation
-
-Access the wiki here:
-
-**https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/-/wikis/Monster-Hunter-Guild-API-Documentation**
-
----
-
 # Tech Stack
 
 - TypeScript
