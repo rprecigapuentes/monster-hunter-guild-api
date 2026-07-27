@@ -18,10 +18,23 @@ Access the wiki here:
 
 **https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/-/wikis/Monster-Hunter-Guild-API-Documentation**
 
+---
+
+## Wiki
+
+The complete project documentation is available in the Monster Hunter Guild Wiki, including:
+
+- Business rules
+- API endpoint reference
+- Additional technical documentation
+
+Access the wiki here:
+
+**https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/-/wikis/Monster-Hunter-Guild-API-Documentation**
 
 ---
 
-# Technologies
+# Tech Stack
 
 - TypeScript
 - Node.js
@@ -94,141 +107,6 @@ Application
       ▼
     MySQL
 ```
-
----
-
-# Prisma Schema
-
-## Guild
-
-Represents a hunter guild.
-
-Main attributes:
-
-| Field        | Type   |
-| ------------ | ------ |
-| id           | UUID   |
-| name         | string |
-| region       | string |
-| headquarters | string |
-
-Rules:
-
-- Name required
-
----
-
-## Hunter
-
-Represents a guild hunter.
-
-Main attributes:
-
-| Field            | Type   |
-| ---------------- | ------ |
-| id               | UUID   |
-| name             | string |
-| rank             | number |
-| experiencePoints | number |
-| guildId          | UUID   |
-
-Rules:
-
-- Name required
-- Rank >= 1
-- Experience >= 0
-
----
-
-## Monster
-
-Represents huntable monsters.
-
-Main attributes:
-
-| Field       | Type   |
-| ----------- | ------ |
-| id          | UUID   |
-| name        | string |
-| species     | string |
-| dangerLevel | number |
-| rewardValue | number |
-
-Rules:
-
-- Name required
-- Danger Level between 1 and 10
-- Reward Value >= 0
-
----
-
-## Quest
-
-Represents hunting missions.
-
-Main attributes:
-
-| Field     | Type   |
-| --------- | ------ |
-| id        | UUID   |
-| title     | string |
-| monsterId | UUID   |
-| location  | string |
-| reward    | number |
-| status    | string |
-
-Rules:
-
-- Monster must exist
-- Reward >= 0
-- Title required
-
-Supported states:
-
-- Pending
-- In Progress
-- Completed
-- Failed
-
----
-
-## QuestAssignment
-
-Associates hunters with quests.
-
-| Field    | Type   |
-| -------- | ------ |
-| id       | UUID   |
-| hunterId | UUID   |
-| questId  | UUID   |
-| role     | string |
-
-Allowed roles:
-
-- Leader
-- Support
-- Scout
-
-Rules:
-
-- Hunter must exist.
-- Quest must exist.
-- A hunter cannot be assigned twice to the same quest.
-- Every quest must have exactly one Leader.
-- A quest must contain at least one hunter before it can be started.
-
----
-
-## Audit
-
-Stores read-only audit history.
-
-Fields:
-
-- id
-- operation
-- entity
-- timestamp
 
 ---
 
