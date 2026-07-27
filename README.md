@@ -1,11 +1,8 @@
-
 # Monster Hunter Guild API
 
 ## Overview
 
-The **Monster Hunter Guild API** is a RESTful backend application developed with **TypeScript**, **Express**, **Prisma ORM**, and **MySQL**.
-
-The project manages the core operations of a fictional Monster Hunter Guild, including hunters, monsters, guilds, quests, quest assignments, audit history, global search, and statistics. The architecture emphasizes maintainability, extensibility, and testability by applying object-oriented programming principles, SOLID principles, dependency injection, and design patterns.
+The project manages the core operations of a fictional Monster Hunter Guild organization. It includes hunters, monsters, guilds, quests, quest assignments, audit history, global search, and statistics modules. The architecture emphasizes maintainability, extensibility, and testability by applying object-oriented programming principles, SOLID principles, dependency injection, and design patterns.
 
 ---
 
@@ -117,7 +114,7 @@ Main attributes:
 
 Rules:
 
-* Name required
+- Name required
 
 ---
 
@@ -137,9 +134,9 @@ Main attributes:
 
 Rules:
 
-* Name required
-* Rank >= 1
-* Experience >= 0
+- Name required
+- Rank >= 1
+- Experience >= 0
 
 ---
 
@@ -159,9 +156,9 @@ Main attributes:
 
 Rules:
 
-* Name required
-* Danger Level between 1 and 10
-* Reward Value >= 0
+- Name required
+- Danger Level between 1 and 10
+- Reward Value >= 0
 
 ---
 
@@ -182,9 +179,9 @@ Main attributes:
 
 Rules:
 
-* Monster must exist
-* Reward >= 0
-* Title required
+- Monster must exist
+- Reward >= 0
+- Title required
 
 Supported states:
 
@@ -208,17 +205,18 @@ Associates hunters with quests.
 
 Allowed roles:
 
-* Leader
-* Support
-* Scout
+- Leader
+- Support
+- Scout
 
 Rules:
 
-* Hunter must exist.
-* Quest must exist.
-* A hunter cannot be assigned twice to the same quest.
-* Every quest must have exactly one Leader.
-* A quest must contain at least one hunter before it can be started.
+- Hunter must exist.
+- Quest must exist.
+- A hunter cannot be assigned twice to the same quest.
+- Every quest must have exactly one Leader.
+- A quest must contain at least one hunter before it can be started.
+
 ---
 
 ## Audit
@@ -317,8 +315,11 @@ tests/
 ---
 
 # Project Abstractions
+
 ---
+
 ## Repository layer
+
 ---
 
 ### ICountable
@@ -340,12 +341,12 @@ tests/
 - PrismaBaseRepository is an abstract class that provides the implementation for all generic CRUD operations defined in IBasicRepository.
 - It implements:
 
-   create()
-   update()
-   delete()
-   findById()
-   findAll()
-   count()
+  create()
+  update()
+  delete()
+  findById()
+  findAll()
+  count()
 
 - using the injected Prisma delegate.
 - Instead of implementing these methods repeatedly for every entity, repositories simply inherit from this class.
@@ -357,7 +358,9 @@ Some entities require queries that are specific to their business logic.
 These repositories extend IBasicRepository and define only the additional methods they need. (IHuunterRepository, IQuestRepository)
 
 ---
+
 ## Service Layer
+
 ---
 
 ### BaseService
@@ -366,12 +369,12 @@ These repositories extend IBasicRepository and define only the additional method
 
 - It implements:
 
-   create()
-   update()
-   delete()
-   findById()
-   findAll()
-   exists()
+  create()
+  update()
+  delete()
+  findById()
+  findAll()
+  exists()
 
 - using an injected repository.
 
@@ -402,7 +405,9 @@ These repositories extend IBasicRepository and define only the additional method
 - Some business rules may evolve over time or require multiple implementations. Instead of hardcoding these algorithms into services, the project uses the Strategy Pattern to encapsulate interchangeable behaviors behind interfaces.
 
 ---
+
 ## Controller Layer
+
 ---
 
 ### BaseService
@@ -437,11 +442,12 @@ Business rules ensure:
 ## Quest Lifecycle Management
 
 Quests follow a controlled lifecycle:
+
 - Pending
 - In Progress
 - Completed
 - Failed
-Invalid state transitions are prevented through business validation.
+  Invalid state transitions are prevented through business validation.
 
 ## Reward Distribution
 
