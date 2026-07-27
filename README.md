@@ -92,55 +92,6 @@ npm run build
 npm start
 ```
 
-# Design Patterns
-
-## State Pattern
-
-Manages the Quest lifecycle.
-
-- Pending
-- In Progress
-- Completed
-- Failed
-
-Each state encapsulates transitions and validations.
-
-## Factory Pattern
-
-QuestStateFactory creates the appropriate state object.
-
-## Strategy Pattern
-
-RewardDistributionStrategy allows reward algorithms to be replaced without modifying the service.
-
-## Observer Pattern
-
-Business events are published through EventManager.
-
-Observers generate audit records while remaining decoupled from business services.
-
----
-
-# Object-Oriented Programming
-
-## Encapsulation
-
-Business rules are hidden inside services.
-
-## Abstraction
-
-Interfaces define repository and service contracts.
-
-## Inheritance
-
-Implemented through BaseService and BaseRepository.
-
-## Polymorphism
-
-Services depend on abstractions rather than concrete implementations.
-
----
-
 # SOLID Principles
 
 ## Single Responsibility Principle
