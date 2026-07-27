@@ -92,44 +92,6 @@ npm run build
 npm start
 ```
 
-# SOLID Principles
-
-## Single Responsibility Principle
-
-Each layer and classes have one responsibility.
-
-## Open/Closed Principle
-
-New quest states and reward strategies can be added without modifying existing code.
-
-## Liskov Substitution Principle
-
-Concrete repositories and services can replace their abstractions.
-
-## Interface Segregation Principle
-
-Specialized repositories expose only methods relevant to their entity.
-
-## Dependency Inversion Principle
-
-High-level modules depend on interfaces.
-
-Dependency injection is configured centrally.
-
----
-
-# Exception Handling
-
-A global middleware handles application exceptions.
-
-Benefits:
-
-- No repetitive try/catch blocks
-- Consistent API responses
-- Cleaner controllers
-
----
-
 # Unit Testing
 
 Run all tests
@@ -147,11 +109,3 @@ Tests cover:
 - State transitions
 - Strategy implementations
 - Observer notifications
-
----
-
-# Known Limitations
-
-- Statistics expose predefined metrics only.
-- Search supports only implemented entities.
-- Folder organization is getting bigger and could be changed.
