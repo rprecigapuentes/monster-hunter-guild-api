@@ -9,6 +9,21 @@ The project manages the core operations of a fictional Monster Hunter Guild, inc
 
 ---
 
+## Wiki
+
+The complete project documentation is available in the Monster Hunter Guild Wiki, including:
+
+- Business rules
+- API endpoint reference
+- Additional technical documentation
+
+Access the wiki here:
+
+**https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/-/wikis/Monster-Hunter-Guild-API-Documentation**
+
+
+---
+
 # Technologies
 
 - TypeScript
