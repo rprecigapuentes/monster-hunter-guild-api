@@ -1,0 +1,16 @@
+node_modules
+dist
+src/generated
+coverage
+.env
+.git
+.gitignore
+.gitlab-ci.yml
+Dockerfile
+.dockerignore
+**/*.md
+docs
+demo-example.txt
+.prettierignore
+.prettierrc
+eslint.config.js
