@@ -60,6 +60,46 @@ npm install
 
 Create a `.env` file with your database connection string.
 
+## Run with Docker
+
+Both the API and MySQL run as containers. 
+
+1. Start MySQL:
+
+```bash
+docker run -d --name mhg-mysql \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=monster_hunter_guild \
+  -p 3307:3306 \
+  mysql:8.4.11 --lower-case-table-names=1
+```
+
+2. Wait until `docker logs mhg-mysql` shows `ready for connections ... port: 3306` (about 20 s on first start).
+
+3. Point `.env` at the host's IP (containers cannot reach MySQL through `localhost`). Get it with `ip a` and use port `3307`:
+
+```bash
+DATABASE_URL=mysql://root:root@<host-ip>:3307/monster_hunter_guild
+DATABASE_HOST=<host-ip>
+DATABASE_PORT=3307
+```
+
+4. Build and run the API (migrations run automatically on start):
+
+```bash
+docker build -t monster-hunter-guild-api:1.0.0 .
+docker run --rm --name mhg-api -p 3000:3000 --env-file .env monster-hunter-guild-api:1.0.0
+```
+
+The API listens on `http://localhost:3000`.
+
+5. Tear down:
+
+```bash
+docker stop mhg-api
+docker rm -f mhg-mysql
+```
+
 ## Prisma Commands
 
 Generate Prisma Client
