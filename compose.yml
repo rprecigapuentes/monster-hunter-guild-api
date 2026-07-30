@@ -1,0 +1,20 @@
+services:
+  mysql-db:
+    image: mysql:8.4.11
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+    command: --lower-case-table-names=1
+    ports:
+      - 3307:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mhg-network
+
+volumes:
+  mysql_data:
+
+networks:
+  mhg-network:
