@@ -7,16 +7,28 @@ services:
       MYSQL_DATABASE: ${DATABASE_NAME}
     command: --lower-case-table-names=1
     ports:
-      - ${DATABASE_PORT}:3306
+      - ${FORWARD_DATABASE_PORT}:3306
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - mhg-network
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p${DATABASE_PASSWORD}']
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          '127.0.0.1',
+          '--protocol=TCP',
+          '-u',
+          'root',
+          '-p${DATABASE_PASSWORD}',
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 30s
 
   api:
     container_name: mhg-api
