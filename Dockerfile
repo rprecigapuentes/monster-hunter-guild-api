@@ -36,6 +36,6 @@ COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 
 USER node
 
-EXPOSE 3000
+EXPOSE ${APP_PORT}
 
 CMD ["sh", "-c", "npx prisma migrate deploy && exec node dist/src/index.js"]

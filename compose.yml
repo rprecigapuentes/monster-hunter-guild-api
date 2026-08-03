@@ -1,0 +1,56 @@
+services:
+  mysql-db:
+    image: mysql:8.4.11
+    container_name: mhg-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+    command: --lower-case-table-names=1
+    ports:
+      - ${FORWARD_DATABASE_PORT}:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mhg-network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          '127.0.0.1',
+          '--protocol=TCP',
+          '-u',
+          'root',
+          '-p${DATABASE_PASSWORD}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    container_name: mhg-api
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    build: .
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      APP_PORT: ${APP_PORT}
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    networks:
+      - mhg-network
+
+volumes:
+  mysql_data:
+
+networks:
+  mhg-network:
