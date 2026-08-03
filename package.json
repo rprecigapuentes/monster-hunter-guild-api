@@ -15,7 +15,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,json,md}\"",
     "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -29,8 +30,14 @@
   },
   "homepage": "https://gitlab.com/josecarlosgvr/monster-hunter-guild#readme",
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^11.0.1",
+    "@semantic-release/gitlab": "^13.3.3",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.0.1",
@@ -42,6 +49,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "globals": "^17.7.0",
     "jest": "^30.4.2",
+    "semantic-release": "^25.0.8",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
@@ -51,9 +59,9 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "prisma": "^7.8.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "prisma": "^7.8.0",
     "winston": "^3.19.0",
     "zod": "^4.4.3"
   }
