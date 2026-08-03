@@ -37,6 +37,7 @@ Access the wiki here:
 - Prisma ORM
 - MySQL
 - Jest
+- Semantic Release
 
 ---
 
@@ -144,3 +145,23 @@ Tests cover:
 - State transitions
 - Strategy implementations
 - Observer notifications
+
+# Releases
+
+This project uses **Semantic Versioning (SemVer)** with **semantic-release** to automate version management.
+
+When changes are merged into the `main` branch, the GitLab CI/CD pipeline automatically:
+
+- Determines the next version following SemVer rules.
+- Creates a Git tag for each release.
+- Generates release notes.
+- Updates the `CHANGELOG.md` file.
+- Creates a GitLab Release.
+
+The release process is based on Conventional Commits.
+
+To validate the release configuration locally without creating a tag or release:
+
+```bash
+npx semantic-release --dry-run
+```

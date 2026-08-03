@@ -20,6 +20,7 @@ stages:
   - install
   - build
   - check
+  - release
 
 cache:
   paths:
@@ -69,3 +70,18 @@ test:
     - apt-get update && apt-get install -y default-mysql-client
     - until mysqladmin ping -h mysql -u root -proot --silent; do echo "Waiting for MySQL..."; sleep 2; done
     - npm run test:ci --silent
+
+release:
+  stage: release
+
+  needs:
+    - install_dependencies
+    - lint
+    - format_check
+    - test
+
+  script:
+    - npm run release
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
