@@ -1,6 +1,7 @@
 image: node:24
 
 variables:
+  GIT_DEPTH: "0"
   NODE_ENV: test
   MYSQL_DATABASE: monster_hunter_guild
   MYSQL_ROOT_PASSWORD: root
