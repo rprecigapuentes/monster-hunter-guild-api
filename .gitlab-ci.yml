@@ -22,6 +22,7 @@ stages:
   - install
   - build
   - check
+  - analysis
   - release
   - docker_build
   - docker_publish
@@ -74,6 +75,27 @@ test:
     - apt-get update && apt-get install -y default-mysql-client
     - until mysqladmin ping -h mysql -u root -proot --silent; do echo "Waiting for MySQL..."; sleep 2; done
     - npm run test:ci --silent
+  artifacts:
+    paths:
+      - coverage/
+
+sonarqube_check:
+  stage: analysis
+  image: sonarsource/sonar-scanner-cli:5.0.1
+  needs: [test]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - sonar-scanner
+      -Dsonar.host.url="$SONAR_HOST_URL"
+      -Dsonar.token="$SONAR_TOKEN"
+      -Dsonar.qualitygate.wait=true
 
 release:
   stage: release
