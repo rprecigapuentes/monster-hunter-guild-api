@@ -1,3 +1,10 @@
+# [1.2.0](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.1.1...v1.2.0) (2026-08-06)
+
+
+### Features
+
+* add save and docker load to the command ([c8810c2](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/commit/c8810c24cc5a5307d49e050728b765337b6b7ff5))
+
 ## [1.1.1](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.1.0...v1.1.1) (2026-08-06)
 
 
