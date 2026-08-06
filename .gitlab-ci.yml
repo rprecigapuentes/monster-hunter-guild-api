@@ -81,7 +81,7 @@ test:
 
 sonarqube_check:
   stage: analysis
-  image: sonarsource/sonar-scanner-cli:5.0.1
+  image: sonarsource/sonar-scanner-cli:8.0.1
   needs: [test]
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
