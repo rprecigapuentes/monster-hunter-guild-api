@@ -1,3 +1,10 @@
+# [1.1.0](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.0.1...v1.1.0) (2026-08-06)
+
+
+### Features
+
+* build and publish with ci ([782eb88](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/commit/782eb8824a8b6a0e4c9d872038858a72e6ec27bb))
+
 ## [1.0.1](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.0.0...v1.0.1) (2026-08-05)
 
 
