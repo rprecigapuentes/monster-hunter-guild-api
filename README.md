@@ -165,3 +165,53 @@ To validate the release configuration locally without creating a tag or release:
 ```bash
 npx semantic-release --dry-run
 ```
+
+## SonarQube — Static Code Analysis (Local)
+
+This project includes a CI stage that analyzes the code with SonarQube Community Edition. You can run the same analysis on your machine before pushing changes to `main`.
+
+### 1. Start SonarQube locally
+
+The `compose.yml` includes the `sonar_db` (Postgres) and `sonarqube` services. Start them along with the rest of the stack:
+
+```bash
+docker compose up -d
+```
+
+Wait about 30-60 seconds for SonarQube to finish starting up (the first run takes longer).
+
+### 2. Access the server and generate a token
+
+1. Open [http://localhost:9000](http://localhost:9000) in your browser.
+2. Log in with the default credentials: username `admin`, password `admin`. You'll be prompted to change it immediately.
+3. Generate a token: click your avatar (top right) → **My Account → Security**.
+   - **Name**: something identifiable, e.g. `local-<your-name>`
+   - **Type**: `Global Analysis Token`
+   - Click **Generate** and copy the token — it's only shown once.
+
+### 3. Generate the coverage report
+
+```bash
+npm run test:ci
+```
+
+This creates `coverage/lcov.info`, which the scanner needs to report coverage.
+
+### 4. Run the scanner
+
+```bash
+docker run --rm \
+  --network mhg-network \
+  -v "$(pwd):/usr/src" \
+  sonarsource/sonar-scanner-cli:5.0.1 \
+  -Dsonar.host.url=http://sonarqube:9000 \
+  -Dsonar.token=YOUR_TOKEN_HERE \
+  -Dsonar.qualitygate.wait=true
+```
+
+If everything goes well, you'll see `QUALITY GATE STATUS: PASSED` (or `FAILED`) in the console, and you can check the details on [http://localhost:9000/projects](http://localhost:9000/projects)
+
+### Notes
+
+- The local SonarQube instance is for testing only — the GitLab CI pipeline uses the server deployed at `10.27.10.184`, configured via CI/CD variables (`SONAR_HOST_URL`, `SONAR_TOKEN`).
+- The analysis stage in CI only runs on the `main` branch; it doesn't run on Merge Requests or feature branches.
