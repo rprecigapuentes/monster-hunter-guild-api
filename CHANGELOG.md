@@ -1,3 +1,10 @@
+## [1.1.1](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.1.0...v1.1.1) (2026-08-06)
+
+
+### Bug Fixes
+
+* delete unnecesary lines for pipeline ([d491b66](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/commit/d491b66be4ec64dec8757f97c59736e0151ea54a))
+
 # [1.1.0](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.0.1...v1.1.0) (2026-08-06)
 
 
