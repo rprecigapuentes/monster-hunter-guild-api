@@ -1,3 +1,10 @@
+## [1.2.1](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.2.0...v1.2.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* changed app.ts to test ansible ([7520338](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/commit/7520338a14daa933cd477677c9006a0df2de04c0))
+
 # [1.2.0](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.1.1...v1.2.0) (2026-08-06)
 
 
