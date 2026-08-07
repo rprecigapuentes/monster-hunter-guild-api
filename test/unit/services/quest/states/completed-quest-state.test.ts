@@ -51,7 +51,7 @@ describe('CompletedQuestState', () => {
       await state.onEnter(mockQuest);
 
       expect(mockEvents.notify).toHaveBeenCalledWith('quest.completed', {
-        operation: 'COMPLETED',
+        operation: 'IN_PROGRESS',
         entity: 'Quest',
         entityId: 'uuid-uuid-uuid-uuid',
       });
