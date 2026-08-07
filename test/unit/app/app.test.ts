@@ -6,8 +6,8 @@ describe('GET /', () => {
   beforeEach(async () => {
     response = await request(app).get('/').set('Accept', 'application/json');
   });
-  it('should return a "Hello Steeven!!"', () => {
-    expect(response.body).toEqual({ message: 'Hello Steeven!!' });
+  it('should return a "Hello Cochabogos!! (Thank u Steeven <3)"', () => {
+    expect(response.body).toEqual({ message: 'Hello Cochabogos!! (Thank u Steeven <3)' });
   });
 
   it('should return a 200 status code', () => {
