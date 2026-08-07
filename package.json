@@ -1,6 +1,6 @@
 {
   "name": "monster-hunter-guild",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "The world is plagued by dangerous monsters that threaten villages, cities, and trade routes.",
   "main": "dist/index.ts",
   "scripts": {

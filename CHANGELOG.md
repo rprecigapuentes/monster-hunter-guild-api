@@ -1,3 +1,11 @@
+## [1.2.2](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.2.1...v1.2.2) (2026-08-07)
+
+
+### Bug Fixes
+
+* changed hello world ([ec54fb4](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/commit/ec54fb45616883ea5d514b7ef2539650f4558a5b))
+* changed hello world unit test ([43d0773](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/commit/43d0773a301efbec38269f8c50d3b12af8734ca4))
+
 ## [1.2.1](https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/compare/v1.2.0...v1.2.1) (2026-08-07)
 
 
