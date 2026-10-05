@@ -7,6 +7,10 @@
 <img src="https://img.shields.io/badge/MySQL-v8.4.11-DD8907?&labelColor=006085&logo=mysql&logoColor=fff&style=plastic" alt="MySQL">
 <img src="https://img.shields.io/badge/Jest-v30.4.2-934258?logo=jest&style=plastic" alt="Jest">
 
+[![CI](https://github.com/rprecigapuentes/monster-hunter-guild-api/actions/workflows/ci.yml/badge.svg)](https://github.com/rprecigapuentes/monster-hunter-guild-api/actions/workflows/ci.yml)
+
+Team project of the Programming 102 module, Jalasoft Software Automation Testing Bootcamp (2026), final grade A. Deployed with a Blue/Green Ansible role in [mhg-deployments](https://github.com/rprecigapuentes/mhg-deployments). See [Team and contributions](#team-and-contributions).
+
 ---
 
 ## Overview
@@ -23,7 +27,7 @@ The complete project documentation is available in the Monster Hunter Guild Wiki
 - API endpoint reference
 - Additional technical documentation
 
-Access the wiki here:
+Access the wiki here (the GitLab wiki of the original team repository):
 
 **https://gitlab.com/jalau-bootcamps/bc-lt-at-fs-05/monster-hunter-guild/-/wikis/Monster-Hunter-Guild-API-Documentation**
 
@@ -52,8 +56,8 @@ Access the wiki here:
 ## Installation
 
 ```bash
-git clone https://gitlab.com/josecarlosgvr/monster-hunter-guild.git
-cd monster-hunter-guild
+git clone https://github.com/rprecigapuentes/monster-hunter-guild-api.git
+cd monster-hunter-guild-api
 npm install
 ```
 
@@ -215,3 +219,20 @@ If everything goes well, you'll see `QUALITY GATE STATUS: PASSED` (or `FAILED`) 
 
 - The local SonarQube instance is for testing only — the GitLab CI pipeline uses the server deployed at `10.27.10.184`, configured via CI/CD variables (`SONAR_HOST_URL`, `SONAR_TOKEN`).
 - The analysis stage in CI only runs on the `main` branch; it doesn't run on Merge Requests or feature branches.
+
+---
+
+# Team and contributions
+
+Built by a team of four developers, every change through a reviewed merge request on a protected `main`. The suite reaches 96.71 % line coverage with Jest.
+
+My contributions (Rosemberth Preciga, [@rprecigapuentes](https://github.com/rprecigapuentes)):
+
+- Quest CRUD, at 99.3 % coverage when delivered.
+- The `AbstractService` refactor that the services share.
+- Quest assignment of hunters to quests.
+- `EntityExistenceValidator`, a generic existence check applied across services.
+- The audit trail: an Observer-based `EventManager` with an `AuditObserver`, exposed through `GET /audit`.
+- The first Dockerfile, later extended by the team into the multi-stage build.
+
+The original repository and its CI (including SonarQube analysis and semantic-release) live on GitLab; this copy carries the full history and runs build, lint and tests on GitHub Actions.

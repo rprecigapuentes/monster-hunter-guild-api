@@ -1,0 +1,59 @@
+# GitHub Actions version of the install, build, check and test stages in .gitlab-ci.yml.
+# SonarQube analysis, semantic-release and the Docker publish stay on GitLab, where their
+# credentials and registry live.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    env:
+      NODE_ENV: test
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/monster_hunter_guild
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: monster_hunter_guild
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: "3306"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # A service container cannot take server flags, and the schema needs case-insensitive table names.
+      - name: Start MySQL 8.4
+        run: >-
+          docker run -d --name mysql -p 3306:3306
+          -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=monster_hunter_guild -e MYSQL_ROOT_HOST=%
+          mysql:8.4 --lower-case-table-names=1
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Wait for MySQL
+        run: |
+          for _ in $(seq 1 60); do
+            docker exec mysql mysql -uroot -proot -e "SELECT 1" monster_hunter_guild > /dev/null 2>&1 && exit 0
+            sleep 2
+          done
+          echo "MySQL never accepted connections"
+          exit 1
+
+      - run: npm run prisma:migrate
+      - run: npm run prisma:generate
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run test:ci --silent
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
